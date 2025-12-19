@@ -2,18 +2,20 @@
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <title>독서활동상황관리</title>
+    <title>독서활동상황관리 - 디자인 통합</title>
     <style>
-      /* 공통 스타일 */
+      /* [디자인 통일] 폰트 및 기본 컬러 설정 */
       * {
         box-sizing: border-box;
       }
       body {
         margin: 0;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+        font-family: "Segoe UI", -apple-system, sans-serif;
         background: #f5f6f8;
+        color: #333;
       }
+
+      /* [디자인 통일] 상단바 스타일 */
       .topbar {
         height: 48px;
         background: #f5c6cf;
@@ -21,8 +23,10 @@
         align-items: center;
         padding: 0 16px;
         font-weight: 700;
-        color: #374151;
+        border-bottom: 1px solid #e5adba; /* 테두리 추가 */
+        color: #333;
       }
+
       .container {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -30,83 +34,113 @@
       }
       .left,
       .right {
-        padding: 16px;
+        padding: 25px; /* 여백 16px -> 25px 통일 */
         background: #fff;
-        overflow: auto;
+        overflow-y: auto; /* 스크롤바 스타일 통일 */
       }
       .left {
         border-right: 1px solid #e5e7eb;
       }
 
-      /* 좌측 입력 카드 스타일 */
+      /* [디자인 통일] 입력 카드 스타일 */
       .card {
         border-radius: 12px;
-        border: 1px solid #e5e7eb;
-        background: #fafafa;
-        padding: 14px 16px 16px;
-        margin-bottom: 16px;
+        border: 1px solid #d1d5db; /* 테두리 색상 조정 */
+        background: #fff; /* 배경 흰색으로 통일 */
+        padding: 20px; /* 내부 여백 확장 */
+        margin-bottom: 20px;
         position: relative;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* 미세한 그림자 추가 */
       }
       .card-title {
         font-weight: 700;
-        margin-bottom: 10px;
-        font-size: 15px;
+        margin-bottom: 15px;
+        font-size: 16px;
+        color: #1f2937;
       }
       .field {
-        margin-bottom: 12px;
+        margin-bottom: 15px;
       }
+
+      /* [디자인 통일] 라벨 및 입력창 */
       .label {
         font-size: 13px;
         font-weight: 600;
-        color: #374151;
-        margin-bottom: 4px;
+        color: #4b5563;
+        margin-bottom: 8px;
         display: block;
       }
       .input {
         width: 100%;
-        padding: 8px 10px;
+        padding: 12px; /* 8px -> 12px 확장 */
         border-radius: 8px;
         border: 1px solid #d1d5db;
-        font-size: 13px;
+        font-size: 14px;
+        transition: border 0.2s;
         background: #fff;
       }
+      .input:focus {
+        outline: none;
+        border-color: #1f4ddc;
+        box-shadow: 0 0 0 3px rgba(31, 77, 220, 0.1);
+      }
+
+      /* [디자인 통일] 버튼 스타일 */
       .btn-row {
         display: flex;
         flex-wrap: wrap;
         justify-content: flex-end;
         gap: 8px;
-        margin-top: 16px;
-        padding-top: 8px;
-        border-top: 1px solid #eee;
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid #f3f4f6;
       }
       .btn {
+        padding: 10px 18px; /* 버튼 크기 확대 */
         border-radius: 8px;
-        border: 1px solid #d0d7e2;
-        background: #f1f5f9;
-        padding: 7px 12px;
         font-size: 13px;
         font-weight: 600;
         cursor: pointer;
+        border: 1px solid #d1d5db;
+        background: #fff;
+        transition: 0.2s;
+        color: #374151;
+      }
+      .btn:hover {
+        background: #f9fafb;
+        border-color: #9ca3af;
       }
       .btn.primary {
         background: #1f4ddc;
         border-color: #163aa5;
         color: #fff;
       }
-      .btn.danger {
-        background: #ff7f7f;
-        border-color: #d84315;
-        color: #fff;
-      }
-      .btn.add {
-        width: 100%;
-        margin-top: 12px;
-        background: #e0e7ff;
-        border-color: #c7d2fe;
-        color: #1e3a8a;
+      .btn.primary:hover {
+        background: #1b43c1;
       }
 
-      /* 자동 완성 기능 관련 스타일 */
+      .btn.danger {
+        background: #fff;
+        border-color: #ffcccc;
+        color: #e11d48;
+      }
+      .btn.danger:hover {
+        background: #fff1f2;
+      }
+
+      .btn.add {
+        width: 100%;
+        margin-top: 15px;
+        background: #eff6ff;
+        border-color: #bfdbfe;
+        color: #1d4ed8;
+        padding: 12px;
+      }
+      .btn.add:hover {
+        background: #dbeafe;
+      }
+
+      /* 자동 완성 */
       .autocomplete-wrapper {
         position: relative;
       }
@@ -115,88 +149,84 @@
         top: 100%;
         left: 0;
         right: 0;
-        z-index: 10;
+        z-index: 100;
         background: #fff;
         border: 1px solid #d1d5db;
         border-top: none;
         border-radius: 0 0 8px 8px;
         max-height: 200px;
         overflow-y: auto;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
       }
       .autocomplete-item {
-        padding: 8px 10px;
-        font-size: 13px;
+        padding: 10px 15px;
+        font-size: 14px;
         cursor: pointer;
       }
       .autocomplete-item:hover,
       .autocomplete-item.selected {
-        background: #f0f6ff;
+        background: #eff6ff;
         color: #1f4ddc;
       }
 
-      /* 카드 내부 학생 선택 영역 스타일 */
+      /* 학생 선택 영역 */
       .student-selector-area {
-        margin-top: 16px;
-        padding-top: 16px;
-        border-top: 1px solid #eee;
-        margin-bottom: 12px;
-      }
-      .student-selector-area .label {
-        margin-bottom: 8px;
-        font-size: 14px;
-        font-weight: 700;
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid #f3f4f6;
+        margin-bottom: 10px;
       }
       .student-buttons {
         display: flex;
         flex-wrap: wrap;
-        gap: 6px;
-        margin-bottom: 8px;
+        gap: 8px;
+        margin-bottom: 10px;
       }
       .student-select-btn {
-        padding: 6px 10px;
-        border-radius: 999px;
+        padding: 8px 14px;
+        border-radius: 20px;
         border: 1px solid #d1d5db;
-        background: #f9f9f9;
+        background: #fff;
         font-size: 13px;
         cursor: pointer;
-        white-space: nowrap;
-        transition: all 0.1s ease;
+        transition: 0.2s;
+        color: #4b5563;
+      }
+      .student-select-btn:hover {
+        background: #f3f4f6;
       }
       .student-select-btn.active {
         background: #1f4ddc;
         color: #fff;
         border-color: #1f4ddc;
         font-weight: 600;
-        transform: translateY(-1px);
       }
       .selection-controls {
         display: flex;
-        gap: 6px;
-        margin-bottom: 8px;
+        gap: 8px;
+        margin-bottom: 10px;
       }
       .selection-controls .btn {
-        padding: 4px 8px;
+        padding: 6px 12px;
         font-size: 12px;
-        background: #e5e7eb;
       }
       .selection-status {
         font-size: 13px;
         color: #6b7280;
+        margin-top: 5px;
       }
 
-      /* 우측 영역 (학생 리스트) 스타일 */
+      /* 우측 영역 */
       .right-header {
         display: flex;
-        justify-content: space-between; /* Title on left, buttons on right */
+        justify-content: space-between;
         align-items: center;
-        margin-bottom: 16px;
+        margin-bottom: 20px;
       }
       .right-title {
         font-weight: 700;
-        font-size: 16px;
-        flex-shrink: 1;
-        margin-right: 8px;
+        font-size: 18px;
+        color: #1f2937;
       }
       .right-buttons {
         display: flex;
@@ -205,69 +235,71 @@
 
       .student-record-block {
         border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        padding: 10px;
-        margin-bottom: 12px;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 15px;
         background: #fff;
-        transition: all 0.15s ease;
+        transition: all 0.2s ease;
+      }
+      .student-record-block:hover {
+        border-color: #1f4ddc;
       }
       .student-record-block.delete-mode-active {
         cursor: pointer;
-        border-color: #ff7f7f; /* 삭제 모드일 때 붉은 테두리 */
-        box-shadow: 0 0 5px rgba(255, 127, 127, 0.5);
+        border-color: #fca5a5;
       }
       .student-record-block.delete-mode-active:hover {
-        background: #ffe6e6;
+        background: #fef2f2;
+        border-color: #ef4444;
       }
 
-      /* 이름과 글자수 정렬을 위한 Flex container */
       .record-name-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 4px;
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #f3f4f6;
       }
       .record-name {
         font-weight: 700;
         color: #1f4ddc;
-        font-size: 14px;
+        font-size: 15px;
       }
       .char-count {
-        font-size: 12px;
-        font-weight: 500;
+        font-size: 13px;
+        font-weight: 600;
         color: #6b7280;
-        flex-shrink: 0;
       }
 
       .record-content {
-        font-size: 13px;
-        color: #333;
-        line-height: 1.4;
+        font-size: 14px;
+        color: #374151;
+        line-height: 1.6;
         white-space: pre-wrap;
         word-break: break-all;
-        min-height: 18px;
       }
       .no-record {
         color: #9ca3af;
         font-style: italic;
       }
 
-      /* 증빙자료 목록 스타일 */
+      /* 증빙자료 스타일 */
       .doc-list-container {
-        margin-top: 10px;
-        border-top: 1px solid #eee;
-        padding-top: 10px;
+        margin-top: 15px;
+        padding-top: 12px;
+        border-top: 1px dashed #e5e7eb;
         font-size: 13px;
       }
       .doc-list-header {
         display: flex;
         align-items: center;
-        gap: 8px;
-        margin-bottom: 5px;
+        gap: 10px;
+        margin-bottom: 8px;
       }
       .doc-list-header span {
         font-weight: 600;
-        color: #6b7280;
+        color: #4b5563;
       }
       .doc-list {
         padding-left: 0;
@@ -275,34 +307,34 @@
         margin: 0;
       }
       .doc-item {
-        color: #1f4ddc;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        padding: 2px 0;
+        color: #2563eb;
+        padding: 3px 0;
+        display: flex;
+        align-items: center;
+        gap: 5px;
       }
       .no-doc-item {
         color: #9ca3af;
-        font-style: italic;
-        font-weight: normal;
       }
 
       .toast {
         position: fixed;
         left: 50%;
         transform: translateX(-50%);
-        bottom: 24px;
-        background: #111827;
+        bottom: 30px;
+        background: #333;
         color: #fff;
         font-size: 13px;
-        padding: 8px 12px;
-        border-radius: 8px;
+        padding: 10px 25px;
+        border-radius: 30px;
         opacity: 0;
         pointer-events: none;
-        transition: opacity 0.2s ease;
+        transition: 0.3s;
+        z-index: 2000;
       }
       .toast.show {
-        opacity: 0.95;
+        opacity: 1;
+        bottom: 40px;
       }
     </style>
   </head>
@@ -313,7 +345,6 @@
     <div class="container">
       <section class="left">
         <div id="bookList"></div>
-
         <button class="btn add" id="btnAddBook">+ 책 추가</button>
       </section>
 
@@ -338,9 +369,8 @@
 
     <script>
       const bookList = document.getElementById("bookList");
-      const MAX_LEN = 1500;
+      const MAX_BYTE = 1500;
 
-      // 더미 학생 목록
       const STUDENT_LIST = [
         { id: "s1", name: "김태연" },
         { id: "s2", name: "박지성" },
@@ -349,7 +379,6 @@
         { id: "s5", name: "이하은" },
       ];
 
-      // 더미 도서 검색 결과
       const DUMMY_BOOKS = [
         { title: "코스모스", author: "칼 세이건" },
         { title: "사피엔스", author: "유발 하라리" },
@@ -371,15 +400,14 @@
       ];
 
       let studentRecords = new Map();
-      let studentDocuments = new Map(); // [수정] 증빙자료 파일명 배열을 저장할 Map
+      let studentDocuments = new Map();
       STUDENT_LIST.forEach((s) => {
         studentRecords.set(s.id, "");
-        studentDocuments.set(s.id, []); // [수정] 증빙자료 초기값을 빈 배열로 설정
+        studentDocuments.set(s.id, []);
       });
       let isDeleteMode = false;
       let cardIdCounter = 0;
 
-      // --- 유틸리티 함수 ---
       function showToast(msg) {
         const t = document.getElementById("toast");
         t.textContent = msg;
@@ -387,34 +415,45 @@
         setTimeout(() => t.classList.remove("show"), 1500);
       }
 
-      // [수정] 증빙자료 업로드 처리 함수 (다중 파일 처리)
+      function getByteLength(s) {
+        let b = 0;
+        for (let i = 0; i < s.length; i++) {
+          const c = s.charCodeAt(i);
+          b += c >> 7 ? 3 : 1;
+        }
+        return b;
+      }
+
+      function sliceByByte(str, maxByte) {
+        let b = 0;
+        let result = "";
+        for (let i = 0; i < str.length; i++) {
+          const c = str.charCodeAt(i);
+          const size = c >> 7 ? 3 : 1;
+          if (b + size > maxByte) break;
+          b += size;
+          result += str[i];
+        }
+        return result;
+      }
+
       function handleDocumentUpload(event) {
         const fileInput = event.target;
         const studentId = fileInput.dataset.studentId;
         const student = STUDENT_LIST.find((s) => s.id === studentId);
 
         if (fileInput.files.length > 0) {
-          // 새로 업로드된 파일 이름을 배열로 만듦
           const newFileNames = Array.from(fileInput.files).map(
             (file) => file.name
           );
-
-          // 기존 목록을 덮어쓰거나, 추가하는 방식 선택 (여기서는 **덮어쓰기**로 구현)
-          // 여러 번 업로드할 때마다 새로운 파일들로 대체됨
           studentDocuments.set(studentId, newFileNames);
-
           showToast(
             `${student.name} 학생에게 총 ${newFileNames.length}개의 증빙자료가 등록되었습니다.`
           );
-        } else {
-          // 파일 선택을 취소했을 때 기존 파일명을 유지 (변화 없음)
         }
-        renderStudentRecords(); // 파일명 업데이트를 위해 리렌더링
-        // 파일 input의 value를 초기화하여, 같은 파일을 다시 선택해도 change 이벤트가 발생하게 함
+        renderStudentRecords();
         fileInput.value = null;
       }
-
-      // --- 학생 선택/렌더링 (우측 패널) ---
 
       function renderStudentRecords() {
         const listEl = document.getElementById("studentRecordsList");
@@ -430,27 +469,21 @@
           }
 
           const recordText = studentRecords.get(student.id).trim();
-          const docList = studentDocuments.get(student.id); // [수정] 증빙자료 파일명 배열 가져오기
-
-          // 글자 수 계산 (NEIS 기재/복사될 최종 텍스트 기준)
+          const docList = studentDocuments.get(student.id);
           const finalCopyText = recordText.replace(/[『』]/g, "");
-          const totalLength = finalCopyText.length;
+          const totalByte = getByteLength(finalCopyText);
 
           let contentHtml;
           if (recordText) {
-            // 『』 괄호를 제거하고 쉼표(,)로 연결된 텍스트로 변환하여 표시
             let displayRecord = finalCopyText.trim();
-
             if (displayRecord.length > 500) {
               displayRecord = displayRecord.slice(0, 500) + "...";
             }
-
             contentHtml = `<div class="record-content">${displayRecord}</div>`;
           } else {
             contentHtml = `<div class="record-content no-record">입력된 독서 기록이 없습니다.</div>`;
           }
 
-          // [수정] 증빙자료 업로드 및 표시를 위한 HTML 구조
           const docListItems =
             docList.length > 0
               ? docList
@@ -469,8 +502,8 @@
                       />
                       <button 
                           type="button" 
-                          class="btn" 
-                          style="padding: 4px 8px; font-size: 11px; background: #e0f7fa; color: #006064; border-color: #b2ebf2;"
+                          class="btn sm" 
+                          style="background: #e0f7fa; color: #006064; border-color: #b2ebf2;"
                           onclick="document.getElementById('upload_${student.id}').click()"
                       >
                           새 자료 업로드/덮어쓰기
@@ -482,46 +515,40 @@
               </div>
           `;
 
-          // 이름과 글자 수를 같은 라인에 우측 정렬
           wrap.innerHTML = `
             <div class="record-name-row">
-                <div class="record-name">${index + 1}. 이름: ${
-            student.name
-          }</div>
-                <div class="char-count">총 ${totalLength}자 / ${MAX_LEN}자</div>
+                <div class="record-name">${index + 1}. ${student.name}</div>
+                <div class="char-count" style="color: ${
+                  totalByte > MAX_BYTE ? "#ef4444" : "#6b7280"
+                }">
+                    ${totalByte} Byte / ${MAX_BYTE} Byte
+                </div>
             </div>
-            <div style="font-size: 13px; font-weight: 600; margin-bottom: 4px;">작성 내용:</div>
+            <div style="font-size: 13px; font-weight: 600; margin-bottom: 6px; color:#4b5563;">작성 내용:</div>
             ${contentHtml}
             ${docControlHtml} `;
 
-          // [수정] 학생 카드 클릭 이벤트: 삭제 모드일 때만 기능
           wrap.addEventListener("click", () => {
             if (isDeleteMode) {
               deleteStudentRecords(student.id, student.name);
             }
-            // 일반 모드에서는 클릭해도 아무 일도 일어나지 않음
           });
           listEl.appendChild(wrap);
         });
       }
 
-      // [수정] 학생 기록 삭제 기능 (증빙자료 배열 초기화)
       function deleteStudentRecords(studentId, studentName) {
         if (
           confirm(
-            `${studentName} 학생의 독서 기록과 증빙자료를 완전히 삭제하시겠습니까?`
+            `${studentName} 학생의 독서 기록과 증빙자료를 삭제하시겠습니까?`
           )
         ) {
           studentRecords.set(studentId, "");
-          studentDocuments.set(studentId, []); // [수정] 증빙자료를 빈 배열로 초기화
-          showToast(
-            `${studentName} 학생의 독서 기록 및 증빙자료가 삭제되었습니다.`
-          );
+          studentDocuments.set(studentId, []);
+          showToast(`${studentName} 학생의 데이터가 삭제되었습니다.`);
           renderStudentRecords();
         }
       }
-
-      // --- 좌측 패널 기능: 책 카드 및 로컬 학생 선택 ---
 
       function createStudentSelectorHTML(cardId) {
         let buttonsHTML = STUDENT_LIST.map(
@@ -556,77 +583,51 @@
           ".student-select-btn.active"
         );
         const statusEl = document.getElementById(`${cardId}_selection_status`);
-
         const names = Array.from(activeButtons).map((btn) => btn.dataset.name);
 
-        if (names.length === 0) {
-          statusEl.textContent = "선택된 학생: 0명";
-        } else if (names.length <= 3) {
+        if (names.length === 0) statusEl.textContent = "선택된 학생: 0명";
+        else if (names.length <= 3)
           statusEl.textContent = `선택된 학생: ${names.join(", ")} (${
             names.length
           }명)`;
-        } else {
-          // [수정] 배열 인덱스 오류 수정 및 표시 방식 개선
+        else
           statusEl.textContent = `선택된 학생: ${names[0]}, ${names[1]} 외 ${
             names.length - 2
           }명 (${names.length}명)`;
-        }
       }
 
       function createBookCard() {
         cardIdCounter++;
         const id = `book_${cardIdCounter}`;
-
         const card = document.createElement("div");
         card.className = "card";
         card.id = id;
         card.innerHTML = `
         <div class="card-title">📖 독서 기록 ${cardIdCounter}</div>
-        
         <div class="field">
           <div class="label">도서명 (검색하여 선택)</div>
           <div class="autocomplete-wrapper">
-            <input
-              type="text"
-              class="input book-title"
-              id="${id}_search_title"
-              placeholder="책 제목을 입력하면 자동 완성됩니다. (예: 코스모스)"
-              autocomplete="off"
-            />
+            <input type="text" class="input book-title" id="${id}_search_title" placeholder="책 제목을 입력하세요 (예: 코스모스)" autocomplete="off" />
             <div class="autocomplete-results" id="${id}_results" style="display: none;"></div>
           </div>
         </div>
-
-        <div class="field" style="display: flex; gap: 8px;">
+        <div class="field" style="display: flex; gap: 10px;">
             <div style="flex: 1;">
               <div class="label">확정된 책 제목</div>
-              <input
-                type="text"
-                class="input final-title"
-                id="${id}_final_title"
-                placeholder="자동 완성 또는 직접 입력"
-              />
+              <input type="text" class="input final-title" id="${id}_final_title" placeholder="제목" />
             </div>
             <div style="flex: 1;">
               <div class="label">확정된 저자</div>
-              <input
-                type="text"
-                class="input final-author"
-                id="${id}_final_author"
-                placeholder="자동 완성 또는 직접 입력"
-              />
+              <input type="text" class="input final-author" id="${id}_final_author" placeholder="저자" />
             </div>
         </div>
-
         ${createStudentSelectorHTML(id)}
-        
-        <div class="btn-row" style="justify-content: flex-end; border-top: none; padding-top: 0;">
+        <div class="btn-row">
             <button class="btn primary" id="${id}_apply">선택 학생에게 적용</button>
-            <button class="btn danger" id="${id}_delete">카드 삭제</button>
+            <button class="btn danger" id="${id}_delete">삭제</button>
         </div>
       `;
 
-        // 이벤트 등록
         setTimeout(() => {
           const cardEl = document.getElementById(id);
           const titleInput = document.getElementById(`${id}_search_title`);
@@ -639,24 +640,20 @@
             `${id}_final_author`
           );
 
-          // 1. 자동 완성 기능
           let selectedIndex = -1;
           const updateAutocomplete = () => {
             const query = titleInput.value.toLowerCase().trim();
             resultsEl.innerHTML = "";
-
             if (query.length < 2) {
               resultsEl.style.display = "none";
               selectedIndex = -1;
               return;
             }
-
             const filtered = DUMMY_BOOKS.filter(
               (book) =>
                 book.title.toLowerCase().includes(query) ||
                 book.author.toLowerCase().includes(query)
             );
-
             if (filtered.length === 0) {
               resultsEl.style.display = "none";
               selectedIndex = -1;
@@ -667,16 +664,11 @@
               const item = document.createElement("div");
               item.className = "autocomplete-item";
               item.textContent = `${book.title} (${book.author})`;
-              item.dataset.title = book.title;
-              item.dataset.author = book.author;
-
               item.addEventListener("click", () =>
                 selectBook(book.title, book.author)
               );
-
               resultsEl.appendChild(item);
             });
-
             resultsEl.style.display = "block";
             selectedIndex = -1;
           };
@@ -686,13 +678,12 @@
             finalTitleInput.value = title;
             finalAuthorInput.value = author;
             resultsEl.style.display = "none";
-            showToast(`'${title} (${author})'이 선택되었습니다.`);
+            showToast(`'${title}' 선택됨`);
           };
 
           titleInput.addEventListener("keydown", (e) => {
             const items = resultsEl.querySelectorAll(".autocomplete-item");
             if (items.length === 0) return;
-
             if (e.key === "ArrowDown") {
               e.preventDefault();
               selectedIndex = (selectedIndex + 1) % items.length;
@@ -701,22 +692,14 @@
               selectedIndex = (selectedIndex - 1 + items.length) % items.length;
             } else if (e.key === "Enter") {
               e.preventDefault();
-              if (selectedIndex !== -1) {
-                const selectedItem = items[selectedIndex];
-                selectBook(
-                  selectedItem.dataset.title,
-                  selectedItem.dataset.author
-                );
-              }
+              if (selectedIndex !== -1) items[selectedIndex].click();
               return;
             }
-
-            items.forEach((item, index) => {
-              item.classList.toggle("selected", index === selectedIndex);
-            });
-            if (selectedIndex !== -1) {
+            items.forEach((item, index) =>
+              item.classList.toggle("selected", index === selectedIndex)
+            );
+            if (selectedIndex !== -1)
               items[selectedIndex].scrollIntoView({ block: "nearest" });
-            }
           });
           titleInput.addEventListener("input", updateAutocomplete);
           titleInput.addEventListener("blur", () => {
@@ -725,7 +708,6 @@
             }, 200);
           });
 
-          // 2. 학생 선택/전체 선택/취소 기능
           studentButtonsEl.addEventListener("click", (e) => {
             if (e.target.classList.contains("student-select-btn")) {
               e.target.classList.toggle("active");
@@ -740,7 +722,6 @@
                 .querySelectorAll(".student-select-btn")
                 .forEach((btn) => btn.classList.add("active"));
               updateSelectionStatus(id);
-              showToast("모든 학생이 선택되었습니다.");
             });
 
           document
@@ -750,10 +731,8 @@
                 .querySelectorAll(".student-select-btn")
                 .forEach((btn) => btn.classList.remove("active"));
               updateSelectionStatus(id);
-              showToast("모든 학생 선택이 취소되었습니다.");
             });
 
-          // 3. 버튼 이벤트 연결
           document
             .getElementById(`${id}_apply`)
             .addEventListener("click", () => applyBookRecord(id));
@@ -761,44 +740,29 @@
             .getElementById(`${id}_delete`)
             .addEventListener("click", () => {
               card.remove();
-              showToast(`독서 기록 ${cardIdCounter} 카드가 삭제되었습니다.`);
+              showToast("카드가 삭제되었습니다.");
             });
 
-          // 초기 상태 업데이트
           updateSelectionStatus(id);
         }, 10);
-
         return card;
       }
 
       function applyBookRecord(cardId) {
         const cardEl = document.getElementById(cardId);
-        const finalTitleInput = cardEl.querySelector(".final-title");
-        const finalAuthorInput = cardEl.querySelector(".final-author");
-
-        const finalTitle = finalTitleInput.value.trim();
-        const finalAuthor = finalAuthorInput.value.trim();
-
+        const finalTitle = cardEl.querySelector(".final-title").value.trim();
+        const finalAuthor = cardEl.querySelector(".final-author").value.trim();
         const selectedStudentButtons = cardEl.querySelectorAll(
           ".student-select-btn.active"
         );
 
-        if (!finalTitle || !finalAuthor) {
-          showToast("확정된 책 제목과 저자를 입력해 주세요.");
-          return;
-        }
+        if (!finalTitle || !finalAuthor)
+          return showToast("책 제목과 저자를 입력해 주세요.");
+        if (selectedStudentButtons.length === 0)
+          return showToast("학생을 선택해 주세요.");
 
-        if (selectedStudentButtons.length === 0) {
-          showToast("적용할 학생을 1명 이상 선택해 주세요.");
-          return;
-        }
-
-        // 책 제목에 있는 괄호 제거
         let cleanTitle = finalTitle.replace(/[()]/g, "").trim();
-
-        // 저장 형식: 『Clean Title』(Author)
         const finalRecord = `『${cleanTitle}』(${finalAuthor})`;
-
         const selectedStudentIds = Array.from(selectedStudentButtons).map(
           (btn) => btn.dataset.id
         );
@@ -806,131 +770,74 @@
 
         selectedStudentIds.forEach((studentId) => {
           let currentText = studentRecords.get(studentId).trim();
-
-          // 중복 확인
-          if (currentText.includes(finalRecord)) {
-            return;
-          }
-
-          // 구분자를 쉼표와 공백(', ')으로 사용
+          if (currentText.includes(finalRecord)) return;
           let merged = currentText
             ? currentText + ", " + finalRecord
             : finalRecord;
-
-          // 글자 수 제한 체크
-          if (merged.length > MAX_LEN) {
-            merged = merged.slice(0, MAX_LEN);
-          }
-
+          if (getByteLength(merged) > MAX_BYTE)
+            merged = sliceByByte(merged, MAX_BYTE);
           studentRecords.set(studentId, merged);
           appliedCount++;
         });
 
-        // 우측 패널(학생 목록) 업데이트
         renderStudentRecords();
-
-        if (appliedCount > 0) {
-          showToast(
-            `선택된 ${appliedCount}명 학생의 기록에 '${finalTitle}'이(가) 반영되었습니다.`
-          );
-        } else {
-          showToast(
-            "선택된 모든 학생에게 해당 독서 기록이 이미 적용되어 있었습니다."
-          );
-        }
+        if (appliedCount > 0)
+          showToast(`${appliedCount}명에게 반영되었습니다.`);
+        else showToast("이미 모든 학생에게 적용되어 있습니다.");
       }
 
-      // --- 우측 상단 버튼 기능 ---
-
-      // [수정] 기록 삭제 모드 토글 기능
       document.getElementById("btnDeleteMode").addEventListener("click", () => {
         isDeleteMode = !isDeleteMode;
         const btn = document.getElementById("btnDeleteMode");
-
         if (isDeleteMode) {
-          btn.textContent = "✅ 삭제 모드 활성화 (클릭하여 기록 삭제)";
-          btn.classList.remove("danger");
-          btn.style.backgroundColor = "#d1e7dd";
-          btn.style.borderColor = "#badbcc";
-          btn.style.color = "#0a3622";
-          showToast(
-            "기록 삭제 모드가 활성화되었습니다. 학생 기록을 클릭하여 삭제하세요."
-          );
+          btn.textContent = "삭제 모드 활성화";
+          btn.style.backgroundColor = "#dcfce7";
+          btn.style.borderColor = "#bbf7d0";
+          btn.style.color = "#15803d";
+          showToast("삭제 모드: 기록을 클릭하여 삭제하세요.");
         } else {
           btn.textContent = "기록 삭제 모드";
-          btn.classList.add("danger");
           btn.style.backgroundColor = "";
           btn.style.borderColor = "";
           btn.style.color = "";
-          showToast("기록 삭제 모드가 비활성화되었습니다.");
+          showToast("삭제 모드 해제");
         }
-        renderStudentRecords(); // 삭제 모드 상태를 반영하여 리렌더링
+        renderStudentRecords();
       });
 
       document.getElementById("btnCopy").addEventListener("click", () => {
-        if (isDeleteMode) {
-          showToast(
-            "현재 기록 삭제 모드가 활성화되어 있습니다. 먼저 모드를 비활성화해주세요."
-          );
-          return;
-        }
+        if (isDeleteMode) return showToast("삭제 모드를 해제해주세요.");
+        const studentsWithRecord = STUDENT_LIST.filter(
+          (s) => studentRecords.get(s.id).trim().length > 0
+        );
+        if (studentsWithRecord.length === 0)
+          return showToast("기록된 내용이 없습니다.");
 
-        const studentsWithRecord = STUDENT_LIST.filter((s) => {
-          const text = studentRecords.get(s.id);
-          return text && text.trim().length > 0;
-        });
-
-        if (studentsWithRecord.length === 0) {
-          showToast("독서 기록이 입력된 학생이 없습니다.");
-          return;
-        }
-
-        // 모든 기록된 학생의 내용을 순차적으로 복사 및 알림
         let totalCopyText = "";
         const studentNames = [];
-
         studentsWithRecord.forEach((student) => {
           const text = studentRecords.get(student.id).trim();
-          // 복사 시 『』 괄호 제거
           const finalCopyText = text.replace(/[『』]/g, "");
-
-          // NEIS 기재는 학생별로 복사-붙여넣기를 반복하는 행위이므로,
-          // 여기서는 첫 번째 학생의 기록만 클립보드에 복사하고
-          // 사용자에게 순차적으로 진행됨을 알리는 방식으로 구현합니다.
-          if (studentNames.length === 0) {
-            totalCopyText = finalCopyText; // 첫 학생의 기록만 클립보드에 저장
-          }
-
+          if (studentNames.length === 0) totalCopyText = finalCopyText;
           studentNames.push(student.name);
         });
 
-        if (totalCopyText) {
-          navigator.clipboard.writeText(totalCopyText);
-        }
-
-        // Alert 메시지 변경: 기록이 있는 학생 전체를 대상으로 함을 알림
+        if (totalCopyText) navigator.clipboard.writeText(totalCopyText);
         alert(
           `총 ${
             studentsWithRecord.length
-          }명 학생의 독서 기록 기재를 완료했습니다.\n\n[완료된 학생]: ${studentNames.join(
+          }명 완료.\n[완료 명단]: ${studentNames.join(
             ", "
-          )}\n\n(첫 번째 학생 [${
-            studentNames[0]
-          }]의 기록이 클립보드에 복사되었습니다. NEIS에 붙여넣기 후 다음 학생으로 진행하세요.)`
+          )}\n\n(첫 번째 학생 기록이 복사되었습니다.)`
         );
       });
 
-      // --- 초기화 ---
-
       document.getElementById("btnAddBook").addEventListener("click", () => {
         bookList.appendChild(createBookCard());
-        showToast(`독서 기록 ${cardIdCounter} 카드가 추가되었습니다.`);
       });
 
       window.onload = () => {
-        // 우측 학생 목록 렌더링
         renderStudentRecords();
-        // 좌측 첫 카드 생성
         bookList.appendChild(createBookCard());
       };
     </script>
