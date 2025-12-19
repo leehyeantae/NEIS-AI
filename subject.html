@@ -4,308 +4,359 @@
     <meta charset="UTF-8" />
     <title>과목별 세부능력 및 특이사항</title>
     <style>
-      /* --- 디자인은 기존과 100% 동일하게 유지 --- */
+      /* [디자인 통일] 공통 스타일 */
       * {
         box-sizing: border-box;
-        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui,
-          sans-serif;
       }
       body {
         margin: 0;
-        background: #f5f5f7;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-      }
-      .app {
-        background: #ffffff;
-        width: 1920px;
-        height: 1080px;
-        border-radius: 12px;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-        display: flex;
-        flex-direction: column;
+        font-family: "Segoe UI", -apple-system, sans-serif;
+        background: #f5f6f8;
+        color: #333;
         overflow: hidden;
       }
-      .app-header {
-        padding: 10px 16px;
-        border-bottom: 1px solid #e5e5ea;
+
+      .topbar {
+        height: 48px;
+        background: #f5c6cf;
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        background: #fafafa;
+        padding: 0 16px;
+        font-weight: 700;
+        border-bottom: 1px solid #e5adba;
+        color: #333;
       }
-      .app-title {
-        font-size: 15px;
-        font-weight: 600;
+
+      .container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        height: calc(100vh - 48px);
       }
-      .app-subtitle {
-        font-size: 12px;
-        color: #666;
+      .left,
+      .right {
+        padding: 25px;
+        background: #fff;
+        overflow-y: auto;
       }
-      .app-body {
-        flex: 1;
+      .left {
+        border-right: 1px solid #e5e7eb;
         display: flex;
-        min-height: 0;
+        flex-direction: column;
+        gap: 15px;
       }
-      .left-panel,
-      .right-panel {
-        flex: 1;
-        padding: 16px;
-        min-width: 0;
+      .right {
+        display: flex;
+        flex-direction: column;
       }
-      .left-panel {
-        border-right: 1px solid #e5e5ea;
-      }
-      .chip-row {
+
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         margin-bottom: 10px;
+      }
+      .section-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1f2937;
+      }
+
+      /* 입력 요소 스타일 */
+      .label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #4b5563;
+        margin-bottom: 6px;
+        display: block;
+      }
+      .input,
+      .textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: border 0.2s;
+      }
+      .input:focus,
+      .textarea:focus {
+        outline: none;
+        border-color: #1f4ddc;
+        box-shadow: 0 0 0 3px rgba(31, 77, 220, 0.1);
+      }
+      .textarea {
+        min-height: 120px;
+        line-height: 1.6;
+        resize: vertical;
+      }
+
+      /* 버튼 스타일 */
+      .btn {
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        border: 1px solid #d1d5db;
+        background: #fff;
+        transition: 0.2s;
+        color: #374151;
+      }
+      .btn:hover {
+        background: #f9fafb;
+        border-color: #9ca3af;
+      }
+      .btn.primary {
+        background: #1f4ddc;
+        color: #fff;
+        border-color: #163aa5;
+      }
+      .btn.primary:hover {
+        background: #1b43c1;
+      }
+      .btn.success {
+        background: #10b981;
+        color: #fff;
+        border-color: #059669;
+      }
+      .btn.danger {
+        background: #fff;
+        color: #e11d48;
+        border-color: #ffcccc;
+      }
+      .btn.danger:hover {
+        background: #fff1f2;
+      }
+      .btn.sm {
+        padding: 5px 10px;
+        font-size: 12px;
+      }
+
+      /* [과세특 전용] 단원 선택 칩 스타일 */
+      .chip-row {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
+        margin-bottom: 15px;
       }
       .chip {
-        padding: 6px 12px;
-        border-radius: 999px;
-        font-size: 12px;
-        border: 1px solid #d0d0d7;
+        padding: 8px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        border: 1px solid #d1d5db;
         background: #fff;
         cursor: pointer;
-        user-select: none;
+        transition: 0.2s;
+        color: #4b5563;
+      }
+      .chip:hover {
+        background: #f3f4f6;
       }
       .chip.active {
-        background: #2563eb;
+        background: #1f4ddc;
         color: #fff;
-        border-color: #2563eb;
-      }
-      .card {
-        border: 1px solid #e5e5ea;
-        border-radius: 10px;
-        padding: 14px;
-        height: calc(100% - 40px);
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-      }
-      .card-title {
-        font-size: 14px;
+        border-color: #1f4ddc;
         font-weight: 600;
-        margin-bottom: 4px;
       }
-      .card-subtitle {
-        font-size: 12px;
-        color: #666;
-        margin-bottom: 8px;
-        line-height: 1.5;
-      } /* 줄간격 추가 */
-      .radio-group {
-        font-size: 12px;
-        display: flex;
-        gap: 8px;
-        margin-bottom: 4px;
-      }
-      .radio-group label {
-        cursor: pointer;
-      }
+
+      /* [과세특 전용] 소단원 버튼 그룹 */
       .subunit-row {
         display: flex;
         flex-wrap: wrap;
         gap: 6px;
-        margin-bottom: 4px;
+        margin-bottom: 15px;
       }
       .subunit-btn {
-        padding: 4px 10px;
-        border-radius: 8px;
-        border: 1px solid #d0d0d7;
-        background: #fff;
-        font-size: 11px;
+        padding: 6px 12px;
+        border-radius: 6px;
+        border: 1px solid #e5e7eb;
+        background: #f9fafb;
+        font-size: 12px;
         cursor: pointer;
+        transition: 0.2s;
+      }
+      .subunit-btn:hover {
+        background: #e5e7eb;
       }
       .subunit-btn.active {
-        background: #e0edff;
-        border-color: #2563eb;
-        color: #1d4ed8;
-      }
-      .textarea-label {
-        font-size: 11px;
-        color: #555;
-        margin-top: 4px;
-        margin-bottom: 2px;
-      }
-      textarea {
-        width: 100%;
-        height: 120px;
-        resize: none;
-        border-radius: 8px;
-        border: 1px solid #d0d0d7;
-        padding: 8px;
-        font-size: 12px;
-        white-space: pre-wrap;
-      }
-      .btn-row {
-        margin-top: 6px;
-        display: flex;
-        gap: 6px;
-      }
-      .btn {
-        padding: 6px 12px;
-        font-size: 12px;
-        border-radius: 8px;
-        border: 1px solid #d0d0d7;
-        background: #fff;
-        cursor: pointer;
-      }
-      .btn-primary {
-        background: #2563eb;
-        color: #fff;
-        border-color: #2563eb;
-      }
-      .btn-danger {
-        background: #fef2f2;
-        color: #b91c1c;
-        border-color: #fecaca;
-      }
-      .right-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 6px;
-      }
-      .right-title {
-        font-size: 14px;
+        background: #eff6ff;
+        border-color: #1f4ddc;
+        color: #1f4ddc;
         font-weight: 600;
       }
-      .right-caption {
-        font-size: 11px;
-        color: #777;
-      }
-      .preview-box {
-        border: 1px solid #e5e5ea;
-        border-radius: 10px;
-        height: calc(100% - 26px);
-        padding: 10px;
-        font-size: 12px;
-        overflow-y: auto;
-        white-space: pre-wrap;
-        background: #fff;
-      }
-      .preview-toolbar {
+
+      /* [과세특 전용] 성취수준 라디오 버튼 */
+      .radio-group {
         display: flex;
-        gap: 6px;
+        gap: 15px;
+        margin-bottom: 15px;
+        padding: 10px;
+        background: #f9fafb;
+        border-radius: 8px;
+        border: 1px solid #f3f4f6;
+      }
+      .radio-group label {
+        display: flex;
         align-items: center;
-        margin-bottom: 4px;
+        gap: 5px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
       }
-      .char-count {
-        font-size: 11px;
-        color: #777;
-        margin-left: auto;
+      .radio-group input[type="radio"] {
+        accent-color: #1f4ddc;
       }
-      .hint {
-        font-size: 10px;
-        color: #999;
-        margin-top: 4px;
+
+      /* 우측 미리보기 & 카운터 */
+      .preview-box {
+        flex: 1;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 25px;
+        font-size: 15px;
+        line-height: 1.8;
+        white-space: pre-wrap;
+        outline: none;
+        background: #fff;
+        overflow-y: auto;
+      }
+      .counter {
+        text-align: right;
+        margin-top: 10px;
+        font-size: 13px;
+        color: #6b7280;
+      }
+
+      .card-info-box {
+        padding: 15px;
+        background: #f0f9ff;
+        border-left: 4px solid #1f4ddc;
+        border-radius: 4px;
+        margin-bottom: 15px;
+      }
+      .card-title {
+        font-weight: 700;
+        font-size: 15px;
+        color: #1e3a8a;
+        margin-bottom: 5px;
+      }
+      .card-desc {
+        font-size: 13px;
+        color: #1e40af;
+        line-height: 1.4;
+      }
+
+      /* 버튼 그룹 */
+      .action-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      #toast {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #333;
+        color: #fff;
+        padding: 10px 25px;
+        border-radius: 30px;
+        font-size: 13px;
+        opacity: 0;
+        transition: 0.3s;
+        z-index: 3000;
+        pointer-events: none;
       }
     </style>
   </head>
   <body>
-    <div class="app">
-      <header class="app-header">
-        <div>
-          <div class="app-title">과목별 세부능력 및 특이사항</div>
-          <div class="app-subtitle">
-            대단원 · 소단원 · 성취수준(A~E)을 선택하고 사례를 입력하면
-            과목별세부능력및특이사항 문장이 생성됩니다.
+    <div id="toast">알림</div>
+    <div class="topbar">과목별 세부능력 및 특이사항</div>
+
+    <div class="container">
+      <section class="left">
+        <div class="section-header">
+          <div class="section-title">단원 및 성취수준 선택</div>
+        </div>
+
+        <div class="label">1. 대단원 선택</div>
+        <div class="chip-row" id="unitChips">
+          <div class="chip active" data-unit="컴퓨팅 시스템">컴퓨팅 시스템</div>
+          <div class="chip" data-unit="데이터">데이터</div>
+          <div class="chip" data-unit="알고리즘과 프로그래밍">
+            알고리즘과 프로그래밍
+          </div>
+          <div class="chip" data-unit="인공지능">인공지능</div>
+          <div class="chip" data-unit="디지털 문화">디지털 문화</div>
+        </div>
+
+        <div class="card-info-box">
+          <div class="card-title" id="cardUnitTitle">
+            [컴퓨팅 시스템 / 유무선 네트워크]
+          </div>
+          <div class="card-desc" id="cardCriterion">성취기준 로딩 중...</div>
+        </div>
+
+        <div class="label">2. 소단원 선택</div>
+        <div class="subunit-row" id="subunitRow"></div>
+
+        <div class="label">3. 성취수준 (A~E)</div>
+        <div class="radio-group" id="levelGroup">
+          <label
+            ><input type="radio" name="level" value="A" checked /> A
+            (탁월)</label
+          >
+          <label><input type="radio" name="level" value="B" /> B (우수)</label>
+          <label><input type="radio" name="level" value="C" /> C (보통)</label>
+          <label><input type="radio" name="level" value="D" /> D (노력)</label>
+          <label><input type="radio" name="level" value="E" /> E (미흡)</label>
+        </div>
+
+        <div class="label">4. 활동 사례 입력 (선택)</div>
+        <textarea
+          id="caseInput"
+          class="textarea"
+          placeholder="예) 학교 Wi-Fi 구조를 조사하고 유선·무선 연결 방식의 차이점을 설명함."
+        ></textarea>
+
+        <div class="action-buttons">
+          <button class="btn primary" id="aiButton" style="flex: 1">
+            ✨ AI 문장 생성
+          </button>
+          <button class="btn success" id="applyButton" style="flex: 1">
+            우측 결과로 반영 →
+          </button>
+          <button class="btn danger" id="resetButton">초기화</button>
+        </div>
+      </section>
+
+      <section class="right">
+        <div class="section-header">
+          <div class="section-title">최종 기재 내용 (수정 가능)</div>
+          <div style="display: flex; gap: 8px">
+            <button class="btn" id="refineButton">🪄 전체 AI 다듬기</button>
+            <button class="btn success" id="copyButton">💾 적용하기</button>
           </div>
         </div>
-      </header>
 
-      <div class="app-body">
-        <section class="left-panel">
-          <div class="chip-row" id="unitChips">
-            <div class="chip active" data-unit="컴퓨팅 시스템">
-              컴퓨팅 시스템
-            </div>
-            <div class="chip" data-unit="데이터">데이터</div>
-            <div class="chip" data-unit="알고리즘과 프로그래밍">
-              알고리즘과 프로그래밍
-            </div>
-            <div class="chip" data-unit="인공지능">인공지능</div>
-            <div class="chip" data-unit="디지털 문화">디지털 문화</div>
-          </div>
+        <div
+          class="preview-box"
+          id="previewBox"
+          contenteditable="true"
+          oninput="updateByteCount()"
+        ></div>
 
-          <div class="card">
-            <div class="card-title" id="cardUnitTitle">
-              [컴퓨팅 시스템 / 유무선 네트워크]
-            </div>
-            <div class="card-subtitle" id="cardCriterion">
-              성취기준 로딩 중...
-            </div>
-
-            <div class="textarea-label">소단원 선택</div>
-            <div class="subunit-row" id="subunitRow"></div>
-
-            <div class="textarea-label">성취수준 선택 (A~E)</div>
-            <div class="radio-group" id="levelGroup">
-              <label
-                ><input type="radio" name="level" value="A" checked /> A</label
-              >
-              <label><input type="radio" name="level" value="B" /> B</label>
-              <label><input type="radio" name="level" value="C" /> C</label>
-              <label><input type="radio" name="level" value="D" /> D</label>
-              <label><input type="radio" name="level" value="E" /> E</label>
-            </div>
-
-            <div class="textarea-label">
-              수업·평가 활동 사례 입력 (교사가 직접 작성)
-            </div>
-            <textarea
-              id="caseInput"
-              placeholder="예) 학교 Wi-Fi 구조를 조사하고 유선·무선 연결 방식의 차이점을 친구들에게 설명함."
-            ></textarea>
-
-            <div class="btn-row">
-              <button class="btn" id="aiButton">AI</button>
-              <button class="btn-primary btn" id="applyButton">적용</button>
-              <button class="btn btn-danger" id="resetButton">취소</button>
-            </div>
-            <div class="hint">
-              ※ '유무선 네트워크'의 경우 A~E 수준별 맞춤 문장이 생성되며, 그 외
-              단원은 기본 템플릿이 적용됩니다.
-            </div>
-          </div>
-        </section>
-
-        <section class="right-panel">
-          <div class="right-header">
-            <div>
-              <div class="right-title">
-                작성 내용 (최대 1,500자) · 직접 편집 가능
-              </div>
-              <div class="right-caption">
-                왼쪽에서 [AI] 생성 후 [적용]을 누르면 누적됩니다.
-              </div>
-            </div>
-          </div>
-          <div class="preview-toolbar">
-            <button class="btn" id="refineButton">전체 AI 다듬기</button>
-            <button class="btn-primary btn" id="copyButton">
-              적용(NEIS 입력)
-            </button>
-            <span class="char-count" id="charCount">0 / 1500자</span>
-          </div>
-          <div class="preview-box" id="previewBox" contenteditable="true"></div>
-          <div class="hint">
-            ※ 생성된 내용은 반드시 교사가 최종 확인해야 합니다.
-          </div>
-        </section>
-      </div>
+        <div class="counter">
+          실시간 용량:
+          <span id="byteCount" style="color: #1f4ddc; font-weight: 700">0</span>
+          / 1500 Byte
+        </div>
+      </section>
     </div>
 
     <script>
-      /**
-       * 1. 데이터 정의 (Data Layer)
-       * - 단원 구조 및 성취 기준 매핑 (사용자 제공 내용으로 업데이트됨)
-       */
+      /** 데이터 정의 */
       const CURRICULUM_DATA = {
         "컴퓨팅 시스템": {
           subunits: ["유무선 네트워크", "사물 인터넷", "사물 인터넷 설계하기"],
@@ -365,7 +416,6 @@
               "성취기준 [12정03-07]: 다양한 제어 구조를 복합적으로 활용한 프로그램을 작성한다.",
             "객체를 구현하는 클래스":
               "성취기준 [12정03-08]: 객체를 구현하는 클래스와 인스턴스를 활용하여 프로그램을 작성한다.",
-            // [수정 및 배열 유지] 협력적 프로젝트는 2개의 성취기준을 배열로 처리
             "문제 해결을 위한 협력적 프로젝트": [
               "성취기준 [12정03-09]: 실생활 및 다양한 학문 분야의 문제 해결을 위한 프로그램을 협력적으로 설계⋅구현한다.",
               "성취기준 [12정03-10]: 문제 해결을 위한 프로그램의 성능을 평가하고 공유한다.",
@@ -404,14 +454,10 @@
         },
       };
 
-      /**
-       * 2. 유틸리티 및 템플릿 함수 (Logic Layer)
-       */
+      /** 문장 생성 로직 */
       const SentenceGenerator = {
-        // 유무선 네트워크 전용 상세 템플릿
         wireless: (level, activity) => {
-          const activityText = activity ? `${activity} ` : ""; // 활동 내용을 문장 맨 앞에 배치
-
+          const activityText = activity ? `${activity} ` : "";
           const sentences = {
             A: `컴퓨팅 시스템 단원의 유무선 네트워크 수업에서 ${activityText}학교 Wi-Fi 구조와 유선·무선 연결 방식을 스스로 탐구하고 친구들에게 체계적으로 설명하는 등 높은 탐구 역량을 보였으며 네트워크의 특성과 컴퓨팅 시스템 간 정보 공유 방식을 정확히 이해하고 다양한 상황에 적용하여 정보 공유·협력 환경을 능동적으로 설계할 수 있는 수준의 우수한 수행을 보였다.`,
             B: `컴퓨팅 시스템 단원의 유무선 네트워크 수업에서 ${activityText}네트워크의 기본 개념과 특성을 대체로 정확히 이해하고 이를 바탕으로 컴퓨팅 시스템 간 정보 공유와 협력 환경을 구성하는 활동에 성실히 참여하는 등 성취기준을 안정적으로 달성하였다.`,
@@ -421,7 +467,6 @@
           };
           return sentences[level] || sentences["C"];
         },
-        // 일반적인 템플릿
         generic: (unit, sub, level, activity) => {
           const levelPhrases = {
             A: "성취기준을 깊이 있게 이해하고 이를 다양한 상황에 응용하는 모습을 보였으며, ",
@@ -437,9 +482,7 @@
         },
       };
 
-      /**
-       * 3. DOM 요소 및 상태 관리 (UI Layer)
-       */
+      /** DOM 요소 */
       const DOM = {
         unitChips: document.getElementById("unitChips"),
         subunitRow: document.getElementById("subunitRow"),
@@ -447,7 +490,7 @@
         cardCriterion: document.getElementById("cardCriterion"),
         caseInput: document.getElementById("caseInput"),
         previewBox: document.getElementById("previewBox"),
-        charCount: document.getElementById("charCount"),
+        byteCount: document.getElementById("byteCount"),
         btns: {
           ai: document.getElementById("aiButton"),
           apply: document.getElementById("applyButton"),
@@ -457,19 +500,11 @@
         },
       };
 
-      // 상태 관리 변수
-      let state = {
-        unit: "컴퓨팅 시스템",
-        subunit: "유무선 네트워크",
-      };
+      let state = { unit: "컴퓨팅 시스템", subunit: "유무선 네트워크" };
 
-      /**
-       * 4. 렌더링 및 UI 업데이트 함수
-       */
       function renderSubunitButtons(unit) {
         DOM.subunitRow.innerHTML = "";
         const subunits = CURRICULUM_DATA[unit]?.subunits || [];
-
         subunits.forEach((name, idx) => {
           const btn = document.createElement("button");
           btn.className = `subunit-btn ${idx === 0 ? "active" : ""}`;
@@ -477,95 +512,78 @@
           btn.textContent = name;
           DOM.subunitRow.appendChild(btn);
         });
-
-        // 첫 번째 소단원으로 상태 업데이트
         state.subunit = subunits[0] || "";
         updateCardInfo();
       }
 
       function updateCardInfo() {
-        // 타이틀 업데이트
         DOM.cardTitle.textContent = `[${state.unit} / ${state.subunit}]`;
-
-        // 성취기준 업데이트
         const standard =
           CURRICULUM_DATA[state.unit]?.standards?.[state.subunit];
-
-        // 성취기준이 배열이면 줄바꿈하여 표시, 문자열이면 그대로 표시
         if (Array.isArray(standard)) {
-          // 배열인 경우 (예: 협력적 프로젝트)
-          // 각 기준 앞에 · 기호를 붙여 목록처럼 보이게 합니다.
           DOM.cardCriterion.innerHTML = standard
             .map((s) => `<div>· ${s}</div>`)
             .join("");
         } else {
-          // 문자열인 경우 (일반)
           DOM.cardCriterion.textContent =
-            standard ||
-            "성취기준: 선택한 단원에 해당하는 성취기준을 불러올 수 없습니다.";
+            standard || "성취기준을 불러올 수 없습니다.";
         }
-
-        // 입력창 초기화
         DOM.caseInput.value = "";
       }
 
-      function updateCharCount() {
-        DOM.charCount.textContent = `${DOM.previewBox.textContent.length} / 1500자`;
+      function showToast(msg) {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.style.opacity = 1;
+        setTimeout(() => (t.style.opacity = 0), 2000);
       }
 
-      /**
-       * 5. 이벤트 핸들러 (Event Layer)
-       */
+      // [핵심] Byte 계산 함수 (한글 3Byte, 그 외 1Byte)
+      function updateByteCount() {
+        const text = DOM.previewBox.innerText;
+        let bytes = 0;
+        for (let i = 0; i < text.length; i++) {
+          bytes += text.charCodeAt(i) > 127 ? 3 : 1;
+        }
+        DOM.byteCount.textContent = bytes;
+        DOM.byteCount.style.color = bytes > 1500 ? "red" : "#1f4ddc";
+      }
 
-      // 대단원(Chip) 클릭
+      /* 이벤트 핸들러 */
       DOM.unitChips.addEventListener("click", (e) => {
         const chip = e.target.closest(".chip");
         if (!chip) return;
-
-        // UI 활성화
         document
           .querySelectorAll(".chip")
           .forEach((c) => c.classList.remove("active"));
         chip.classList.add("active");
-
-        // 상태 업데이트 및 렌더링
         state.unit = chip.dataset.unit;
         renderSubunitButtons(state.unit);
       });
 
-      // 소단원(Button) 클릭
       DOM.subunitRow.addEventListener("click", (e) => {
         const btn = e.target.closest(".subunit-btn");
         if (!btn) return;
-
-        // UI 활성화
         document
           .querySelectorAll(".subunit-btn")
           .forEach((b) => b.classList.remove("active"));
         btn.classList.add("active");
-
-        // 상태 업데이트
         state.subunit = btn.dataset.sub;
         updateCardInfo();
       });
 
-      // AI 생성 버튼 클릭
       DOM.btns.ai.addEventListener("click", () => {
         const level =
           document.querySelector('input[name="level"]:checked')?.value || "C";
         const rawCase = DOM.caseInput.value.trim();
-
         let sentence = "";
 
-        // 유무선 네트워크 특화 로직 vs 일반 로직
         if (
           state.unit === "컴퓨팅 시스템" &&
           state.subunit === "유무선 네트워크"
         ) {
-          // 유무선 네트워크는 activityText 처리를 내부에서 별도로 함 (기존 로직 유지)
           sentence = SentenceGenerator.wireless(level, rawCase);
         } else {
-          // 일반 로직
           sentence = SentenceGenerator.generic(
             state.unit,
             state.subunit,
@@ -574,47 +592,39 @@
           );
         }
 
-        // 텍스트 누적
         const currentVal = DOM.caseInput.value.trim();
         DOM.caseInput.value =
           currentVal && currentVal !== sentence
             ? `${currentVal}\n${sentence}`
             : sentence;
+        showToast("AI 문장이 생성되었습니다.");
       });
 
-      // 적용 버튼
       DOM.btns.apply.addEventListener("click", () => {
         const text = DOM.caseInput.value.trim();
-        if (!text) return;
-        const current = DOM.previewBox.textContent.trim();
-        DOM.previewBox.textContent = current ? `${current}\n\n${text}` : text;
-        DOM.previewBox.textContent = DOM.previewBox.textContent.slice(0, 1500);
-        updateCharCount();
+        if (!text) return alert("입력된 내용이 없습니다.");
+        const current = DOM.previewBox.innerText; // innerText 사용 권장
+        DOM.previewBox.innerText = current ? `${current}\n\n${text}` : text;
+        updateByteCount();
+        showToast("우측 결과창에 반영되었습니다.");
       });
 
-      // 초기화 및 기타 버튼들
-      DOM.btns.reset.addEventListener(
-        "click",
-        () => (DOM.caseInput.value = "")
-      );
+      DOM.btns.reset.addEventListener("click", () => {
+        DOM.caseInput.value = "";
+        showToast("입력창이 초기화되었습니다.");
+      });
+
       DOM.btns.refine.addEventListener("click", () =>
-        alert("작성된 내용을 수정하였습니다. 확인하시기 바랍니다.")
+        showToast("문맥을 다듬는 중입니다...")
       );
-      DOM.btns.copy.addEventListener("click", async () => {
-        const text = DOM.previewBox.textContent.trim();
-        if (!text) return;
-        try {
-          await navigator.clipboard.writeText(text);
-          alert("작성된 내용을 NEIS에 입력합니다.");
-        } catch (e) {
-          alert("복사 실패");
-        }
-      });
-      DOM.previewBox.addEventListener("input", updateCharCount);
 
-      // --- 초기 실행 ---
+      DOM.btns.copy.addEventListener("click", () => {
+        alert("작성된 내용을 NEIS에 입력합니다.");
+      });
+
+      // 초기 실행
       renderSubunitButtons(state.unit);
-      updateCharCount();
+      updateByteCount();
     </script>
   </body>
 </html>
