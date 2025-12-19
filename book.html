@@ -2,9 +2,9 @@
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <title>독서활동상황관리 - 디자인 통합</title>
+    <title>독서활동상황관리 - 파일 기능 강화</title>
     <style>
-      /* [디자인 통일] 폰트 및 기본 컬러 설정 */
+      /* [기존 디자인 유지] */
       * {
         box-sizing: border-box;
       }
@@ -15,7 +15,6 @@
         color: #333;
       }
 
-      /* [디자인 통일] 상단바 스타일 */
       .topbar {
         height: 48px;
         background: #f5c6cf;
@@ -23,7 +22,7 @@
         align-items: center;
         padding: 0 16px;
         font-weight: 700;
-        border-bottom: 1px solid #e5adba; /* 테두리 추가 */
+        border-bottom: 1px solid #e5adba;
         color: #333;
       }
 
@@ -34,45 +33,46 @@
       }
       .left,
       .right {
-        padding: 25px; /* 여백 16px -> 25px 통일 */
+        padding: 25px;
         background: #fff;
-        overflow-y: auto; /* 스크롤바 스타일 통일 */
+        overflow-y: auto;
       }
       .left {
         border-right: 1px solid #e5e7eb;
       }
 
-      /* [디자인 통일] 입력 카드 스타일 */
+      /* 입력 카드 스타일 */
       .card {
         border-radius: 12px;
-        border: 1px solid #d1d5db; /* 테두리 색상 조정 */
-        background: #fff; /* 배경 흰색으로 통일 */
-        padding: 20px; /* 내부 여백 확장 */
+        border: 1px solid #d1d5db;
+        background: #fff;
+        padding: 25px;
         margin-bottom: 20px;
         position: relative;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* 미세한 그림자 추가 */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
       }
       .card-title {
         font-weight: 700;
         margin-bottom: 15px;
         font-size: 16px;
         color: #1f2937;
+        border-bottom: 2px solid #f3f4f6;
+        padding-bottom: 10px;
       }
       .field {
         margin-bottom: 15px;
       }
 
-      /* [디자인 통일] 라벨 및 입력창 */
       .label {
         font-size: 13px;
         font-weight: 600;
         color: #4b5563;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
         display: block;
       }
       .input {
         width: 100%;
-        padding: 12px; /* 8px -> 12px 확장 */
+        padding: 10px 12px;
         border-radius: 8px;
         border: 1px solid #d1d5db;
         font-size: 14px;
@@ -85,18 +85,8 @@
         box-shadow: 0 0 0 3px rgba(31, 77, 220, 0.1);
       }
 
-      /* [디자인 통일] 버튼 스타일 */
-      .btn-row {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-        gap: 8px;
-        margin-top: 20px;
-        padding-top: 15px;
-        border-top: 1px solid #f3f4f6;
-      }
       .btn {
-        padding: 10px 18px; /* 버튼 크기 확대 */
+        padding: 10px 18px;
         border-radius: 8px;
         font-size: 13px;
         font-weight: 600;
@@ -112,25 +102,32 @@
       }
       .btn.primary {
         background: #1f4ddc;
-        border-color: #163aa5;
         color: #fff;
+        border-color: #163aa5;
       }
       .btn.primary:hover {
         background: #1b43c1;
       }
-
       .btn.danger {
         background: #fff;
-        border-color: #ffcccc;
         color: #e11d48;
+        border-color: #ffcccc;
       }
       .btn.danger:hover {
         background: #fff1f2;
       }
+      .btn.success {
+        background: #10b981;
+        color: #fff;
+        border-color: #059669;
+      }
+      .btn.success:hover {
+        background: #059669;
+      }
 
       .btn.add {
         width: 100%;
-        margin-top: 15px;
+        margin-top: 10px;
         background: #eff6ff;
         border-color: #bfdbfe;
         color: #1d4ed8;
@@ -138,6 +135,13 @@
       }
       .btn.add:hover {
         background: #dbeafe;
+      }
+
+      .btn-row {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 20px;
       }
 
       /* 자동 완성 */
@@ -157,6 +161,7 @@
         max-height: 200px;
         overflow-y: auto;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        display: none;
       }
       .autocomplete-item {
         padding: 10px 15px;
@@ -173,8 +178,7 @@
       .student-selector-area {
         margin-top: 20px;
         padding-top: 15px;
-        border-top: 1px solid #f3f4f6;
-        margin-bottom: 10px;
+        border-top: 1px dashed #e5e7eb;
       }
       .student-buttons {
         display: flex;
@@ -213,7 +217,6 @@
       .selection-status {
         font-size: 13px;
         color: #6b7280;
-        margin-top: 5px;
       }
 
       /* 우측 영역 */
@@ -284,7 +287,7 @@
         font-style: italic;
       }
 
-      /* 증빙자료 스타일 */
+      /* [수정] 증빙자료 스타일 강화 */
       .doc-list-container {
         margin-top: 15px;
         padding-top: 12px;
@@ -306,33 +309,62 @@
         list-style: none;
         margin: 0;
       }
+
+      /* 개별 파일 아이템 */
       .doc-item {
         color: #2563eb;
-        padding: 3px 0;
+        padding: 4px 8px;
         display: flex;
         align-items: center;
-        gap: 5px;
+        justify-content: space-between;
+        background: #f0f9ff;
+        border-radius: 6px;
+        margin-bottom: 4px;
+        border: 1px solid #dbeafe;
       }
-      .no-doc-item {
-        color: #9ca3af;
+      .doc-name {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
 
-      .toast {
+      /* 삭제 버튼 */
+      .btn-del-doc {
+        background: transparent;
+        border: none;
+        color: #ef4444;
+        font-weight: bold;
+        cursor: pointer;
+        padding: 2px 6px;
+        font-size: 12px;
+        border-radius: 4px;
+      }
+      .btn-del-doc:hover {
+        background: #fee2e2;
+      }
+
+      .no-doc-item {
+        color: #9ca3af;
+        padding: 4px 0;
+        font-style: italic;
+      }
+
+      #toast {
         position: fixed;
+        bottom: 30px;
         left: 50%;
         transform: translateX(-50%);
-        bottom: 30px;
         background: #333;
         color: #fff;
-        font-size: 13px;
         padding: 10px 25px;
         border-radius: 30px;
+        font-size: 13px;
         opacity: 0;
-        pointer-events: none;
         transition: 0.3s;
+        pointer-events: none;
         z-index: 2000;
       }
-      .toast.show {
+      #toast.show {
         opacity: 1;
         bottom: 40px;
       }
@@ -340,12 +372,13 @@
   </head>
 
   <body>
+    <div id="toast">알림</div>
     <div class="topbar">독서활동상황관리</div>
 
     <div class="container">
       <section class="left">
         <div id="bookList"></div>
-        <button class="btn add" id="btnAddBook">+ 책 추가</button>
+        <button class="btn add" id="btnAddBook">+ 도서 기록 카드 추가</button>
       </section>
 
       <section class="right">
@@ -355,8 +388,8 @@
             <button type="button" class="btn danger" id="btnDeleteMode">
               기록 삭제 모드
             </button>
-            <button type="button" class="btn primary" id="btnCopy">
-              NEIS에 기재
+            <button type="button" class="btn success" id="btnCopy">
+              💾 적용하기
             </button>
           </div>
         </div>
@@ -437,6 +470,7 @@
         return result;
       }
 
+      // [수정] 파일 업로드 핸들러 (누적 저장 방식)
       function handleDocumentUpload(event) {
         const fileInput = event.target;
         const studentId = fileInput.dataset.studentId;
@@ -446,13 +480,31 @@
           const newFileNames = Array.from(fileInput.files).map(
             (file) => file.name
           );
-          studentDocuments.set(studentId, newFileNames);
+          const currentDocs = studentDocuments.get(studentId) || [];
+
+          // 기존 파일 목록에 새 파일 목록 추가 (누적)
+          studentDocuments.set(studentId, [...currentDocs, ...newFileNames]);
+
           showToast(
-            `${student.name} 학생에게 총 ${newFileNames.length}개의 증빙자료가 등록되었습니다.`
+            `${student.name} 학생에게 ${newFileNames.length}개의 파일이 추가되었습니다.`
           );
         }
         renderStudentRecords();
-        fileInput.value = null;
+        fileInput.value = null; // 입력 초기화 (같은 파일 다시 선택 가능하게)
+      }
+
+      // [추가] 개별 파일 삭제 함수
+      function deleteDocument(studentId, docIndex) {
+        const student = STUDENT_LIST.find((s) => s.id === studentId);
+        if (!confirm(`${student.name} 학생의 해당 파일을 삭제하시겠습니까?`))
+          return;
+
+        const currentDocs = studentDocuments.get(studentId);
+        currentDocs.splice(docIndex, 1); // 해당 인덱스 파일 제거
+        studentDocuments.set(studentId, currentDocs);
+
+        renderStudentRecords();
+        showToast("파일이 삭제되었습니다.");
       }
 
       function renderStudentRecords() {
@@ -464,54 +516,49 @@
           wrap.className = "student-record-block";
           wrap.dataset.id = student.id;
 
-          if (isDeleteMode) {
-            wrap.classList.add("delete-mode-active");
-          }
+          if (isDeleteMode) wrap.classList.add("delete-mode-active");
 
           const recordText = studentRecords.get(student.id).trim();
           const docList = studentDocuments.get(student.id);
+
           const finalCopyText = recordText.replace(/[『』]/g, "");
           const totalByte = getByteLength(finalCopyText);
 
           let contentHtml;
           if (recordText) {
-            let displayRecord = finalCopyText.trim();
-            if (displayRecord.length > 500) {
-              displayRecord = displayRecord.slice(0, 500) + "...";
-            }
-            contentHtml = `<div class="record-content">${displayRecord}</div>`;
+            contentHtml = `<div class="record-content">${finalCopyText}</div>`;
           } else {
             contentHtml = `<div class="record-content no-record">입력된 독서 기록이 없습니다.</div>`;
           }
 
+          // [수정] 파일 목록 렌더링 (삭제 버튼 포함)
           const docListItems =
             docList.length > 0
               ? docList
-                  .map((name) => `<li class="doc-item">📁 ${name}</li>`)
+                  .map(
+                    (name, idx) => `
+                  <li class="doc-item">
+                    <span class="doc-name">📁 ${name}</span>
+                    <button class="btn-del-doc" onclick="event.stopPropagation(); deleteDocument('${student.id}', ${idx})">✕</button>
+                  </li>
+                `
+                  )
                   .join("")
-              : `<li class="doc-item no-doc-item">업로드된 파일 없음</li>`;
+              : `<li class="no-doc-item">업로드된 파일 없음</li>`;
 
           const docControlHtml = `
               <div class="doc-list-container">
                   <div class="doc-list-header">
                       <span>증빙자료 (${docList.length}개):</span>
                       <input type="file" id="upload_${student.id}" style="display: none;" 
-                             data-student-id="${student.id}"
-                             multiple 
-                             onchange="handleDocumentUpload(event)"
-                      />
-                      <button 
-                          type="button" 
-                          class="btn sm" 
+                             data-student-id="${student.id}" multiple onchange="handleDocumentUpload(event)" />
+                      <button type="button" class="btn sm" 
                           style="background: #e0f7fa; color: #006064; border-color: #b2ebf2;"
-                          onclick="document.getElementById('upload_${student.id}').click()"
-                      >
-                          새 자료 업로드/덮어쓰기
+                          onclick="event.stopPropagation(); document.getElementById('upload_${student.id}').click()">
+                          + 파일 추가
                       </button>
                   </div>
-                  <ul class="doc-list">
-                      ${docListItems}
-                  </ul>
+                  <ul class="doc-list">${docListItems}</ul>
               </div>
           `;
 
@@ -526,23 +573,18 @@
             </div>
             <div style="font-size: 13px; font-weight: 600; margin-bottom: 6px; color:#4b5563;">작성 내용:</div>
             ${contentHtml}
-            ${docControlHtml} `;
+            ${docControlHtml}
+          `;
 
           wrap.addEventListener("click", () => {
-            if (isDeleteMode) {
-              deleteStudentRecords(student.id, student.name);
-            }
+            if (isDeleteMode) deleteStudentRecords(student.id, student.name);
           });
           listEl.appendChild(wrap);
         });
       }
 
       function deleteStudentRecords(studentId, studentName) {
-        if (
-          confirm(
-            `${studentName} 학생의 독서 기록과 증빙자료를 삭제하시겠습니까?`
-          )
-        ) {
+        if (confirm(`${studentName} 학생의 데이터를 삭제하시겠습니까?`)) {
           studentRecords.set(studentId, "");
           studentDocuments.set(studentId, []);
           showToast(`${studentName} 학생의 데이터가 삭제되었습니다.`);
@@ -553,12 +595,8 @@
       function createStudentSelectorHTML(cardId) {
         let buttonsHTML = STUDENT_LIST.map(
           (student) => `
-              <button 
-                  type="button" 
-                  class="student-select-btn" 
-                  data-id="${student.id}"
-                  data-name="${student.name}"
-              >${student.name}</button>
+              <button type="button" class="student-select-btn" 
+                  data-id="${student.id}" data-name="${student.name}">${student.name}</button>
           `
         ).join("");
 
@@ -569,9 +607,7 @@
                       <button type="button" class="btn" id="${cardId}_select_all">전체 선택</button>
                       <button type="button" class="btn" id="${cardId}_clear_all">전체 취소</button>
                   </div>
-                  <div class="student-buttons" id="${cardId}_student_buttons">
-                      ${buttonsHTML}
-                  </div>
+                  <div class="student-buttons" id="${cardId}_student_buttons">${buttonsHTML}</div>
                   <div class="selection-status" id="${cardId}_selection_status">선택된 학생: 0명</div>
               </div>
           `;
@@ -591,8 +627,8 @@
             names.length
           }명)`;
         else
-          statusEl.textContent = `선택된 학생: ${names[0]}, ${names[1]} 외 ${
-            names.length - 2
+          statusEl.textContent = `선택된 학생: ${names[0]} 외 ${
+            names.length - 1
           }명 (${names.length}명)`;
       }
 
@@ -603,14 +639,16 @@
         card.className = "card";
         card.id = id;
         card.innerHTML = `
-        <div class="card-title">📖 독서 기록 ${cardIdCounter}</div>
+        <div class="card-title">📖 독서 기록 입력 카드 ${cardIdCounter}</div>
+        
         <div class="field">
-          <div class="label">도서명 (검색하여 선택)</div>
+          <div class="label">도서명 검색 (자동 완성)</div>
           <div class="autocomplete-wrapper">
             <input type="text" class="input book-title" id="${id}_search_title" placeholder="책 제목을 입력하세요 (예: 코스모스)" autocomplete="off" />
             <div class="autocomplete-results" id="${id}_results" style="display: none;"></div>
           </div>
         </div>
+
         <div class="field" style="display: flex; gap: 10px;">
             <div style="flex: 1;">
               <div class="label">확정된 책 제목</div>
@@ -621,10 +659,12 @@
               <input type="text" class="input final-author" id="${id}_final_author" placeholder="저자" />
             </div>
         </div>
+
         ${createStudentSelectorHTML(id)}
+        
         <div class="btn-row">
+            <button class="btn danger" id="${id}_delete">카드 삭제</button>
             <button class="btn primary" id="${id}_apply">선택 학생에게 적용</button>
-            <button class="btn danger" id="${id}_delete">삭제</button>
         </div>
       `;
 
@@ -774,8 +814,10 @@
           let merged = currentText
             ? currentText + ", " + finalRecord
             : finalRecord;
+
           if (getByteLength(merged) > MAX_BYTE)
             merged = sliceByByte(merged, MAX_BYTE);
+
           studentRecords.set(studentId, merged);
           appliedCount++;
         });
@@ -794,7 +836,7 @@
           btn.style.backgroundColor = "#dcfce7";
           btn.style.borderColor = "#bbf7d0";
           btn.style.color = "#15803d";
-          showToast("삭제 모드: 기록을 클릭하여 삭제하세요.");
+          showToast("기록을 클릭하여 삭제하세요.");
         } else {
           btn.textContent = "기록 삭제 모드";
           btn.style.backgroundColor = "";
@@ -814,22 +856,13 @@
           return showToast("기록된 내용이 없습니다.");
 
         let totalCopyText = "";
-        const studentNames = [];
         studentsWithRecord.forEach((student) => {
           const text = studentRecords.get(student.id).trim();
-          const finalCopyText = text.replace(/[『』]/g, "");
-          if (studentNames.length === 0) totalCopyText = finalCopyText;
-          studentNames.push(student.name);
+          if (!totalCopyText) totalCopyText = text.replace(/[『』]/g, ""); // 첫 학생만 복사
         });
 
         if (totalCopyText) navigator.clipboard.writeText(totalCopyText);
-        alert(
-          `총 ${
-            studentsWithRecord.length
-          }명 완료.\n[완료 명단]: ${studentNames.join(
-            ", "
-          )}\n\n(첫 번째 학생 기록이 복사되었습니다.)`
-        );
+        alert("작성된 내용을 NEIS에 입력합니다.");
       });
 
       document.getElementById("btnAddBook").addEventListener("click", () => {
