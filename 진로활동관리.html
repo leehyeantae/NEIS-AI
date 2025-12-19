@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>진로활동 관리 시스템</title>
+    <style>
+      /* 기존 스타일 유지 */
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: "Segoe UI", -apple-system, sans-serif;
+        background: #f5f6f8;
+        color: #333;
+        overflow: hidden;
+      }
+      .topbar {
+        height: 48px;
+        background: #f5c6cf;
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        font-weight: 700;
+        border-bottom: 1px solid #e5adba;
+      }
+      .container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        height: calc(100vh - 48px);
+      }
+      .left {
+        display: flex;
+        flex-direction: column;
+        padding: 25px;
+        border-right: 1px solid #e5e7eb;
+        background: #fff;
+        gap: 15px;
+      }
+      .right {
+        padding: 25px;
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+      }
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 5px;
+      }
+      .section-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1f2937;
+      }
+      .search-container {
+        position: relative;
+        width: 100%;
+      }
+      .autocomplete-list {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #d1d5db;
+        border-top: none;
+        border-radius: 0 0 8px 8px;
+        z-index: 1000;
+        display: none;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .auto-item {
+        padding: 10px 15px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .auto-item.selected {
+        background: #eff6ff;
+        color: #1f4ddc;
+        font-weight: 600;
+      }
+      .flex-1 {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+      .flex-2 {
+        flex: 2;
+        display: flex;
+        flex-direction: column;
+      }
+      .input,
+      .textarea,
+      .select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 14px;
+      }
+      .textarea {
+        flex: 1;
+        resize: none;
+        line-height: 1.6;
+      }
+      .btn {
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        border: 1px solid #d1d5db;
+        background: #fff;
+        transition: 0.2s;
+      }
+      .btn.primary {
+        background: #1f4ddc;
+        color: #fff;
+        border-color: #163aa5;
+      }
+      .btn.success {
+        background: #10b981;
+        color: #fff;
+        border-color: #059669;
+      }
+      .btn.accent {
+        background: #f59e0b;
+        color: #fff;
+        border-color: #d97706;
+      }
+      .btn.sm {
+        padding: 4px 8px;
+        font-size: 11px;
+      }
+      .preview-box {
+        flex: 1;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 25px;
+        font-size: 15px;
+        line-height: 1.8;
+        white-space: pre-wrap;
+        outline: none;
+        background: #fff;
+        overflow-y: auto;
+      }
+      .counter {
+        text-align: right;
+        margin-top: 10px;
+        font-size: 13px;
+        color: #6b7280;
+      }
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 2000;
+      }
+      .modal-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 1150px;
+        height: 85vh;
+        background: #fff;
+        border-radius: 16px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .modal-header {
+        padding: 18px 25px;
+        background: #f9fafb;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .modal-body {
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        flex: 1;
+        overflow: hidden;
+      }
+      .student-list {
+        background: #f8fafc;
+        border-right: 1px solid #e5e7eb;
+        padding: 20px 0;
+        overflow-y: auto;
+      }
+      .student-item {
+        padding: 15px 30px;
+        cursor: pointer;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 15px;
+        transition: 0.2s;
+      }
+      .student-item:hover {
+        background: #f1f5f9;
+      }
+      .student-item.active {
+        background: #eff6ff;
+        color: #1f4ddc;
+        font-weight: 700;
+        border-right: 4px solid #1f4ddc;
+      }
+      .log-entry {
+        padding: 30px;
+        overflow-y: auto;
+      }
+      #toast {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #333;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 30px;
+        font-size: 13px;
+        opacity: 0;
+        transition: 0.3s;
+        z-index: 3000;
+        pointer-events: none;
+      }
+      .inner-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        background: #f9fafb;
+        padding: 15px;
+        margin-bottom: 15px;
+      }
+      .badge {
+        font-size: 12px;
+        padding: 2px 7px;
+        border-radius: 999px;
+        background: #eef2ff;
+        color: #3730a3;
+        font-weight: bold;
+        margin-bottom: 10px;
+        display: inline-block;
+      }
+      .history-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 10px;
+        background: #f9fafb;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        border: 1px solid #eee;
+      }
+      .history-content {
+        font-size: 13.5px;
+        line-height: 1.4;
+        flex: 1;
+      }
+      .history-actions {
+        display: flex;
+        gap: 5px;
+        margin-left: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="toast">알림 메시지</div>
+    <div class="topbar">진로활동 관리 시스템</div>
+
+    <div class="container">
+      <section class="left">
+        <div class="section-header">
+          <div class="section-title">진로 데이터 로드 및 생성</div>
+          <button class="btn accent" onclick="openModal()">
+            📅 상세 기록 관리
+          </button>
+        </div>
+
+        <div class="search-container">
+          <input
+            type="text"
+            class="input"
+            id="studentSearch"
+            placeholder="학생 이름을 검색하세요 (방향키/엔터 사용)"
+            autocomplete="off"
+          />
+          <div id="autoList" class="autocomplete-list"></div>
+        </div>
+
+        <div class="flex-1">
+          <div class="section-header">
+            <label class="section-title">불러온 진로 활동 요약</label>
+            <button class="btn sm" onclick="loadMainSummary()">
+              🔄 데이터 불러오기
+            </button>
+          </div>
+          <textarea
+            id="rawDataDisplay"
+            class="textarea"
+            readonly
+            placeholder="팝업에서 저장된 데이터가 표시됩니다."
+          ></textarea>
+        </div>
+
+        <button
+          class="btn primary"
+          style="height: 48px; font-size: 15px"
+          onclick="generateCareerAI()"
+        >
+          ✨ AI 진로 문장 생성
+        </button>
+
+        <div class="flex-2">
+          <label
+            class="section-title"
+            style="margin-bottom: 8px; display: block"
+            >AI 생성 초안 (교사 수정)</label
+          >
+          <textarea
+            id="tempDraft"
+            class="textarea"
+            style="background: #fdfbff; border-color: #c7d2fe"
+          ></textarea>
+          <button
+            class="btn success"
+            style="width: 100%; margin-top: 10px"
+            onclick="moveToFinal()"
+          >
+            우측 결과창으로 보내기 →
+          </button>
+        </div>
+      </section>
+
+      <section class="right">
+        <div class="section-header" style="margin-bottom: 15px">
+          <div class="section-title">진로활동 최종 기재 내용</div>
+          <div style="display: flex; gap: 8px">
+            <button
+              class="btn"
+              onclick="alert('AI가 문장 흐름과 맞춤법을 보정합니다.')"
+            >
+              🪄 전체 AI 다듬기
+            </button>
+            <button class="btn success" onclick="finalApply()">
+              💾 적용하기
+            </button>
+          </div>
+        </div>
+        <div
+          id="finalPreview"
+          class="preview-box"
+          contenteditable="true"
+          oninput="updateByte()"
+        >
+          학생을 선택하고 문장을 생성해 주세요.
+        </div>
+        <div class="counter">
+          실시간 글자수:
+          <span id="byteCount" style="color: #1f4ddc; font-weight: 700">0</span>
+          / 2100 Byte
+        </div>
+      </section>
+    </div>
+
+    <div id="logModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span style="font-size: 18px; font-weight: 700; color: #374151"
+            >📅 학생별 진로 상세 기록 통합 관리</span
+          >
+          <button class="btn" onclick="closeModal()">닫기</button>
+        </div>
+        <div class="modal-body">
+          <div class="student-list" id="modalStudentList"></div>
+          <div class="log-entry">
+            <h3
+              id="modalStudentTitle"
+              style="
+                margin-top: 0;
+                margin-bottom: 25px;
+                color: #1f4ddc;
+                font-size: 22px;
+              "
+            >
+              학생을 선택해 주세요
+            </h3>
+
+            <div
+              class="inner-card"
+              style="background: #fff; border: 2px solid #eef2ff"
+            >
+              <span class="badge">1. 희망 분야</span>
+              <input
+                id="hopeField"
+                type="text"
+                class="input"
+                placeholder="진로가 없거나 정하는 중이면 '진로 탐색 중', '미정' 입력"
+              />
+            </div>
+
+            <div
+              style="
+                background: #f8fafc;
+                padding: 25px;
+                border-radius: 12px;
+                border: 1px solid #e5e7eb;
+              "
+            >
+              <div id="careerItemsContainer"></div>
+              <div style="margin-top: 20px; display: flex; gap: 10px">
+                <button class="btn sm" onclick="addCareerItem('검사')">
+                  + 진로/적성 검사 추가
+                </button>
+                <button class="btn sm" onclick="addCareerItem('강연')">
+                  + 외부 강연 추가
+                </button>
+                <button class="btn sm" onclick="addCareerItem('기타')">
+                  + 기타 활동 추가
+                </button>
+                <button
+                  class="btn success"
+                  style="margin-left: auto; padding: 10px 25px"
+                  onclick="saveToDB()"
+                >
+                  💾 현재 학생 데이터 저장
+                </button>
+              </div>
+            </div>
+
+            <div
+              class="section-title"
+              style="margin-top: 40px; font-size: 16px"
+            >
+              🕒 임시 저장된 기록 목록 (수정/삭제 가능)
+            </div>
+            <div
+              id="historyListView"
+              style="
+                margin-top: 15px;
+                border: 1px solid #e5e7eb;
+                border-radius: 10px;
+                padding: 20px;
+                background: #fff;
+              "
+            >
+              기록이 없습니다.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const TEST_OPTIONS = [
+        "커리어넷 직업흥미검사(H형)",
+        "커리어넷 직업가치관검사",
+        "커리어넷 직업적성검사",
+        "청소년 진로탐색검사",
+        "다중지능 검사",
+      ];
+      const RESULT_CATEGORIES = [
+        "현실형",
+        "탐구형",
+        "예술형",
+        "사회형",
+        "진취형",
+        "관습형",
+        "능력발휘",
+        "자율성",
+        "창의성",
+      ];
+      const students = ["김태연", "박지성", "최민호", "정소민", "이하은"];
+      let db = {};
+      let selectedIndex = -1;
+      let currentStudent = "";
+      let recordIdCounter = 0;
+
+      window.onload = () => {
+        students.forEach((name) => (db[name] = { hope: "", items: [] }));
+        initModalList();
+      };
+
+      // --- 검색 자동완성 & 키보드 조작 (기존과 동일) ---
+      const searchInput = document.getElementById("studentSearch");
+      const autoList = document.getElementById("autoList");
+
+      searchInput.addEventListener("input", () => {
+        const val = searchInput.value;
+        autoList.innerHTML = "";
+        selectedIndex = -1;
+        if (!val) {
+          autoList.style.display = "none";
+          return;
+        }
+        const matched = students.filter((s) => s.includes(val));
+        matched.forEach((name, idx) => {
+          const div = document.createElement("div");
+          div.className = "auto-item";
+          div.textContent = name;
+          div.onclick = () => selectStudent(name);
+          autoList.appendChild(div);
+        });
+        autoList.style.display = matched.length ? "block" : "none";
+      });
+
+      searchInput.addEventListener("keydown", (e) => {
+        const items = autoList.getElementsByClassName("auto-item");
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          selectedIndex++;
+          if (selectedIndex >= items.length) selectedIndex = 0;
+          updateSelection(items);
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          selectedIndex--;
+          if (selectedIndex < 0) selectedIndex = items.length - 1;
+          updateSelection(items);
+        } else if (e.key === "Enter") {
+          if (selectedIndex > -1)
+            selectStudent(items[selectedIndex].textContent);
+          else if (items.length > 0) selectStudent(items[0].textContent);
+        }
+      });
+
+      function updateSelection(items) {
+        Array.from(items).forEach((item, idx) =>
+          item.classList.toggle("selected", idx === selectedIndex)
+        );
+      }
+      function selectStudent(name) {
+        searchInput.value = name;
+        autoList.style.display = "none";
+        loadMainSummary();
+        showToast(`${name} 학생이 선택되었습니다.`);
+      }
+
+      // --- 모달 로직 (기존과 동일) ---
+      function openModal() {
+        document.getElementById("logModal").style.display = "block";
+      }
+      function closeModal() {
+        document.getElementById("logModal").style.display = "none";
+      }
+      function showToast(m) {
+        const t = document.getElementById("toast");
+        t.textContent = m;
+        t.style.opacity = 1;
+        setTimeout(() => (t.style.opacity = 0), 2000);
+      }
+
+      function initModalList() {
+        const list = document.getElementById("modalStudentList");
+        students.forEach((name) => {
+          const div = document.createElement("div");
+          div.className = "student-item";
+          div.textContent = name;
+          div.onclick = () => {
+            currentStudent = name;
+            document
+              .querySelectorAll(".student-item")
+              .forEach((i) => i.classList.remove("active"));
+            div.classList.add("active");
+            document.getElementById(
+              "modalStudentTitle"
+            ).textContent = `[${name}] 학생 진로 기록 상세`;
+            document.getElementById("hopeField").value = db[name].hope;
+            renderItemsFromDB();
+            renderHistory();
+          };
+          list.appendChild(div);
+        });
+      }
+
+      function addCareerItem(type, data = null) {
+        if (!currentStudent) return alert("학생을 먼저 선택하세요.");
+        const container = document.getElementById("careerItemsContainer");
+        const div = document.createElement("div");
+        div.className = "inner-card career-input-row";
+        div.dataset.id = data ? data.id : recordIdCounter++;
+
+        let contentHtml = `<span class="badge">${type}</span>`;
+        if (type === "검사") {
+          contentHtml += `
+                <div style="display:flex; gap:8px; margin-bottom:8px;">
+                    <select class="select item-name" style="flex:1;">
+                        <option disabled ${
+                          !data ? "selected" : ""
+                        }>검사 종류 선택</option>
+                        ${TEST_OPTIONS.map(
+                          (o) =>
+                            `<option ${
+                              data?.name === o ? "selected" : ""
+                            }>${o}</option>`
+                        ).join("")}
+                    </select>
+                </div>
+                <div style="display:flex; gap:5px; margin-bottom:8px;">
+                    <select class="select item-r1" style="flex:1;"><option disabled selected>1순위</option>${RESULT_CATEGORIES.map(
+                      (c) =>
+                        `<option ${
+                          data?.results?.[0] === c ? "selected" : ""
+                        }>${c}</option>`
+                    ).join("")}</select>
+                    <select class="select item-r2" style="flex:1;"><option disabled selected>2순위</option>${RESULT_CATEGORIES.map(
+                      (c) =>
+                        `<option ${
+                          data?.results?.[1] === c ? "selected" : ""
+                        }>${c}</option>`
+                    ).join("")}</select>
+                    <select class="select item-r3" style="flex:1;"><option disabled selected>3순위</option>${RESULT_CATEGORIES.map(
+                      (c) =>
+                        `<option ${
+                          data?.results?.[2] === c ? "selected" : ""
+                        }>${c}</option>`
+                    ).join("")}</select>
+                </div>
+            `;
+        } else {
+          contentHtml += `<input type="text" class="input item-name" style="margin-bottom: 8px;" placeholder="${type}명 (주제) 입력" value="${
+            data?.name || ""
+          }">`;
+        }
+
+        contentHtml += `
+            <textarea class="textarea item-detail" placeholder="상세 내용 입력">${
+              data?.detail || ""
+            }</textarea>
+            <div style="text-align:right; margin-top:8px;"><button class="btn sm" style="color:red; border-color:#ffcfcf;" onclick="this.closest('.inner-card').remove()">항목 삭제</button></div>
+        `;
+        div.innerHTML = contentHtml;
+        container.appendChild(div);
+      }
+
+      function renderItemsFromDB() {
+        const container = document.getElementById("careerItemsContainer");
+        container.innerHTML = "";
+        db[currentStudent].items.forEach((item) =>
+          addCareerItem(item.type, item)
+        );
+      }
+
+      function saveToDB() {
+        if (!currentStudent) return;
+        const items = [];
+        document.querySelectorAll(".career-input-row").forEach((row) => {
+          const type = row.querySelector(".badge").textContent;
+          const name = row.querySelector(".item-name").value;
+          const detail = row.querySelector(".item-detail").value;
+          const id = row.dataset.id;
+
+          const item = { id, type, name, detail };
+          if (type === "검사") {
+            item.results = [
+              row.querySelector(".item-r1").value,
+              row.querySelector(".item-r2").value,
+              row.querySelector(".item-r3").value,
+            ].filter((v) => !["1순위", "2순위", "3순위"].includes(v));
+          }
+          if (name) items.push(item);
+        });
+        db[currentStudent].hope = document.getElementById("hopeField").value;
+        db[currentStudent].items = items;
+        renderHistory();
+        showToast("데이터가 임시 저장되었습니다.");
+      }
+
+      function renderHistory() {
+        const view = document.getElementById("historyListView");
+        const data = db[currentStudent];
+        if (!data.items.length && !data.hope) {
+          view.innerHTML = "기록이 없습니다.";
+          return;
+        }
+
+        let html = `<div><b>희망 분야:</b> ${
+          data.hope || "미정"
+        }</div><hr style="border:0; border-top:1px solid #eee; margin:10px 0;">`;
+        data.items.forEach((item) => {
+          let resText = item.results
+            ? ` (결과: ${item.results.join(", ")})`
+            : "";
+          html += `
+                <div class="history-item">
+                    <div class="history-content"><b>[${item.type}] ${item.name}</b>${resText}<br>${item.detail}</div>
+                    <div class="history-actions">
+                        <button class="btn sm" onclick="editItem('${item.id}')">수정</button>
+                        <button class="btn sm" style="color:red;" onclick="deleteItem('${item.id}')">삭제</button>
+                    </div>
+                </div>`;
+        });
+        view.innerHTML = html;
+      }
+
+      function deleteItem(id) {
+        if (!confirm("정말 삭제하시겠습니까?")) return;
+        db[currentStudent].items = db[currentStudent].items.filter(
+          (i) => i.id != id
+        );
+        renderItemsFromDB();
+        renderHistory();
+      }
+
+      function editItem(id) {
+        const item = db[currentStudent].items.find((i) => i.id == id);
+        if (!item) return;
+        document.getElementById("careerItemsContainer").innerHTML = "";
+        addCareerItem(item.type, item);
+        showToast("수정 후 다시 '현재 학생 데이터 저장'을 눌러주세요.");
+      }
+
+      function loadMainSummary() {
+        const name = searchInput.value;
+        if (db[name]) {
+          const data = db[name];
+          let summary = `[희망 분야] ${
+            data.hope || "미정"
+          }\n\n[진로 활동 내역]\n`;
+          data.items.forEach((item) => {
+            let res = item.results ? ` (${item.results.join(", ")})` : "";
+            summary += `- ${item.type}: ${item.name}${res} / ${item.detail}\n`;
+          });
+          document.getElementById("rawDataDisplay").value = summary;
+        }
+      }
+
+      // [수정] AI 생성 로직: 진로 미정/탐색 시 긍정적 서술 처리
+      function generateCareerAI() {
+        const name = searchInput.value;
+        if (!db[name] || !db[name].items.length)
+          return alert("저장된 데이터가 없습니다.");
+        const data = db[name];
+
+        let hopeField = (data.hope || "").trim();
+        let isUndecided = ["미정", "진로 탐색 중", "탐색 중", ""].includes(
+          hopeField
+        );
+
+        let intro = isUndecided
+          ? `아직 구체적인 진로를 확정하지 않았으나 다양한 활동을 통해 자신의 적성을 다각도로 탐색하고 있음. `
+          : `자신의 희망 분야인 '${hopeField}'과 관련하여 뚜렷한 목표 의식을 가지고 꾸준히 탐구함. `;
+
+        let body = "";
+        data.items.forEach((item) => {
+          if (item.type === "검사") {
+            body += `${item.name} 결과 ${item.results.join(
+              ", "
+            )} 영역에서 높은 성향을 보였으며, 이를 바탕으로 ${
+              item.detail
+            } 등의 긍정적 반응을 보임. `;
+          } else {
+            body += `「${item.name}」 ${item.type}에 참여하여 ${item.detail}를(을) 통해 진로 의식을 고취함. `;
+          }
+        });
+
+        let outro = isUndecided
+          ? "앞으로 다양한 진로 체험을 통해 자신에게 맞는 길을 찾아갈 것으로 기대됨."
+          : "종합적으로 자신의 강점을 명확히 이해하고 구체적인 진로 로드맵을 설계하려는 노력이 매우 돋보임.";
+
+        document.getElementById("tempDraft").value = intro + body + outro;
+      }
+
+      function moveToFinal() {
+        const text = document.getElementById("tempDraft").value;
+        const target = document.getElementById("finalPreview");
+        if (target.innerText.includes("학생을 선택하고")) target.innerText = "";
+        target.innerText += (target.innerText ? "\n\n" : "") + text;
+        updateByte();
+      }
+
+      function updateByte() {
+        const text = document.getElementById("finalPreview").innerText;
+        let bytes = 0;
+        for (let i = 0; i < text.length; i++)
+          bytes += text.charCodeAt(i) > 127 ? 3 : 1;
+        document.getElementById("byteCount").textContent = bytes;
+      }
+
+      function finalApply() {
+        alert("작성된 내용을 NEIS에 입력합니다.");
+      }
+    </script>
+  </body>
+</html>
