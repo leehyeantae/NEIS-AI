@@ -2,9 +2,9 @@
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <title>동아리활동 관리 - 최종 완성</title>
+    <title>동아리활동 관리 - 1인(이현태) 전용</title>
     <style>
-      /* [기존 스타일 유지] */
+      /* [기존 디자인 및 스타일 100% 유지] */
       * {
         box-sizing: border-box;
       }
@@ -22,6 +22,7 @@
         padding: 0 16px;
         font-weight: 700;
         border-bottom: 1px solid #e5adba;
+        color: #333;
       }
 
       .container {
@@ -63,16 +64,19 @@
         color: #4b5563;
       }
       .input,
-      .textarea {
+      .textarea,
+      .select {
         width: 100%;
         padding: 12px;
         border: 1px solid #d1d5db;
         border-radius: 8px;
         font-size: 14px;
         transition: border 0.2s;
+        background: #fff;
       }
       .input:focus,
-      .textarea:focus {
+      .textarea:focus,
+      .select:focus {
         outline: none;
         border-color: #1f4ddc;
         box-shadow: 0 0 0 3px rgba(31, 77, 220, 0.1);
@@ -97,6 +101,7 @@
         border: 1px solid #d1d5db;
         background: #fff;
         transition: 0.2s;
+        color: #374151;
       }
       .btn:hover {
         background: #f9fafb;
@@ -186,8 +191,8 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        width: 900px;
-        height: 700px;
+        width: 950px;
+        height: 750px;
         background: #fff;
         border-radius: 16px;
         display: flex;
@@ -282,6 +287,25 @@
         background: #eff6ff;
         padding: 2px 6px;
         border-radius: 4px;
+      }
+
+      .tag-category {
+        font-size: 11px;
+        background: #e0e7ff;
+        color: #3730a3;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: 600;
+        margin-right: 4px;
+      }
+      .tag-level {
+        font-size: 11px;
+        background: #dcfce7;
+        color: #166534;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: 600;
+        margin-right: 4px;
       }
 
       #toast {
@@ -443,24 +467,47 @@
                 padding: 20px;
                 border-radius: 12px;
                 margin-bottom: 20px;
+                border: 1px solid #e2e8f0;
               "
             >
-              <div style="margin-bottom: 15px; font-weight: 600">
-                활동 일자:
+              <div style="display: flex; gap: 10px; margin-bottom: 12px">
+                <div style="flex: 1">
+                  <label class="label">날짜</label>
+                  <input type="date" id="logDate" class="input" />
+                </div>
+                <div style="flex: 1.5">
+                  <label class="label">활동 영역(카테고리)</label>
+                  <select id="logCategory" class="select">
+                    <option value="참여태도">참여태도</option>
+                    <option value="협력소통">협력·소통</option>
+                    <option value="창의성">창의성</option>
+                    <option value="리더십">리더십</option>
+                    <option value="과제수행">과제수행</option>
+                    <option value="진로역량">진로역량</option>
+                    <option value="기타">기타 활동</option>
+                  </select>
+                </div>
+                <div style="flex: 1">
+                  <label class="label">성취 수준</label>
+                  <select id="logLevel" class="select">
+                    <option value="탁월">탁월 (S)</option>
+                    <option value="우수">우수 (A)</option>
+                    <option value="보통">보통 (B)</option>
+                    <option value="노력">노력 (C)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style="margin-bottom: 15px">
+                <label class="label">구체적 활동 내용 (Fact)</label>
                 <input
-                  type="date"
-                  id="logDate"
+                  type="text"
+                  id="logContent"
                   class="input"
-                  style="width: 160px; margin-left: 10px"
+                  placeholder="예: 축제 부스 기획, 드론 조립, 보고서 작성 등"
                 />
               </div>
-              <input
-                type="text"
-                id="logContent"
-                class="input"
-                placeholder="활동 내용을 입력하세요 (예: 축제 부스 운영)"
-                style="margin-bottom: 15px"
-              />
+
               <div style="text-align: right">
                 <button class="btn primary" onclick="saveBatchLogs()">
                   💾 선택된 학생(들)에게 일괄 적용
@@ -477,7 +524,7 @@
                 style="
                   background: #fff;
                   min-height: 100px;
-                  max-height: 250px;
+                  max-height: 200px;
                   overflow-y: auto;
                   border: 1px solid #e5e7eb;
                   border-radius: 8px;
@@ -496,20 +543,53 @@
     </div>
 
     <script>
-      const students = [
-        "김민수",
-        "김철수",
-        "박지성",
-        "손흥민",
-        "이영희",
-        "이하늬",
-        "최수연",
-        "정해인",
-      ];
+      // [수정] 학생 명단을 "이현태" 1명으로 제한
+      const students = ["이현태"];
       let studentLogs = {};
       let viewingStudent = "";
       let logIdCounter = 0;
       let selectedIndex = -1;
+
+      // 카테고리/성취수준별 템플릿
+      const CLUB_TEMPLATES = {
+        참여태도: {
+          탁월: "매 활동에 열정적으로 참여하며 분위기를 주도함.",
+          우수: "활동에 적극적으로 참여하며 성실한 태도를 보임.",
+          보통: "주어진 활동에 성실하게 참여함.",
+          노력: "활동에 흥미를 갖고 참여하려 노력함.",
+        },
+        협력소통: {
+          탁월: "팀원 간 의견을 조율하며 뛰어난 소통 능력을 발휘함.",
+          우수: "동료들과 원만하게 협력하며 과제를 수행함.",
+          보통: "팀 활동에서 자신의 역할을 무난히 수행함.",
+          노력: "동료들과 협력하려는 자세가 긍정적임.",
+        },
+        창의성: {
+          탁월: "기존과 다른 참신한 아이디어를 제시하여 문제를 해결함.",
+          우수: "다양한 관점에서 접근하여 창의적인 결과물을 만듦.",
+          보통: "새로운 방법을 시도하려는 모습이 보임.",
+          노력: "자신의 생각을 표현하려 노력함.",
+        },
+        리더십: {
+          탁월: "탁월한 리더십으로 부원들을 이끌며 목표를 달성함.",
+          우수: "팀장 역할을 맡아 부원들을 잘 독려함.",
+          보통: "필요시 리더십을 발휘하여 팀을 도움.",
+          노력: "자신이 맡은 역할에 책임감을 가짐.",
+        },
+        과제수행: {
+          탁월: "완성도 높은 결과물을 산출하며 뛰어난 수행력을 보임.",
+          우수: "주어진 과제를 기한 내에 충실히 완성함.",
+          보통: "과제 수행 과정을 성실히 이행함.",
+          노력: "과제를 끝까지 완수하려 노력함.",
+        },
+        진로역량: {
+          탁월: "동아리 활동을 자신의 진로와 연계하여 심화 탐구함.",
+          우수: "관심 분야에 대한 지식을 넓히며 진로를 구체화함.",
+          보통: "진로와 관련된 활동에 관심을 갖고 참여함.",
+          노력: "자신의 적성을 탐색하는 기회로 삼음.",
+        },
+        기타: { 탁월: "", 우수: "", 보통: "", 노력: "" },
+      };
 
       window.onload = () => {
         students.sort().forEach((name) => (studentLogs[name] = []));
@@ -606,24 +686,23 @@
           return;
         }
         logs.sort((a, b) => a.date.localeCompare(b.date));
-        const summary = logs.map((l) => `[${l.date}] ${l.content}`).join("\n");
+
+        const summary = logs.map((l) => `[${l.date}] ${l.fullText}`).join("\n");
         document.getElementById("activityInput").value = summary;
         showToast("데이터를 불러왔습니다.");
       }
 
-      // [수정] AI 문장 생성 시 날짜 제거 로직 적용
       function generateAI() {
+        const input = document.getElementById("activityInput").value;
+        if (!input) return alert("데이터를 먼저 불러와주세요.");
         const name = searchInput.value;
-        if (!name || !studentLogs[name] || studentLogs[name].length === 0) {
-          return alert("먼저 학생을 검색하고 누가기록을 불러와주세요.");
-        }
-
-        // 날짜를 제외하고 활동 내용만 추출하여 연결
-        const contents = studentLogs[name].map((l) => l.content).join(", ");
-
+        const cleanContent = input.replace(/\[\d{4}-\d{2}-\d{2}\]/g, "").trim();
         document.getElementById(
           "tempDraft"
-        ).value = `${name} 학생은 동아리 활동을 통해 ${contents} 등의 활동을 주도적으로 수행함. 이 과정에서 발생한 문제를 동료들과 협력하여 해결하며 뛰어난 의사소통 능력을 발휘함.`;
+        ).value = `${name} 학생은 동아리 활동에서 ${cleanContent.substring(
+          0,
+          50
+        )}... 등의 활동을 통해 자신의 역량을 꾸준히 발전시킴.`;
       }
 
       function applyToRight() {
@@ -704,12 +783,29 @@
           return alert("적용할 학생을 체크박스로 선택해주세요.");
 
         const date = document.getElementById("logDate").value;
+        const cat = document.getElementById("logCategory").value;
+        const level = document.getElementById("logLevel").value;
         const content = document.getElementById("logContent").value.trim();
+
         if (!content) return alert("활동 내용을 입력해주세요.");
+
+        let templatePhrase = "";
+        if (cat !== "기타") {
+          templatePhrase = CLUB_TEMPLATES[cat][level] || "";
+        }
+
+        const fullText = `${content}. ${templatePhrase}`;
 
         checked.forEach((cb) => {
           const name = cb.value;
-          studentLogs[name].push({ id: logIdCounter++, date, content });
+          studentLogs[name].push({
+            id: logIdCounter++,
+            date: date,
+            cat: cat,
+            level: level,
+            content: content,
+            fullText: fullText,
+          });
         });
 
         showToast(`${checked.length}명에게 기록이 일괄 적용되었습니다.`);
@@ -743,12 +839,18 @@
         logs
           .sort((a, b) => b.date.localeCompare(a.date))
           .forEach((log) => {
+            const catTag = `<span class="tag-category">${log.cat}</span>`;
+            const levelTag = `<span class="tag-level">${log.level}</span>`;
+
             html += `
             <div class="history-item">
               <div class="history-content">
-                <span class="history-date">${log.date}</span> ${log.content}
+                <span class="history-date">${log.date}</span>
+                ${catTag}${levelTag}
+                <br/>
+                <span style="display:inline-block; margin-top:4px;">${log.fullText}</span>
               </div>
-              <div style="display:flex; gap:5px;">
+              <div style="display:flex; gap:5px; align-items: flex-start;">
                 <button class="btn sm" onclick="editLog('${name}', ${log.id})">수정</button>
                 <button class="btn sm" style="color:red; border-color:#fee2e2;" onclick="deleteLog('${name}', ${log.id})">삭제</button>
               </div>
@@ -766,14 +868,20 @@
       function editLog(name, id) {
         const log = studentLogs[name].find((l) => l.id === id);
         if (!log) return;
+
         document.getElementById("logDate").value = log.date;
+        document.getElementById("logCategory").value = log.cat || "기타";
+        document.getElementById("logLevel").value = log.level || "보통";
         document.getElementById("logContent").value = log.content;
+
         studentLogs[name] = studentLogs[name].filter((l) => l.id !== id);
         renderHistory(name);
+
         const checkboxes = document.querySelectorAll(".stu-chk");
         checkboxes.forEach((cb) => (cb.checked = cb.value === name));
         updateTitle();
-        showToast("내용을 수정한 뒤 [일괄 적용] 버튼을 눌러주세요.");
+
+        showToast("수정 모드: 내용을 변경한 뒤 [일괄 적용]을 눌러주세요.");
       }
     </script>
   </body>
