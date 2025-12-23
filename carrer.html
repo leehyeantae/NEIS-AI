@@ -475,7 +475,10 @@
         "자율성",
         "창의성",
       ];
-      const students = ["김태연", "박지성", "최민호", "정소민", "이하은"];
+      
+      // [수정] 학생 명단을 "이현태" 1명으로 제한
+      const students = ["이현태"];
+      
       let db = {};
       let selectedIndex = -1;
       let currentStudent = "";
@@ -486,7 +489,7 @@
         initModalList();
       };
 
-      // --- 검색 자동완성 & 키보드 조작 (기존과 동일) ---
+      // --- 검색 자동완성 & 키보드 조작 ---
       const searchInput = document.getElementById("studentSearch");
       const autoList = document.getElementById("autoList");
 
@@ -540,7 +543,7 @@
         showToast(`${name} 학생이 선택되었습니다.`);
       }
 
-      // --- 모달 로직 (기존과 동일) ---
+      // --- 모달 로직 ---
       function openModal() {
         document.getElementById("logModal").style.display = "block";
       }
@@ -729,7 +732,6 @@
         }
       }
 
-      // [수정] AI 생성 로직: 진로 미정/탐색 시 긍정적 서술 처리
       function generateCareerAI() {
         const name = searchInput.value;
         if (!db[name] || !db[name].items.length)
