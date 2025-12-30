@@ -2,7 +2,7 @@
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <title>동아리활동 관리 - 1인(이현태) 전용</title>
+    <title>동아리활동 관리</title>
     <style>
       /* [기존 디자인 및 스타일 100% 유지] */
       * {
@@ -490,10 +490,10 @@
                 <div style="flex: 1">
                   <label class="label">성취 수준</label>
                   <select id="logLevel" class="select">
-                    <option value="탁월">탁월 (S)</option>
-                    <option value="우수">우수 (A)</option>
-                    <option value="보통">보통 (B)</option>
-                    <option value="노력">노력 (C)</option>
+                    <option value="매우우수">매우우수</option>
+                    <option value="우수">우수</option>
+                    <option value="보통">보통</option>
+                    <option value="노력">노력</option>
                   </select>
                 </div>
               </div>
@@ -504,7 +504,7 @@
                   type="text"
                   id="logContent"
                   class="input"
-                  placeholder="예: 축제 부스 기획, 드론 조립, 보고서 작성 등"
+                  placeholder="내용을 입력하지 않아도 카테고리에 맞는 문장이 자동 생성됩니다."
                 />
               </div>
 
@@ -543,52 +543,51 @@
     </div>
 
     <script>
-      // [수정] 학생 명단을 "이현태" 1명으로 제한
       const students = ["이현태"];
       let studentLogs = {};
       let viewingStudent = "";
       let logIdCounter = 0;
       let selectedIndex = -1;
 
-      // 카테고리/성취수준별 템플릿
+      // [수정] 카테고리/성취수준별 템플릿 (탁월 -> 매우우수 변경)
       const CLUB_TEMPLATES = {
         참여태도: {
-          탁월: "매 활동에 열정적으로 참여하며 분위기를 주도함.",
+          매우우수: "매 활동에 열정적으로 참여하며 분위기를 주도함.",
           우수: "활동에 적극적으로 참여하며 성실한 태도를 보임.",
           보통: "주어진 활동에 성실하게 참여함.",
           노력: "활동에 흥미를 갖고 참여하려 노력함.",
         },
         협력소통: {
-          탁월: "팀원 간 의견을 조율하며 뛰어난 소통 능력을 발휘함.",
+          매우우수: "팀원 간 의견을 조율하며 뛰어난 소통 능력을 발휘함.",
           우수: "동료들과 원만하게 협력하며 과제를 수행함.",
           보통: "팀 활동에서 자신의 역할을 무난히 수행함.",
           노력: "동료들과 협력하려는 자세가 긍정적임.",
         },
         창의성: {
-          탁월: "기존과 다른 참신한 아이디어를 제시하여 문제를 해결함.",
+          매우우수: "기존과 다른 참신한 아이디어를 제시하여 문제를 해결함.",
           우수: "다양한 관점에서 접근하여 창의적인 결과물을 만듦.",
           보통: "새로운 방법을 시도하려는 모습이 보임.",
           노력: "자신의 생각을 표현하려 노력함.",
         },
         리더십: {
-          탁월: "탁월한 리더십으로 부원들을 이끌며 목표를 달성함.",
+          매우우수: "탁월한 리더십으로 부원들을 이끌며 목표를 달성함.",
           우수: "팀장 역할을 맡아 부원들을 잘 독려함.",
           보통: "필요시 리더십을 발휘하여 팀을 도움.",
           노력: "자신이 맡은 역할에 책임감을 가짐.",
         },
         과제수행: {
-          탁월: "완성도 높은 결과물을 산출하며 뛰어난 수행력을 보임.",
+          매우우수: "완성도 높은 결과물을 산출하며 뛰어난 수행력을 보임.",
           우수: "주어진 과제를 기한 내에 충실히 완성함.",
           보통: "과제 수행 과정을 성실히 이행함.",
           노력: "과제를 끝까지 완수하려 노력함.",
         },
         진로역량: {
-          탁월: "동아리 활동을 자신의 진로와 연계하여 심화 탐구함.",
+          매우우수: "동아리 활동을 자신의 진로와 연계하여 심화 탐구함.",
           우수: "관심 분야에 대한 지식을 넓히며 진로를 구체화함.",
           보통: "진로와 관련된 활동에 관심을 갖고 참여함.",
           노력: "자신의 적성을 탐색하는 기회로 삼음.",
         },
-        기타: { 탁월: "", 우수: "", 보통: "", 노력: "" },
+        기타: { 매우우수: "", 우수: "", 보통: "", 노력: "" },
       };
 
       window.onload = () => {
@@ -696,7 +695,9 @@
         const input = document.getElementById("activityInput").value;
         if (!input) return alert("데이터를 먼저 불러와주세요.");
         const name = searchInput.value;
+
         const cleanContent = input.replace(/\[\d{4}-\d{2}-\d{2}\]/g, "").trim();
+
         document.getElementById(
           "tempDraft"
         ).value = `${name} 학생은 동아리 활동에서 ${cleanContent.substring(
@@ -777,6 +778,7 @@
         else title.textContent = "작업 대상을 선택해 주세요";
       }
 
+      // [핵심 수정] 내용 없이도 저장 가능하도록 로직 변경
       function saveBatchLogs() {
         const checked = document.querySelectorAll(".stu-chk:checked");
         if (checked.length === 0)
@@ -787,14 +789,29 @@
         const level = document.getElementById("logLevel").value;
         const content = document.getElementById("logContent").value.trim();
 
-        if (!content) return alert("활동 내용을 입력해주세요.");
-
+        // 템플릿 문구 가져오기
         let templatePhrase = "";
         if (cat !== "기타") {
           templatePhrase = CLUB_TEMPLATES[cat][level] || "";
         }
 
-        const fullText = `${content}. ${templatePhrase}`;
+        // [수정] 둘 다 없는 경우에만 경고
+        if (!content && !templatePhrase) {
+          return alert(
+            "활동 내용을 입력하거나, 유효한 카테고리/성취수준을 선택해주세요."
+          );
+        }
+
+        // 최종 저장 문구 조합 (내용 + 템플릿)
+        let fullText = "";
+        if (content) {
+          fullText = content;
+          if (!fullText.endsWith(".")) fullText += ".";
+          if (templatePhrase) fullText += " " + templatePhrase;
+        } else {
+          // 내용이 없으면 템플릿만 저장
+          fullText = templatePhrase;
+        }
 
         checked.forEach((cb) => {
           const name = cb.value;
@@ -836,6 +853,7 @@
         }
 
         let html = `<div style="font-weight:bold; margin-bottom:10px; color:#1f4ddc;">[${name}]님의 기록 내역</div>`;
+
         logs
           .sort((a, b) => b.date.localeCompare(a.date))
           .forEach((log) => {
