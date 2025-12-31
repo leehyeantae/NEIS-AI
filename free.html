@@ -2,343 +2,71 @@
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <title>자율활동 관리 시스템 (최종 개선판)</title>
+    <title>자율활동 관리 시스템 (접속사 로직 개선)</title>
     <style>
       /* [기존 디자인 유지] */
-      * {
-        box-sizing: border-box;
-      }
-      body {
-        margin: 0;
-        font-family: "Segoe UI", -apple-system, sans-serif;
-        background: #f5f6f8;
-        color: #333;
-        overflow: hidden;
-      }
-      .topbar {
-        height: 48px;
-        background: #f5c6cf;
-        display: flex;
-        align-items: center;
-        padding: 0 16px;
-        font-weight: 700;
-        border-bottom: 1px solid #e5adba;
-      }
+      * { box-sizing: border-box; }
+      body { margin: 0; font-family: "Segoe UI", -apple-system, sans-serif; background: #f5f6f8; color: #333; overflow: hidden; }
+      .topbar { height: 48px; background: #f5c6cf; display: flex; align-items: center; padding: 0 16px; font-weight: 700; border-bottom: 1px solid #e5adba; }
+      
+      .container { display: grid; grid-template-columns: 1fr 1fr; height: calc(100vh - 48px); }
+      .left { display: flex; flex-direction: column; padding: 25px; border-right: 1px solid #e5e7eb; background: #fff; gap: 15px; }
+      .right { padding: 25px; display: flex; flex-direction: column; background: #fff; }
 
-      .container {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        height: calc(100vh - 48px);
-      }
-      .left {
-        display: flex;
-        flex-direction: column;
-        padding: 25px;
-        border-right: 1px solid #e5e7eb;
-        background: #fff;
-        gap: 15px;
-      }
-      .right {
-        padding: 25px;
-        display: flex;
-        flex-direction: column;
-        background: #fff;
-      }
+      .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+      .section-title { font-size: 16px; font-weight: 700; color: #1f2937; }
 
-      .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 5px;
-      }
-      .section-title {
-        font-size: 16px;
-        font-weight: 700;
-        color: #1f2937;
-      }
+      .search-container { position: relative; width: 100%; }
+      .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #d1d5db; border-top: none; border-radius: 0 0 8px 8px; z-index: 1000; display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+      .auto-item { padding: 10px 15px; cursor: pointer; font-size: 14px; }
+      .auto-item.selected { background: #eff6ff; color: #1f4ddc; font-weight: 600; }
 
-      .search-container {
-        position: relative;
-        width: 100%;
-      }
-      .autocomplete-list {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        background: white;
-        border: 1px solid #d1d5db;
-        border-top: none;
-        border-radius: 0 0 8px 8px;
-        z-index: 1000;
-        display: none;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      }
-      .auto-item {
-        padding: 10px 15px;
-        cursor: pointer;
-        font-size: 14px;
-      }
-      .auto-item.selected {
-        background: #eff6ff;
-        color: #1f4ddc;
-        font-weight: 600;
-      }
+      .flex-1 { flex: 1; display: flex; flex-direction: column; }
+      .flex-2 { flex: 2; display: flex; flex-direction: column; }
+      .input, .textarea, .select { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; }
+      .textarea { flex: 1; resize: none; line-height: 1.6; }
 
-      .flex-1 {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-      }
-      .flex-2 {
-        flex: 2;
-        display: flex;
-        flex-direction: column;
-      }
-      .input,
-      .textarea,
-      .select {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #d1d5db;
-        border-radius: 8px;
-        font-size: 14px;
-      }
-      .textarea {
-        flex: 1;
-        resize: none;
-        line-height: 1.6;
-      }
+      .btn { padding: 10px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid #d1d5db; background: #fff; transition: 0.2s; }
+      .btn.primary { background: #1f4ddc; color: #fff; border-color: #163aa5; }
+      .btn.success { background: #10b981; color: #fff; border-color: #059669; }
+      .btn.accent { background: #f59e0b; color: #fff; border-color: #d97706; }
+      .btn.sm { padding: 6px 12px; font-size: 12px; }
 
-      .btn {
-        padding: 10px 18px;
-        border-radius: 8px;
-        font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
-        border: 1px solid #d1d5db;
-        background: #fff;
-        transition: 0.2s;
-      }
-      .btn.primary {
-        background: #1f4ddc;
-        color: #fff;
-        border-color: #163aa5;
-      }
-      .btn.success {
-        background: #10b981;
-        color: #fff;
-        border-color: #059669;
-      }
-      .btn.accent {
-        background: #f59e0b;
-        color: #fff;
-        border-color: #d97706;
-      }
-      .btn.sm {
-        padding: 6px 12px;
-        font-size: 12px;
-      }
+      .preview-box { flex: 1; border: 1px solid #e5e7eb; border-radius: 12px; padding: 25px; font-size: 15px; line-height: 1.8; white-space: pre-wrap; outline: none; background: #fff; overflow-y: auto; }
+      .counter { text-align: right; margin-top: 10px; font-size: 13px; color: #6b7280; }
 
-      .preview-box {
-        flex: 1;
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
-        padding: 25px;
-        font-size: 15px;
-        line-height: 1.8;
-        white-space: pre-wrap;
-        outline: none;
-        background: #fff;
-        overflow-y: auto;
-      }
-      .counter {
-        text-align: right;
-        margin-top: 10px;
-        font-size: 13px;
-        color: #6b7280;
-      }
-
-      .modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 2000;
-      }
-      .modal-content {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 1150px;
-        height: 85vh;
-        background: #fff;
-        border-radius: 16px;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-      }
-      .modal-header {
-        padding: 18px 25px;
-        background: #f9fafb;
-        border-bottom: 1px solid #eee;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-      .modal-body {
-        display: grid;
-        grid-template-columns: 240px 1fr;
-        flex: 1;
-        overflow: hidden;
-      }
-
-      .student-list {
-        background: #f8fafc;
-        border-right: 1px solid #e5e7eb;
-        padding: 20px 0;
-        overflow-y: auto;
-      }
-      .student-item {
-        padding: 15px 30px;
-        cursor: pointer;
-        border-bottom: 1px solid #f1f5f9;
-        font-size: 15px;
-        transition: 0.2s;
-      }
-      .student-item:hover {
-        background: #f1f5f9;
-      }
-      .student-item.active {
-        background: #eff6ff;
-        color: #1f4ddc;
-        font-weight: 700;
-        border-right: 4px solid #1f4ddc;
-      }
-
-      .log-entry {
-        padding: 30px;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-      }
-
+      .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; }
+      .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 1150px; height: 85vh; background: #fff; border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; }
+      .modal-header { padding: 18px 25px; background: #f9fafb; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+      .modal-body { display: grid; grid-template-columns: 240px 1fr; flex: 1; overflow: hidden; }
+      
+      .student-list { background: #f8fafc; border-right: 1px solid #e5e7eb; padding: 20px 0; overflow-y: auto; }
+      .student-item { padding: 15px 30px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 15px; transition: 0.2s; }
+      .student-item:hover { background: #f1f5f9; }
+      .student-item.active { background: #eff6ff; color: #1f4ddc; font-weight: 700; border-right: 4px solid #1f4ddc; }
+      
+      .log-entry { padding: 30px; overflow-y: auto; display: flex; flex-direction: column; }
+      
       /* 탭 스타일 */
-      .tab-menu {
-        display: flex;
-        border-bottom: 2px solid #e5e7eb;
-        margin-bottom: 20px;
-      }
-      .tab-btn {
-        flex: 1;
-        padding: 12px;
-        text-align: center;
-        cursor: pointer;
-        font-weight: 600;
-        color: #6b7280;
-        transition: 0.2s;
-        border-bottom: 2px solid transparent;
-        margin-bottom: -2px;
-      }
-      .tab-btn:hover {
-        background: #f9fafb;
-        color: #374151;
-      }
-      .tab-btn.active {
-        color: #1f4ddc;
-        border-bottom-color: #1f4ddc;
-        background: #fff;
-      }
+      .tab-menu { display: flex; border-bottom: 2px solid #e5e7eb; margin-bottom: 20px; }
+      .tab-btn { flex: 1; padding: 12px; text-align: center; cursor: pointer; font-weight: 600; color: #6b7280; transition: 0.2s; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+      .tab-btn:hover { background: #f9fafb; color: #374151; }
+      .tab-btn.active { color: #1f4ddc; border-bottom-color: #1f4ddc; background: #fff; }
+      
+      .tab-content { display: none; animation: fadeIn 0.3s; }
+      .tab-content.active { display: block; }
+      @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-      .tab-content {
-        display: none;
-        animation: fadeIn 0.3s;
-      }
-      .tab-content.active {
-        display: block;
-      }
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-        }
-        to {
-          opacity: 1;
-        }
-      }
+      .input-group { background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #e5e7eb; margin-bottom: 20px; }
+      .form-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
+      .form-label { width: 80px; font-weight: 600; font-size: 13px; color: #4b5563; }
 
-      .input-group {
-        background: #f8fafc;
-        padding: 20px;
-        border-radius: 12px;
-        border: 1px solid #e5e7eb;
-        margin-bottom: 20px;
-      }
-      .form-row {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 10px;
-        align-items: center;
-      }
-      .form-label {
-        width: 80px;
-        font-weight: 600;
-        font-size: 13px;
-        color: #4b5563;
-      }
-
-      .history-list {
-        flex: 1;
-        overflow-y: auto;
-        border: 1px solid #e5e7eb;
-        border-radius: 10px;
-        padding: 15px;
-        background: #fff;
-      }
-      .history-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        padding: 12px;
-        background: #f9fafb;
-        border-radius: 8px;
-        margin-bottom: 8px;
-        border: 1px solid #eee;
-      }
-      .history-date {
-        font-size: 12px;
-        color: #6b7280;
-        margin-bottom: 4px;
-        display: block;
-      }
-      .history-badge {
-        font-size: 11px;
-        padding: 2px 6px;
-        border-radius: 4px;
-        background: #e0e7ff;
-        color: #3730a3;
-        font-weight: 700;
-        margin-right: 6px;
-      }
-
-      #toast {
-        position: fixed;
-        bottom: 30px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: #333;
-        color: #fff;
-        padding: 10px 20px;
-        border-radius: 30px;
-        font-size: 13px;
-        opacity: 0;
-        transition: 0.3s;
-        z-index: 3000;
-        pointer-events: none;
-      }
+      .history-list { flex: 1; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 10px; padding: 15px; background: #fff; }
+      .history-item { display: flex; justify-content: space-between; align-items: flex-start; padding: 12px; background: #f9fafb; border-radius: 8px; margin-bottom: 8px; border: 1px solid #eee; }
+      .history-date { font-size: 12px; color: #6b7280; margin-bottom: 4px; display: block; }
+      .history-badge { font-size: 11px; padding: 2px 6px; border-radius: 4px; background: #e0e7ff; color: #3730a3; font-weight: 700; margin-right: 6px; }
+      
+      #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 10px 20px; border-radius: 30px; font-size: 13px; opacity: 0; transition: 0.3s; z-index: 3000; pointer-events: none; }
     </style>
   </head>
   <body>
@@ -349,154 +77,71 @@
       <section class="left">
         <div class="section-header">
           <div class="section-title">자율 데이터 로드 및 생성</div>
-          <button class="btn accent" onclick="openModal()">
-            📅 상세 기록 관리
-          </button>
+          <button class="btn accent" onclick="openModal()">📅 상세 기록 관리</button>
         </div>
 
         <div class="search-container">
-          <input
-            type="text"
-            class="input"
-            id="studentSearch"
-            placeholder="학생 이름을 검색하세요 (방향키/엔터 사용)"
-            autocomplete="off"
-          />
+          <input type="text" class="input" id="studentSearch" placeholder="학생 이름을 검색하세요 (방향키/엔터 사용)" autocomplete="off">
           <div id="autoList" class="autocomplete-list"></div>
         </div>
 
         <div class="flex-1">
           <div class="section-header">
             <label class="section-title">불러온 활동 요약</label>
-            <button class="btn sm" onclick="loadMainSummary()">
-              🔄 데이터 불러오기
-            </button>
+            <button class="btn sm" onclick="loadMainSummary()">🔄 데이터 불러오기</button>
           </div>
-          <textarea
-            id="rawDataDisplay"
-            class="textarea"
-            readonly
-            placeholder="팝업에서 저장된 데이터가 표시됩니다."
-          ></textarea>
+          <textarea id="rawDataDisplay" class="textarea" readonly placeholder="팝업에서 저장된 데이터가 표시됩니다."></textarea>
         </div>
 
-        <button
-          class="btn primary"
-          style="height: 48px; font-size: 15px"
-          onclick="generateAutoAI()"
-        >
-          ✨ AI 자율 문장 생성
-        </button>
+        <button class="btn primary" style="height: 48px; font-size: 15px;" onclick="generateAutoAI()">✨ AI 자율 문장 생성</button>
 
         <div class="flex-2">
-          <label
-            class="section-title"
-            style="margin-bottom: 8px; display: block"
-            >AI 생성 초안 (교사 수정)</label
-          >
-          <textarea
-            id="tempDraft"
-            class="textarea"
-            style="background: #fdfbff; border-color: #c7d2fe"
-          ></textarea>
-          <button
-            class="btn success"
-            style="width: 100%; margin-top: 10px"
-            onclick="moveToFinal()"
-          >
-            우측 결과창으로 보내기 →
-          </button>
+          <label class="section-title" style="margin-bottom: 8px; display: block;">AI 생성 초안 (교사 수정)</label>
+          <textarea id="tempDraft" class="textarea" style="background: #fdfbff; border-color: #c7d2fe;"></textarea>
+          <button class="btn success" style="width: 100%; margin-top: 10px;" onclick="moveToFinal()">우측 결과창으로 보내기 →</button>
         </div>
       </section>
 
       <section class="right">
-        <div class="section-header" style="margin-bottom: 15px">
+        <div class="section-header" style="margin-bottom: 15px;">
           <div class="section-title">자율활동 최종 기재 내용</div>
-          <div style="display: flex; gap: 8px">
-            <button
-              class="btn"
-              onclick="alert('AI가 문장 흐름과 맞춤법을 보정합니다.')"
-            >
-              🪄 전체 AI 다듬기
-            </button>
-            <button class="btn success" onclick="finalApply()">
-              💾 적용하기
-            </button>
+          <div style="display: flex; gap: 8px;">
+            <button class="btn" onclick="alert('AI가 문장 흐름과 맞춤법을 보정합니다.')">🪄 전체 AI 다듬기</button>
+            <button class="btn success" onclick="finalApply()">💾 적용하기</button>
           </div>
         </div>
-        <div
-          id="finalPreview"
-          class="preview-box"
-          contenteditable="true"
-          oninput="updateByte()"
-        >
-          학생을 선택하고 문장을 생성해 주세요.
-        </div>
-        <div class="counter">
-          실시간 글자수:
-          <span id="byteCount" style="color: #1f4ddc; font-weight: 700">0</span>
-          / 1500 Byte
-        </div>
+        <div id="finalPreview" class="preview-box" contenteditable="true" oninput="updateByte()">학생을 선택하고 문장을 생성해 주세요.</div>
+        <div class="counter">실시간 글자수: <span id="byteCount" style="color: #1f4ddc; font-weight: 700;">0</span> / 1500 Byte</div>
       </section>
     </div>
 
     <div id="logModal" class="modal">
       <div class="modal-content">
         <div class="modal-header">
-          <span style="font-size: 18px; font-weight: 700; color: #374151"
-            >📅 학생별 자율활동 상세 기록 통합 관리</span
-          >
+          <span style="font-size: 18px; font-weight: 700; color: #374151;">📅 학생별 자율활동 상세 기록 통합 관리</span>
           <button class="btn" onclick="closeModal()">닫기</button>
         </div>
         <div class="modal-body">
           <div class="student-list" id="modalStudentList"></div>
           <div class="log-entry">
-            <h3
-              id="modalStudentTitle"
-              style="
-                margin-top: 0;
-                margin-bottom: 20px;
-                color: #1f4ddc;
-                font-size: 22px;
-              "
-            >
-              학생을 선택해 주세요
-            </h3>
+            <h3 id="modalStudentTitle" style="margin-top:0; margin-bottom: 20px; color:#1f4ddc; font-size: 22px;">학생을 선택해 주세요</h3>
 
             <div class="tab-menu">
-              <div class="tab-btn active" onclick="switchTab('tab-edu')">
-                교육 (안전/예방)
-              </div>
-              <div class="tab-btn" onclick="switchTab('tab-gov')">
-                자치 활동 (임원)
-              </div>
-              <div class="tab-btn" onclick="switchTab('tab-event')">
-                교내 행사
-              </div>
+              <div class="tab-btn active" onclick="switchTab('tab-edu')">교육 (안전/예방)</div>
+              <div class="tab-btn" onclick="switchTab('tab-gov')">자치 활동 (임원)</div>
+              <div class="tab-btn" onclick="switchTab('tab-event')">교내 행사</div>
             </div>
 
             <div id="tab-edu" class="tab-content active">
               <div class="input-group">
                 <div class="form-row">
                   <span class="form-label">활동 날짜</span>
-                  <input
-                    type="date"
-                    id="eduDate"
-                    class="input"
-                    style="width: 150px"
-                  />
+                  <input type="date" id="eduDate" class="input" style="width: 150px;">
                 </div>
                 <div class="form-row">
                   <span class="form-label">교육 주제</span>
-                  <select
-                    id="eduTopic"
-                    class="select"
-                    style="flex: 1"
-                    onchange="checkEduInput(this)"
-                  >
-                    <option value="" disabled selected>
-                      주제를 선택하세요
-                    </option>
+                  <select id="eduTopic" class="select" style="flex:1;" onchange="checkEduInput(this)">
+                    <option value="" disabled selected>주제를 선택하세요</option>
                     <option>학교폭력 예방교육</option>
                     <option>마약류 오남용 예방교육</option>
                     <option>생명존중 및 자살예방 교육</option>
@@ -505,28 +150,14 @@
                     <option>사이버 폭력 예방교육</option>
                     <option>직접 입력</option>
                   </select>
-                  <input
-                    type="text"
-                    id="eduTopicDirect"
-                    class="input"
-                    style="flex: 1; display: none"
-                    placeholder="주제 직접 입력"
-                  />
+                  <input type="text" id="eduTopicDirect" class="input" style="flex:1; display:none;" placeholder="주제 직접 입력">
                 </div>
                 <div class="form-row">
                   <span class="form-label">상세 내용</span>
-                  <input
-                    type="text"
-                    id="eduDetail"
-                    class="input"
-                    style="flex: 1"
-                    placeholder="비워두면 '[주제]에 성실히 참여함' 등으로 자동 생성됩니다."
-                  />
+                  <input type="text" id="eduDetail" class="input" style="flex:1;" placeholder="비워두면 '[주제]에 성실히 참여함' 등으로 자동 생성됩니다.">
                 </div>
-                <div style="text-align: right; margin-top: 10px">
-                  <button class="btn primary" onclick="addItemToList('교육')">
-                    + 목록에 추가
-                  </button>
+                <div style="text-align:right; margin-top:10px;">
+                  <button class="btn primary" onclick="addItemToList('교육')">+ 목록에 추가</button>
                 </div>
               </div>
             </div>
@@ -535,7 +166,7 @@
               <div class="input-group">
                 <div class="form-row">
                   <span class="form-label">역할</span>
-                  <select id="govRole" class="select" style="flex: 1">
+                  <select id="govRole" class="select" style="flex:1;">
                     <option value="" disabled selected>역할 선택</option>
                     <option>학급 반장</option>
                     <option>학급 부반장</option>
@@ -548,7 +179,7 @@
                 </div>
                 <div class="form-row">
                   <span class="form-label">활동 기간</span>
-                  <select id="govPeriod" class="select" style="flex: 1">
+                  <select id="govPeriod" class="select" style="flex:1;">
                     <option>1학기</option>
                     <option>2학기</option>
                     <option>1년</option>
@@ -556,17 +187,10 @@
                 </div>
                 <div class="form-row">
                   <span class="form-label">활동 내용</span>
-                  <textarea
-                    id="govDetail"
-                    class="textarea"
-                    style="height: 80px"
-                    placeholder="비워두면 역할에 맞는 기본 문구가 생성됩니다."
-                  ></textarea>
+                  <textarea id="govDetail" class="textarea" style="height:80px;" placeholder="비워두면 역할에 맞는 기본 문구가 생성됩니다."></textarea>
                 </div>
-                <div style="text-align: right; margin-top: 10px">
-                  <button class="btn primary" onclick="addItemToList('자치')">
-                    + 목록에 추가
-                  </button>
+                <div style="text-align:right; margin-top:10px;">
+                  <button class="btn primary" onclick="addItemToList('자치')">+ 목록에 추가</button>
                 </div>
               </div>
             </div>
@@ -575,61 +199,31 @@
               <div class="input-group">
                 <div class="form-row">
                   <span class="form-label">활동 날짜</span>
-                  <input
-                    type="date"
-                    id="eventDate"
-                    class="input"
-                    style="width: 150px"
-                  />
+                  <input type="date" id="eventDate" class="input" style="width: 150px;">
                 </div>
                 <div class="form-row">
                   <span class="form-label">행사명</span>
-                  <input
-                    type="text"
-                    id="eventName"
-                    class="input"
-                    style="flex: 1"
-                    placeholder="예: 체육대회, 합창제, 과학의 날"
-                  />
+                  <input type="text" id="eventName" class="input" style="flex:1;" placeholder="예: 체육대회, 합창제, 과학의 날">
                 </div>
                 <div class="form-row">
                   <span class="form-label">상세 내용</span>
-                  <textarea
-                    id="eventDetail"
-                    class="textarea"
-                    style="height: 80px"
-                    placeholder="비워두면 '[행사명]에 적극적으로 참여함' 등으로 자동 생성됩니다."
-                  ></textarea>
+                  <textarea id="eventDetail" class="textarea" style="height:80px;" placeholder="비워두면 '[행사명]에 적극적으로 참여함' 등으로 자동 생성됩니다."></textarea>
                 </div>
-                <div style="text-align: right; margin-top: 10px">
-                  <button class="btn primary" onclick="addItemToList('행사')">
-                    + 목록에 추가
-                  </button>
+                <div style="text-align:right; margin-top:10px;">
+                  <button class="btn primary" onclick="addItemToList('행사')">+ 목록에 추가</button>
                 </div>
               </div>
             </div>
 
-            <div
-              class="section-title"
-              style="margin-top: 10px; font-size: 15px"
-            >
-              🕒 입력된 기록 목록
-            </div>
+            <div class="section-title" style="margin-top: 10px; font-size: 15px;">🕒 입력된 기록 목록</div>
             <div id="historyListView" class="history-list">
-              <div style="color: #999; text-align: center; padding: 20px">
-                위 탭에서 내용을 입력하고 [추가] 버튼을 눌러주세요.
-              </div>
+              <div style="color:#999; text-align:center; padding:20px;">위 탭에서 내용을 입력하고 [추가] 버튼을 눌러주세요.</div>
+            </div>
+            
+            <div style="margin-top: 15px; text-align: right;">
+                <button class="btn success" style="padding: 12px 30px;" onclick="saveToDB()">💾 전체 목록 저장하기</button>
             </div>
 
-            <div style="margin-top: 15px; text-align: right">
-              <button
-                class="btn success"
-                style="padding: 12px 30px"
-                onclick="saveToDB()"
-              >
-                💾 전체 목록 저장하기
-              </button>
-            </div>
           </div>
         </div>
       </div>
@@ -640,126 +234,103 @@
       let db = {};
       let selectedIndex = -1;
       let currentStudent = "";
-      let tempItems = [];
+      let tempItems = []; 
 
       window.onload = () => {
-        students.forEach((name) => (db[name] = { items: [] }));
+        students.forEach(name => db[name] = { items: [] });
         initModalList();
-
+        
         const today = new Date().toISOString().split("T")[0];
-        document
-          .querySelectorAll('input[type="date"]')
-          .forEach((el) => (el.value = today));
+        document.querySelectorAll('input[type="date"]').forEach(el => el.value = today);
       };
 
       // --- 탭 기능 ---
       function switchTab(tabId) {
-        document
-          .querySelectorAll(".tab-btn")
-          .forEach((btn) => btn.classList.remove("active"));
-        document
-          .querySelectorAll(".tab-content")
-          .forEach((con) => con.classList.remove("active"));
-
-        const buttons = document.querySelectorAll(".tab-btn");
-        if (tabId === "tab-edu") buttons[0].classList.add("active");
-        if (tabId === "tab-gov") buttons[1].classList.add("active");
-        if (tabId === "tab-event") buttons[2].classList.add("active");
-
-        document.getElementById(tabId).classList.add("active");
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(con => con.classList.remove('active'));
+        
+        const buttons = document.querySelectorAll('.tab-btn');
+        if(tabId === 'tab-edu') buttons[0].classList.add('active');
+        if(tabId === 'tab-gov') buttons[1].classList.add('active');
+        if(tabId === 'tab-event') buttons[2].classList.add('active');
+        
+        document.getElementById(tabId).classList.add('active');
       }
 
       function checkEduInput(select) {
-        const directInput = document.getElementById("eduTopicDirect");
-        if (select.value === "직접 입력") {
-          directInput.style.display = "block";
-          directInput.focus();
+        const directInput = document.getElementById('eduTopicDirect');
+        if(select.value === "직접 입력") {
+            directInput.style.display = "block";
+            directInput.focus();
         } else {
-          directInput.style.display = "none";
+            directInput.style.display = "none";
         }
       }
 
       // --- 리스트 추가 로직 (데이터 처리 개선) ---
       function addItemToList(type) {
-        if (!currentStudent) return alert("학생을 먼저 선택하세요.");
-
-        let date = "",
-          title = "",
-          detail = "",
-          sub = "";
-
-        if (type === "교육") {
-          date = document.getElementById("eduDate").value;
-          const selectVal = document.getElementById("eduTopic").value;
-          title =
-            selectVal === "직접 입력"
-              ? document.getElementById("eduTopicDirect").value
-              : selectVal;
-          detail = document.getElementById("eduDetail").value.trim();
-          if (!title) return alert("교육 주제를 입력해주세요.");
-        } else if (type === "자치") {
-          // [수정] 날짜 없음, 기간(Select) 사용
-          title = document.getElementById("govRole").value;
-          sub = document.getElementById("govPeriod").value;
-          detail = document.getElementById("govDetail").value.trim();
-          if (!title || title === "역할 선택")
-            return alert("역할을 선택해주세요.");
-        } else {
-          // 행사
-          date = document.getElementById("eventDate").value;
-          title = document.getElementById("eventName").value.trim();
-          detail = document.getElementById("eventDetail").value.trim();
-          if (!title) return alert("행사명을 입력해주세요.");
+        if(!currentStudent) return alert("학생을 먼저 선택하세요.");
+        
+        let date = "", title = "", detail = "", sub = "";
+        
+        if (type === '교육') {
+            date = document.getElementById('eduDate').value;
+            const selectVal = document.getElementById('eduTopic').value;
+            title = (selectVal === "직접 입력") ? document.getElementById('eduTopicDirect').value : selectVal;
+            detail = document.getElementById('eduDetail').value.trim();
+            if(!title) return alert("교육 주제를 입력해주세요.");
+            
+        } else if (type === '자치') {
+            title = document.getElementById('govRole').value;
+            sub = document.getElementById('govPeriod').value; 
+            detail = document.getElementById('govDetail').value.trim();
+            if(!title || title === "역할 선택") return alert("역할을 선택해주세요.");
+            
+        } else { // 행사
+            date = document.getElementById('eventDate').value;
+            title = document.getElementById('eventName').value.trim();
+            detail = document.getElementById('eventDetail').value.trim();
+            if(!title) return alert("행사명을 입력해주세요.");
         }
 
         tempItems.push({
-          id: Date.now(),
-          type: type,
-          date: date,
-          title: title,
-          sub: sub,
-          detail: detail,
+            id: Date.now(),
+            type: type,
+            date: date,
+            title: title,
+            sub: sub,
+            detail: detail
         });
 
         renderTempHistory();
-
+        
         // 입력창 비우기 (날짜는 유지)
-        if (type === "교육") {
-          document.getElementById("eduDetail").value = "";
-        }
-        if (type === "자치") {
-          document.getElementById("govDetail").value = "";
-        }
-        if (type === "행사") {
-          document.getElementById("eventName").value = "";
-          document.getElementById("eventDetail").value = "";
-        }
+        if(type==='교육') { document.getElementById('eduDetail').value=''; }
+        if(type==='자치') { document.getElementById('govDetail').value=''; }
+        if(type==='행사') { document.getElementById('eventName').value=''; document.getElementById('eventDetail').value=''; }
       }
 
       function renderTempHistory() {
         const view = document.getElementById("historyListView");
-        if (tempItems.length === 0) {
-          view.innerHTML =
-            "<div style='color:#999; text-align:center; padding:20px;'>기록이 없습니다.</div>";
-          return;
+        if(tempItems.length === 0) {
+            view.innerHTML = "<div style='color:#999; text-align:center; padding:20px;'>기록이 없습니다.</div>";
+            return;
         }
 
         // 날짜순 정렬 (자치활동은 날짜가 없으므로 맨 위로)
-        tempItems.sort((a, b) => {
-          if (!a.date) return -1;
-          if (!b.date) return 1;
-          return b.date.localeCompare(a.date);
+        tempItems.sort((a,b) => {
+            if(!a.date) return -1;
+            if(!b.date) return 1;
+            return b.date.localeCompare(a.date);
         });
 
         let html = "";
         tempItems.forEach((item, idx) => {
-          let titleText = item.title;
-          let dateText = item.date ? item.date : "기간: " + item.sub;
-          let displayDetail = item.detail
-            ? item.detail
-            : "(기본 문구 자동 생성 예정)";
-
-          html += `
+            let titleText = item.title;
+            let dateText = item.date ? item.date : "기간: " + item.sub;
+            let displayDetail = item.detail ? item.detail : "(기본 문구 자동 생성 예정)";
+            
+            html += `
                 <div class="history-item">
                     <div style="flex:1;">
                         <span class="history-date">${dateText}</span>
@@ -780,7 +351,7 @@
       }
 
       function saveToDB() {
-        if (!currentStudent) return;
+        if(!currentStudent) return;
         db[currentStudent].items = [...tempItems];
         showToast("전체 기록이 저장되었습니다.");
       }
@@ -790,84 +361,40 @@
       const autoList = document.getElementById("autoList");
 
       searchInput.addEventListener("input", () => {
-        const val = searchInput.value;
-        autoList.innerHTML = "";
-        selectedIndex = -1;
-        if (!val) {
-          autoList.style.display = "none";
-          return;
-        }
-        const matched = students.filter((s) => s.includes(val));
-        matched.forEach((name) => {
-          const div = document.createElement("div");
-          div.className = "auto-item";
-          div.textContent = name;
-          div.onclick = () => selectStudent(name);
-          autoList.appendChild(div);
+        const val = searchInput.value; autoList.innerHTML = ""; selectedIndex = -1;
+        if(!val) { autoList.style.display = "none"; return; }
+        const matched = students.filter(s => s.includes(val));
+        matched.forEach(name => {
+          const div = document.createElement("div"); div.className = "auto-item"; div.textContent = name;
+          div.onclick = () => selectStudent(name); autoList.appendChild(div);
         });
         autoList.style.display = matched.length ? "block" : "none";
       });
 
       searchInput.addEventListener("keydown", (e) => {
         const items = autoList.getElementsByClassName("auto-item");
-        if (e.key === "ArrowDown") {
-          e.preventDefault();
-          selectedIndex++;
-          if (selectedIndex >= items.length) selectedIndex = 0;
-          updateSelection(items);
-        } else if (e.key === "ArrowUp") {
-          e.preventDefault();
-          selectedIndex--;
-          if (selectedIndex < 0) selectedIndex = items.length - 1;
-          updateSelection(items);
-        } else if (e.key === "Enter") {
-          if (selectedIndex > -1)
-            selectStudent(items[selectedIndex].textContent);
-          else if (items.length > 0) selectStudent(items[0].textContent);
-        }
+        if(e.key==="ArrowDown"){ e.preventDefault(); selectedIndex++; if(selectedIndex>=items.length) selectedIndex=0; updateSelection(items); }
+        else if(e.key==="ArrowUp"){ e.preventDefault(); selectedIndex--; if(selectedIndex<0) selectedIndex=items.length-1; updateSelection(items); }
+        else if(e.key==="Enter"){ if(selectedIndex>-1) selectStudent(items[selectedIndex].textContent); else if(items.length>0) selectStudent(items[0].textContent); }
       });
 
-      function updateSelection(items) {
-        Array.from(items).forEach((item, idx) =>
-          item.classList.toggle("selected", idx === selectedIndex)
-        );
-      }
-      function selectStudent(name) {
-        searchInput.value = name;
-        autoList.style.display = "none";
-        loadMainSummary();
-        showToast(`${name} 학생 선택됨`);
-      }
+      function updateSelection(items){ Array.from(items).forEach((item,idx)=>item.classList.toggle("selected", idx===selectedIndex)); }
+      function selectStudent(name){ searchInput.value=name; autoList.style.display="none"; loadMainSummary(); showToast(`${name} 학생 선택됨`); }
 
-      function openModal() {
-        document.getElementById("logModal").style.display = "block";
-      }
-      function closeModal() {
-        document.getElementById("logModal").style.display = "none";
-      }
-      function showToast(m) {
-        const t = document.getElementById("toast");
-        t.textContent = m;
-        t.style.opacity = 1;
-        setTimeout(() => (t.style.opacity = 0), 2000);
-      }
+      function openModal(){ document.getElementById("logModal").style.display="block"; }
+      function closeModal(){ document.getElementById("logModal").style.display="none"; }
+      function showToast(m){ const t=document.getElementById("toast"); t.textContent=m; t.style.opacity=1; setTimeout(()=>t.style.opacity=0,2000); }
 
-      function initModalList() {
+      function initModalList(){
         const list = document.getElementById("modalStudentList");
-        students.forEach((name) => {
-          const div = document.createElement("div");
-          div.className = "student-item";
-          div.textContent = name;
-          div.onclick = () => {
-            currentStudent = name;
-            document
-              .querySelectorAll(".student-item")
-              .forEach((i) => i.classList.remove("active"));
+        students.forEach(name => {
+          const div = document.createElement("div"); div.className="student-item"; div.textContent=name;
+          div.onclick=()=>{
+            currentStudent=name;
+            document.querySelectorAll(".student-item").forEach(i=>i.classList.remove("active"));
             div.classList.add("active");
-            document.getElementById(
-              "modalStudentTitle"
-            ).textContent = `[${name}] 자율활동 기록 관리`;
-
+            document.getElementById("modalStudentTitle").textContent=`[${name}] 자율활동 기록 관리`;
+            
             tempItems = [...db[name].items];
             renderTempHistory();
           };
@@ -875,67 +402,64 @@
         });
       }
 
-      function loadMainSummary() {
+      function loadMainSummary(){
         const name = searchInput.value;
-        if (db[name] && db[name].items.length > 0) {
-          let summary = "";
-          const sorted = [...db[name].items].sort((a, b) => {
-            if (!a.date) return -1;
-            if (!b.date) return 1;
-            return a.date.localeCompare(b.date);
-          });
-          sorted.forEach((item) => {
-            let info = item.title + (item.sub ? `(${item.sub})` : "");
-            let dateStr = item.date ? `[${item.date}] ` : "";
-            summary += `${dateStr}[${item.type}] ${info} : ${
-              item.detail || "(내용 자동생성)"
-            }\n`;
-          });
-          document.getElementById("rawDataDisplay").value = summary;
+        if(db[name] && db[name].items.length > 0){
+            let summary = "";
+            const sorted = [...db[name].items].sort((a,b) => {
+                 if(!a.date) return -1; if(!b.date) return 1;
+                 return a.date.localeCompare(b.date);
+            });
+            sorted.forEach(item => {
+                let info = item.title + (item.sub?`(${item.sub})`:"");
+                let dateStr = item.date ? `[${item.date}] ` : "";
+                summary += `${dateStr}[${item.type}] ${info} : ${item.detail || "(내용 자동생성)"}\n`;
+            });
+            document.getElementById("rawDataDisplay").value = summary;
         } else {
-          document.getElementById("rawDataDisplay").value =
-            "저장된 기록이 없습니다.";
+            document.getElementById("rawDataDisplay").value = "저장된 기록이 없습니다.";
         }
       }
 
-      // [AI 문장 생성 로직 - 자동완성 기능 추가]
-      function generateAutoAI() {
+      // [AI 문장 생성 로직 - 접속사 수정]
+      function generateAutoAI(){
         const name = searchInput.value;
-        if (!db[name] || !db[name].items.length)
-          return alert("저장된 데이터가 없습니다.");
-
+        if(!db[name] || !db[name].items.length) return alert("저장된 데이터가 없습니다.");
+        
         const data = db[name].items;
         let eduText = [];
         let govText = [];
         let eventText = [];
 
-        data.forEach((item) => {
-          // 내용이 비어있으면 기본 문구 생성
-          let finalDetail = item.detail;
-
-          if (item.type === "교육") {
-            if (!finalDetail)
-              finalDetail = "성실히 참여하여 관련 지식을 함양함";
-            eduText.push(`${item.title}에 참여하여 ${finalDetail}`);
-          } else if (item.type === "자치") {
-            if (!finalDetail)
-              finalDetail = "학급을 위해 봉사하며 책임감을 기름";
-            govText.push(`${item.sub} 동안 ${item.title}로서 ${finalDetail}`);
-          } else if (item.type === "행사") {
-            if (!finalDetail)
-              finalDetail = "적극적으로 참여하여 공동체 의식을 높임";
-            eventText.push(`${item.title} 활동에서 ${finalDetail}`);
-          }
+        data.forEach(item => {
+            // 내용이 비어있으면 기본 문구 생성
+            let finalDetail = item.detail;
+            
+            if(item.type==="교육") {
+                if(!finalDetail) finalDetail = "성실히 참여하여 관련 지식을 함양함";
+                eduText.push(`${item.title}에 참여하여 ${finalDetail}`);
+            }
+            else if(item.type==="자치") {
+                if(!finalDetail) finalDetail = "학급을 위해 봉사하며 책임감을 기름";
+                govText.push(`${item.sub} 동안 ${item.title}로서 ${finalDetail}`);
+            }
+            else if(item.type==="행사") {
+                if(!finalDetail) finalDetail = "적극적으로 참여하여 공동체 의식을 높임";
+                eventText.push(`${item.title} 활동에서 ${finalDetail}`);
+            }
         });
 
         let result = "";
-
-        if (govText.length > 0) result += `${govText.join(", ")} `;
-        if (eventText.length > 0) result += `${eventText.join(", ")} `;
-        if (eduText.length > 0)
-          result += `또한 ${eduText.join(
-            ", "
-          )} 등 다양한 활동을 통해 학교생활에 충실히 임함.`;
+        
+        if(govText.length > 0) result += `${govText.join(", ")} `;
+        if(eventText.length > 0) result += `${eventText.join(", ")} `;
+        
+        // [수정된 부분] 교육 활동 접속사 처리
+        if(eduText.length > 0) {
+            // 앞 내용이 있으면 '또한', 없으면(첫 문장이면) '평소'로 시작
+            const prefix = result.length > 0 ? "또한 " : "평소 ";
+            result += `${prefix}${eduText.join(", ")} 등 다양한 활동을 통해 학교생활에 충실히 임함.`;
+        }
 
         document.getElementById("tempDraft").value = result;
       }
@@ -943,7 +467,7 @@
       function moveToFinal() {
         const text = document.getElementById("tempDraft").value;
         const target = document.getElementById("finalPreview");
-        if (target.innerText.includes("학생을 선택하고")) target.innerText = "";
+        if(target.innerText.includes("학생을 선택하고")) target.innerText = "";
         target.innerText += (target.innerText ? "\n\n" : "") + text;
         updateByte();
       }
@@ -951,14 +475,11 @@
       function updateByte() {
         const text = document.getElementById("finalPreview").innerText;
         let bytes = 0;
-        for (let i = 0; i < text.length; i++)
-          bytes += text.charCodeAt(i) > 127 ? 3 : 1;
+        for (let i = 0; i < text.length; i++) bytes += (text.charCodeAt(i) > 127) ? 3 : 1;
         document.getElementById("byteCount").textContent = bytes;
       }
 
-      function finalApply() {
-        alert("작성된 내용을 NEIS에 입력합니다.");
-      }
+      function finalApply() { alert("작성된 내용을 NEIS에 입력합니다."); }
     </script>
   </body>
 </html>
