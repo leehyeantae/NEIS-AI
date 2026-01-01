@@ -2,7 +2,7 @@
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <title>진로활동 관리 시스템</title>
+    <title>진로활동 관리 시스템 (Byte 경고 추가)</title>
     <style>
       /* 기존 스타일 유지 */
       * {
@@ -363,7 +363,7 @@
         <div class="counter">
           실시간 글자수:
           <span id="byteCount" style="color: #1f4ddc; font-weight: 700">0</span>
-          / 2100 Byte
+          / 1500 Byte
         </div>
       </section>
     </div>
@@ -475,10 +475,9 @@
         "자율성",
         "창의성",
       ];
-      
-      // [수정] 학생 명단을 "이현태" 1명으로 제한
+
       const students = ["이현태"];
-      
+
       let db = {};
       let selectedIndex = -1;
       let currentStudent = "";
@@ -780,7 +779,11 @@
         let bytes = 0;
         for (let i = 0; i < text.length; i++)
           bytes += text.charCodeAt(i) > 127 ? 3 : 1;
-        document.getElementById("byteCount").textContent = bytes;
+
+        // [수정] 1500바이트 초과 시 붉은색 표시
+        const countSpan = document.getElementById("byteCount");
+        countSpan.textContent = bytes;
+        countSpan.style.color = bytes > 1500 ? "red" : "#1f4ddc";
       }
 
       function finalApply() {
