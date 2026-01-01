@@ -2,63 +2,315 @@
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <title>행동특성 관리 - 1인(이현태) Full Version</title>
+    <title>행동특성 관리 - 1인(이현태) Full Version (Byte 경고 추가)</title>
     <style>
       /* [기존 스타일 유지] */
-      * { box-sizing: border-box; }
-      body { margin: 0; font-family: "Segoe UI", -apple-system, sans-serif; background: #f5f6f8; color: #333; overflow: hidden; }
-      .topbar { height: 48px; background: #f5c6cf; display: flex; align-items: center; padding: 0 16px; font-weight: 700; border-bottom: 1px solid #e5adba; }
-      
-      .container { display: grid; grid-template-columns: 1fr 1fr; height: calc(100vh - 48px); }
-      .left { display: flex; flex-direction: column; padding: 25px; border-right: 1px solid #e5e7eb; background: #fff; gap: 15px; }
-      .right { padding: 25px; display: flex; flex-direction: column; background: #fff; }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: "Segoe UI", -apple-system, sans-serif;
+        background: #f5f6f8;
+        color: #333;
+        overflow: hidden;
+      }
+      .topbar {
+        height: 48px;
+        background: #f5c6cf;
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        font-weight: 700;
+        border-bottom: 1px solid #e5adba;
+      }
 
-      .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-      .section-title { font-size: 16px; font-weight: 700; color: #1f2937; }
+      .container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        height: calc(100vh - 48px);
+      }
+      .left {
+        display: flex;
+        flex-direction: column;
+        padding: 25px;
+        border-right: 1px solid #e5e7eb;
+        background: #fff;
+        gap: 15px;
+      }
+      .right {
+        padding: 25px;
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+      }
 
-      .search-container { position: relative; width: 100%; }
-      .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #d1d5db; border-top: none; border-radius: 0 0 8px 8px; z-index: 1000; display: none; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
-      .auto-item { padding: 10px 15px; cursor: pointer; font-size: 14px; }
-      .auto-item.selected { background: #eff6ff; color: #1f4ddc; font-weight: 600; }
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 5px;
+      }
+      .section-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1f2937;
+      }
 
-      .flex-1 { flex: 1; display: flex; flex-direction: column; }
-      .flex-2 { flex: 2; display: flex; flex-direction: column; }
-      .input, .textarea { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; }
-      .textarea { flex: 1; resize: none; line-height: 1.6; }
+      .search-container {
+        position: relative;
+        width: 100%;
+      }
+      .autocomplete-list {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #d1d5db;
+        border-top: none;
+        border-radius: 0 0 8px 8px;
+        z-index: 1000;
+        display: none;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .auto-item {
+        padding: 10px 15px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .auto-item.selected {
+        background: #eff6ff;
+        color: #1f4ddc;
+        font-weight: 600;
+      }
 
-      .btn { padding: 10px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid #d1d5db; background: #fff; transition: 0.2s; }
-      .btn.primary { background: #1f4ddc; color: #fff; border-color: #163aa5; }
-      .btn.success { background: #10b981; color: #fff; border-color: #059669; }
-      .btn.accent { background: #f59e0b; color: #fff; border-color: #d97706; }
-      .btn.sm { padding: 4px 8px; font-size: 11px; }
-      .btn.danger-btn { color: red; font-weight: bold; border: 1px solid #ffccc7; padding: 5px 8px; background: white; }
+      .flex-1 {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+      .flex-2 {
+        flex: 2;
+        display: flex;
+        flex-direction: column;
+      }
+      .input,
+      .textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 14px;
+      }
+      .textarea {
+        flex: 1;
+        resize: none;
+        line-height: 1.6;
+      }
 
-      .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 2000; }
-      .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 1100px; height: 85vh; background: #fff; border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
-      .modal-header { padding: 20px 30px; background: #f9fafb; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
-      .modal-body { display: grid; grid-template-columns: 260px 1fr; flex: 1; overflow: hidden; }
-      
-      .student-list { background: #f8fafc; border-right: 1px solid #e5e7eb; padding: 15px 0; overflow-y: auto; }
-      .student-item { padding: 16px 30px; cursor: pointer; border-bottom: 1px solid #f1f5f9; font-size: 15px; transition: 0.2s; }
-      .student-item.active { background: #eff6ff; color: #1f4ddc; font-weight: 700; border-right: 4px solid #1f4ddc; }
-      
-      .log-entry { padding: 35px; overflow-y: auto; }
-      .history-view { margin-top: 25px; background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 20px; }
-      .date-group { margin-bottom: 20px; }
-      .date-header { font-size: 14px; font-weight: 700; color: #1f4ddc; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid #eee; }
-      .history-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: #f9fafb; border-radius: 8px; margin-bottom: 6px; font-size: 13.5px; }
-      .history-actions { display: flex; gap: 6px; }
+      .btn {
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        border: 1px solid #d1d5db;
+        background: #fff;
+        transition: 0.2s;
+      }
+      .btn.primary {
+        background: #1f4ddc;
+        color: #fff;
+        border-color: #163aa5;
+      }
+      .btn.success {
+        background: #10b981;
+        color: #fff;
+        border-color: #059669;
+      }
+      .btn.accent {
+        background: #f59e0b;
+        color: #fff;
+        border-color: #d97706;
+      }
+      .btn.sm {
+        padding: 4px 8px;
+        font-size: 11px;
+      }
+      .btn.danger-btn {
+        color: red;
+        font-weight: bold;
+        border: 1px solid #ffccc7;
+        padding: 5px 8px;
+        background: white;
+      }
 
-      .preview-box { flex: 1; border: 1px solid #e5e7eb; border-radius: 12px; padding: 25px; font-size: 15px; line-height: 1.8; white-space: pre-wrap; outline: none; background: #fff; overflow-y: auto; }
-      .counter { text-align: right; margin-top: 10px; font-size: 13px; color: #6b7280; }
-      #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 10px 25px; border-radius: 30px; font-size: 13px; opacity: 0; transition: 0.3s; z-index: 3000; pointer-events: none; }
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 2000;
+      }
+      .modal-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 1100px;
+        height: 85vh;
+        background: #fff;
+        border-radius: 16px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      }
+      .modal-header {
+        padding: 20px 30px;
+        background: #f9fafb;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .modal-body {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        flex: 1;
+        overflow: hidden;
+      }
+
+      .student-list {
+        background: #f8fafc;
+        border-right: 1px solid #e5e7eb;
+        padding: 15px 0;
+        overflow-y: auto;
+      }
+      .student-item {
+        padding: 16px 30px;
+        cursor: pointer;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 15px;
+        transition: 0.2s;
+      }
+      .student-item.active {
+        background: #eff6ff;
+        color: #1f4ddc;
+        font-weight: 700;
+        border-right: 4px solid #1f4ddc;
+      }
+
+      .log-entry {
+        padding: 35px;
+        overflow-y: auto;
+      }
+      .history-view {
+        margin-top: 25px;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 20px;
+      }
+      .date-group {
+        margin-bottom: 20px;
+      }
+      .date-header {
+        font-size: 14px;
+        font-weight: 700;
+        color: #1f4ddc;
+        margin-bottom: 10px;
+        padding-bottom: 5px;
+        border-bottom: 1px solid #eee;
+      }
+      .history-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 12px;
+        background: #f9fafb;
+        border-radius: 8px;
+        margin-bottom: 6px;
+        font-size: 13.5px;
+      }
+      .history-actions {
+        display: flex;
+        gap: 6px;
+      }
+
+      .preview-box {
+        flex: 1;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 25px;
+        font-size: 15px;
+        line-height: 1.8;
+        white-space: pre-wrap;
+        outline: none;
+        background: #fff;
+        overflow-y: auto;
+      }
+      .counter {
+        text-align: right;
+        margin-top: 10px;
+        font-size: 13px;
+        color: #6b7280;
+      }
+      #toast {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #333;
+        color: #fff;
+        padding: 10px 25px;
+        border-radius: 30px;
+        font-size: 13px;
+        opacity: 0;
+        transition: 0.3s;
+        z-index: 3000;
+        pointer-events: none;
+      }
 
       /* 키워드 칩 */
-      .keyword-tray { display: none; background: #f0f7ff; border: 1px solid #dbeafe; border-radius: 8px; padding: 10px; margin-bottom: 10px; gap: 8px; flex-wrap: wrap; }
-      .keyword-tray.show { display: flex; }
-      .keyword-chip { font-size: 12px; background: #fff; border: 1px solid #bbd1f8; color: #1e40af; padding: 6px 12px; border-radius: 20px; cursor: pointer; transition: all 0.2s; font-weight: 600; }
-      .keyword-chip:hover { background: #1f4ddc; color: #fff; border-color: #1f4ddc; }
-      .input-wrapper { border-bottom: 1px dashed #e5e7eb; padding-bottom: 10px; margin-bottom: 10px; }
+      .keyword-tray {
+        display: none;
+        background: #f0f7ff;
+        border: 1px solid #dbeafe;
+        border-radius: 8px;
+        padding: 10px;
+        margin-bottom: 10px;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .keyword-tray.show {
+        display: flex;
+      }
+      .keyword-chip {
+        font-size: 12px;
+        background: #fff;
+        border: 1px solid #bbd1f8;
+        color: #1e40af;
+        padding: 6px 12px;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-weight: 600;
+      }
+      .keyword-chip:hover {
+        background: #1f4ddc;
+        color: #fff;
+        border-color: #1f4ddc;
+      }
+      .input-wrapper {
+        border-bottom: 1px dashed #e5e7eb;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+      }
     </style>
   </head>
   <body>
@@ -72,21 +324,54 @@
           <button class="btn accent" onclick="openModal()">📅 누가기록</button>
         </div>
         <div class="search-container">
-          <input type="text" class="input" id="studentSearch" placeholder="학생 이름을 입력하세요 (방향키/엔터 조작 가능)" autocomplete="off" />
+          <input
+            type="text"
+            class="input"
+            id="studentSearch"
+            placeholder="학생 이름을 입력하세요 (방향키/엔터 조작 가능)"
+            autocomplete="off"
+          />
           <div id="autoList" class="autocomplete-list"></div>
         </div>
         <div class="flex-1">
           <div class="section-header">
             <label class="section-title">불러온 원본 데이터 요약</label>
-            <button class="btn sm" onclick="loadMainSummary()">🔄 데이터 불러오기</button>
+            <button class="btn sm" onclick="loadMainSummary()">
+              🔄 데이터 불러오기
+            </button>
           </div>
-          <textarea id="rawDataDisplay" class="textarea" readonly placeholder="날짜별 기록과 사례가 여기에 표시됩니다."></textarea>
+          <textarea
+            id="rawDataDisplay"
+            class="textarea"
+            readonly
+            placeholder="날짜별 기록과 사례가 여기에 표시됩니다."
+          ></textarea>
         </div>
-        <button class="btn primary" style="height: 48px; font-size: 15px" onclick="generateSummaryAI()">✨ AI 문장 생성</button>
+        <button
+          class="btn primary"
+          style="height: 48px; font-size: 15px"
+          onclick="generateSummaryAI()"
+        >
+          ✨ AI 문장 생성
+        </button>
         <div class="flex-2">
-          <label class="section-title" style="margin-bottom: 8px; display: block">AI 생성 초안 (교사 수정)</label>
-          <textarea id="tempDraft" class="textarea" style="background: #fdfbff; border-color: #c7d2fe"></textarea>
-          <button class="btn success" style="width: 100%; margin-top: 10px" onclick="moveToFinal()">우측 최종 결과로 반영 →</button>
+          <label
+            class="section-title"
+            style="margin-bottom: 8px; display: block"
+            >AI 생성 초안 (교사 수정)</label
+          >
+          <textarea
+            id="tempDraft"
+            class="textarea"
+            style="background: #fdfbff; border-color: #c7d2fe"
+          ></textarea>
+          <button
+            class="btn success"
+            style="width: 100%; margin-top: 10px"
+            onclick="moveToFinal()"
+          >
+            우측 최종 결과로 반영 →
+          </button>
         </div>
       </section>
 
@@ -94,39 +379,119 @@
         <div class="section-header" style="margin-bottom: 15px">
           <div class="section-title">NEIS 기재 최종 내용</div>
           <div style="display: flex; gap: 8px">
-            <button class="btn" onclick="alert('AI가 전체 문장의 흐름과 맞춤법을 보정합니다.')">🪄 전체 AI 다듬기</button>
+            <button
+              class="btn"
+              onclick="alert('AI가 전체 문장의 흐름과 맞춤법을 보정합니다.')"
+            >
+              🪄 전체 AI 다듬기
+            </button>
             <button class="btn success" id="finalSubmitBtn">💾 적용하기</button>
           </div>
         </div>
-        <div id="finalPreview" class="preview-box" contenteditable="true" oninput="updateByte()">학생을 선택하고 문장을 생성해 주세요.</div>
-        <div class="counter">실시간 글자수: <span id="byteCount" style="color: #1f4ddc; font-weight: 700">0</span> / 1500 Byte</div>
+        <div
+          id="finalPreview"
+          class="preview-box"
+          contenteditable="true"
+          oninput="updateByte()"
+        >
+          학생을 선택하고 문장을 생성해 주세요.
+        </div>
+        <div class="counter">
+          실시간 글자수:
+          <span id="byteCount" style="color: #1f4ddc; font-weight: 700">0</span>
+          / 1500 Byte
+        </div>
       </section>
     </div>
 
     <div id="logModal" class="modal">
       <div class="modal-content">
         <div class="modal-header">
-          <span style="font-size: 18px; font-weight: 700; color: #374151">📅 학생별 누가 기록</span>
+          <span style="font-size: 18px; font-weight: 700; color: #374151"
+            >📅 학생별 누가 기록</span
+          >
           <button class="btn" onclick="closeModal()">닫기</button>
         </div>
         <div class="modal-body">
           <div class="student-list" id="modalStudentList"></div>
           <div class="log-entry">
-            <h3 id="modalStudentTitle" style="margin-top: 0; margin-bottom: 25px; color: #1f4ddc; font-size: 22px;">학생을 선택해 주세요</h3>
-            <div style="background: #f8fafc; padding: 25px; border-radius: 12px; border: 1px solid #e5e7eb;">
+            <h3
+              id="modalStudentTitle"
+              style="
+                margin-top: 0;
+                margin-bottom: 25px;
+                color: #1f4ddc;
+                font-size: 22px;
+              "
+            >
+              학생을 선택해 주세요
+            </h3>
+            <div
+              style="
+                background: #f8fafc;
+                padding: 25px;
+                border-radius: 12px;
+                border: 1px solid #e5e7eb;
+              "
+            >
               <div style="margin-bottom: 20px; font-weight: 600">
-                기록 날짜: <input type="date" id="logDate" class="input" style="width: 180px; margin-left: 10px" />
+                기록 날짜:
+                <input
+                  type="date"
+                  id="logDate"
+                  class="input"
+                  style="width: 180px; margin-left: 10px"
+                />
               </div>
               <div id="inputRowsContainer"></div>
-              <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
-                <button class="btn sm" style="padding: 6px 12px" onclick="addRow()">+ 활동 항목 추가</button>
-                <button class="btn success" style="padding: 10px 25px" onclick="applyAndReset()">✅ 현재 날짜 기록 적용</button>
+              <div
+                style="
+                  margin-top: 20px;
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
+                <button
+                  class="btn sm"
+                  style="padding: 6px 12px"
+                  onclick="addRow()"
+                >
+                  + 활동 항목 추가
+                </button>
+                <button
+                  class="btn success"
+                  style="padding: 10px 25px"
+                  onclick="applyAndReset()"
+                >
+                  ✅ 현재 날짜 기록 적용
+                </button>
               </div>
             </div>
-            <div class="section-title" style="margin-top: 40px; font-size: 16px">🕒 현재까지 입력된 이력 (날짜별 그룹화)</div>
-            <div class="history-view" id="historyGroupView">기록이 없습니다. 활동 내용을 입력하고 [적용]을 눌러주세요.</div>
-            <div style="margin-top: 40px; text-align: right; border-top: 1px solid #eee; padding-top: 25px;">
-              <button class="btn primary" style="padding: 14px 50px; font-size: 15px" onclick="saveAllToDB()">💾 전체 데이터 저장</button>
+            <div
+              class="section-title"
+              style="margin-top: 40px; font-size: 16px"
+            >
+              🕒 현재까지 입력된 이력 (날짜별 그룹화)
+            </div>
+            <div class="history-view" id="historyGroupView">
+              기록이 없습니다. 활동 내용을 입력하고 [적용]을 눌러주세요.
+            </div>
+            <div
+              style="
+                margin-top: 40px;
+                text-align: right;
+                border-top: 1px solid #eee;
+                padding-top: 25px;
+              "
+            >
+              <button
+                class="btn primary"
+                style="padding: 14px 50px; font-size: 15px"
+                onclick="saveAllToDB()"
+              >
+                💾 전체 데이터 저장
+              </button>
             </div>
           </div>
         </div>
@@ -134,96 +499,710 @@
     </div>
 
     <script>
-      const students = ["이현태"]; // 학생 1명 고정
-      const cats = ["성격", "교우관계", "생활태도", "적성·활동", "진로태도", "학업태도", "기타"];
+      const students = ["이현태"];
+      const cats = [
+        "성격",
+        "교우관계",
+        "생활태도",
+        "적성·활동",
+        "진로태도",
+        "학업태도",
+        "기타",
+      ];
       const levels = ["매우우수", "우수", "보통", "노력"];
 
-      // [업데이트] 전체 카테고리별 10개 키워드 및 문장 DB 완성본
       const KEYWORD_DB = {
-        "성격": [
-          { word: "긍정적", s: { "매우우수": "매사 긍정적인 마인드로 학급의 어려운 상황을 밝게 전환시킴.", "우수": "밝고 명랑한 태도로 주변에 긍정적인 에너지를 전파함.", "보통": "상황을 긍정적으로 바라보려 노력하며 원만하게 생활함.", "노력": "어려움 앞에서도 긍정적인 태도를 잃지 않도록 격려가 필요함." } },
-          { word: "차분함", s: { "매우우수": "어떤 상황에서도 동요하지 않고 침착하게 문제를 해결하는 능력이 탁월함.", "우수": "차분한 성품으로 매사 신중하게 생각하고 행동함.", "보통": "대체로 차분한 태도를 유지하며 과제를 수행함.", "노력": "급한 상황에서 조금 더 침착함을 유지하려는 노력이 요구됨." } },
-          { word: "책임감", s: { "매우우수": "자신이 맡은 역할에 대한 책임감이 투철하여 끝까지 완수해냄.", "우수": "자신의 임무를 성실하게 수행하려는 책임감이 강함.", "보통": "주어진 역할에 대해 책임을 지고 수행함.", "노력": "맡은 일을 끝까지 완수하려는 책임감을 기를 필요가 있음." } },
-          { word: "솔직함", s: { "매우우수": "자신의 감정과 생각을 가감 없이 솔직하고 정중하게 표현함.", "우수": "거짓 없이 솔직하게 행동하여 친구들의 신뢰를 얻음.", "보통": "자신의 의견을 대체로 솔직하게 표현함.", "노력": "자신의 생각을 적절한 방식으로 표현하는 연습이 필요함." } },
-          { word: "유머", s: { "매우우수": "재치 있는 유머 감각으로 학급의 갈등 상황을 유연하게 넘김.", "우수": "적절한 유머로 친구들을 즐겁게 하며 분위기 메이커 역할을 함.", "보통": "친구들과 대화하며 즐거운 분위기를 형성함.", "노력": "때와 장소에 맞는 언어 습관을 기르도록 지도함." } },
-          { word: "온순함", s: { "매우우수": "성품이 온순하고 다정다감하여 친구들 사이에서 인기가 많음.", "우수": "친구들과 다투지 않고 온화하게 지냄.", "보통": "모나지 않은 성격으로 원만한 교우관계를 유지함.", "노력": "자신의 의사를 조금 더 명확히 표현할 필요가 있음." } },
-          { word: "자신감", s: { "매우우수": "매사 자신감 넘치는 태도로 새로운 과제에 주도적으로 도전함.", "우수": "자신의 능력을 믿고 적극적으로 활동에 참여함.", "보통": "주어진 과제를 수행할 때 자신감을 가지고 임함.", "노력": "발표나 활동 시 자신감을 가질 수 있도록 칭찬과 격려가 필요함." } },
-          { word: "도전", s: { "매우우수": "어려운 과제에도 굴하지 않고 끊임없이 도전하는 끈기가 돋보임.", "우수": "새로운 분야에 흥미를 가지고 도전하는 것을 즐김.", "보통": "새로운 활동에 대해 관심을 보이고 참여함.", "노력": "실패를 두려워하지 않고 도전하는 용기가 필요함." } },
-          { word: "예의", s: { "매우우수": "웃어른을 공경하고 친구를 존중하는 예의 바른 태도가 몸에 배어 있음.", "우수": "인사를 잘하고 예절을 잘 지켜 선생님들의 칭찬을 받음.", "보통": "기본적인 예절을 지키며 학교생활을 함.", "노력": "상황에 맞는 예절을 익히고 실천하려는 노력이 필요함." } },
-          { word: "인내심", s: { "매우우수": "힘든 상황에서도 포기하지 않고 끝까지 견뎌내는 인내심이 매우 뛰어남.", "우수": "과제를 수행하는 과정에서 끈기 있게 노력하는 모습을 보임.", "보통": "주어진 일을 마칠 때까지 인내심을 가지고 참여함.", "노력": "조금 더 끈기 있게 과제에 집중하는 태도가 필요함." } }
+        성격: [
+          {
+            word: "긍정적",
+            s: {
+              매우우수:
+                "매사 긍정적인 마인드로 학급의 어려운 상황을 밝게 전환시킴.",
+              우수: "밝고 명랑한 태도로 주변에 긍정적인 에너지를 전파함.",
+              보통: "상황을 긍정적으로 바라보려 노력하며 원만하게 생활함.",
+              노력: "어려움 앞에서도 긍정적인 태도를 잃지 않도록 격려가 필요함.",
+            },
+          },
+          {
+            word: "차분함",
+            s: {
+              매우우수:
+                "어떤 상황에서도 동요하지 않고 침착하게 문제를 해결하는 능력이 탁월함.",
+              우수: "차분한 성품으로 매사 신중하게 생각하고 행동함.",
+              보통: "대체로 차분한 태도를 유지하며 과제를 수행함.",
+              노력: "급한 상황에서 조금 더 침착함을 유지하려는 노력이 요구됨.",
+            },
+          },
+          {
+            word: "책임감",
+            s: {
+              매우우수:
+                "자신이 맡은 역할에 대한 책임감이 투철하여 끝까지 완수해냄.",
+              우수: "자신의 임무를 성실하게 수행하려는 책임감이 강함.",
+              보통: "주어진 역할에 대해 책임을 지고 수행함.",
+              노력: "맡은 일을 끝까지 완수하려는 책임감을 기를 필요가 있음.",
+            },
+          },
+          {
+            word: "솔직함",
+            s: {
+              매우우수:
+                "자신의 감정과 생각을 가감 없이 솔직하고 정중하게 표현함.",
+              우수: "거짓 없이 솔직하게 행동하여 친구들의 신뢰를 얻음.",
+              보통: "자신의 의견을 대체로 솔직하게 표현함.",
+              노력: "자신의 생각을 적절한 방식으로 표현하는 연습이 필요함.",
+            },
+          },
+          {
+            word: "유머",
+            s: {
+              매우우수:
+                "재치 있는 유머 감각으로 학급의 갈등 상황을 유연하게 넘김.",
+              우수: "적절한 유머로 친구들을 즐겁게 하며 분위기 메이커 역할을 함.",
+              보통: "친구들과 대화하며 즐거운 분위기를 형성함.",
+              노력: "때와 장소에 맞는 언어 습관을 기르도록 지도함.",
+            },
+          },
+          {
+            word: "온순함",
+            s: {
+              매우우수:
+                "성품이 온순하고 다정다감하여 친구들 사이에서 인기가 많음.",
+              우수: "친구들과 다투지 않고 온화하게 지냄.",
+              보통: "모나지 않은 성격으로 원만한 교우관계를 유지함.",
+              노력: "자신의 의사를 조금 더 명확히 표현할 필요가 있음.",
+            },
+          },
+          {
+            word: "자신감",
+            s: {
+              매우우수:
+                "매사 자신감 넘치는 태도로 새로운 과제에 주도적으로 도전함.",
+              우수: "자신의 능력을 믿고 적극적으로 활동에 참여함.",
+              보통: "주어진 과제를 수행할 때 자신감을 가지고 임함.",
+              노력: "발표나 활동 시 자신감을 가질 수 있도록 칭찬과 격려가 필요함.",
+            },
+          },
+          {
+            word: "도전",
+            s: {
+              매우우수:
+                "어려운 과제에도 굴하지 않고 끊임없이 도전하는 끈기가 돋보임.",
+              우수: "새로운 분야에 흥미를 가지고 도전하는 것을 즐김.",
+              보통: "새로운 활동에 대해 관심을 보이고 참여함.",
+              노력: "실패를 두려워하지 않고 도전하는 용기가 필요함.",
+            },
+          },
+          {
+            word: "예의",
+            s: {
+              매우우수:
+                "웃어른을 공경하고 친구를 존중하는 예의 바른 태도가 몸에 배어 있음.",
+              우수: "인사를 잘하고 예절을 잘 지켜 선생님들의 칭찬을 받음.",
+              보통: "기본적인 예절을 지키며 학교생활을 함.",
+              노력: "상황에 맞는 예절을 익히고 실천하려는 노력이 필요함.",
+            },
+          },
+          {
+            word: "인내심",
+            s: {
+              매우우수:
+                "힘든 상황에서도 포기하지 않고 끝까지 견뎌내는 인내심이 매우 뛰어남.",
+              우수: "과제를 수행하는 과정에서 끈기 있게 노력하는 모습을 보임.",
+              보통: "주어진 일을 마칠 때까지 인내심을 가지고 참여함.",
+              노력: "조금 더 끈기 있게 과제에 집중하는 태도가 필요함.",
+            },
+          },
         ],
-        "교우관계": [
-          { word: "리더십", s: { "매우우수": "탁월한 리더십으로 친구들의 의견을 조율하고 학급을 올바른 방향으로 이끔.", "우수": "친구들을 잘 통솔하며 모둠 활동에서 리더 역할을 훌륭히 수행함.", "보통": "필요시 친구들을 이끄는 모습을 보임.", "노력": "친구들의 의견을 수용하며 이끄는 방법을 배울 필요가 있음." } },
-          { word: "배려", s: { "매우우수": "친구의 입장을 먼저 생각하고 깊이 배려하는 따뜻한 마음씨를 지님.", "우수": "어려움에 처한 친구를 기꺼이 도와주는 배려심이 있음.", "보통": "친구들에게 친절하게 대하며 배려하려 노력함.", "노력": "타인의 입장을 이해하고 배려하는 태도를 기를 필요가 있음." } },
-          { word: "경청", s: { "매우우수": "친구의 이야기를 진심으로 경청하며 깊이 공감해 주는 태도가 훌륭함.", "우수": "대화할 때 상대방의 눈을 맞추고 귀 기울여 들음.", "보통": "친구들의 이야기에 적절히 반응하며 경청함.", "노력": "상대방의 말이 끝날 때까지 듣는 경청의 자세가 필요함." } },
-          { word: "중재", s: { "매우우수": "친구 간의 갈등 발생 시 공정하게 중재하여 원만하게 해결함.", "우수": "다툼이 있을 때 친구들을 화해시키려 노력함.", "보통": "갈등 상황에서 친구들을 말리거나 선생님께 도움을 요청함.", "노력": "갈등 상황을 합리적으로 해결하는 방법을 배울 필요가 있음." } },
-          { word: "협동", s: { "매우우수": "공동의 목표를 위해 자신의 역할을 다하며 훌륭한 협동심을 발휘함.", "우수": "모둠 활동에서 친구들과 협력하여 과제를 성실히 수행함.", "보통": "친구들과 어울려 활동하는 것에 거부감이 없음.", "노력": "친구들과 협력하여 과제를 완성하는 경험이 더 필요함." } },
-          { word: "인기", s: { "매우우수": "유머와 재치로 주변을 즐겁게 하여 친구들에게 인기가 매우 많음.", "우수": "원만한 성격으로 많은 친구들과 두루 친하게 지냄.", "보통": "친하게 지내는 친구들이 있으며 관계가 원만함.", "노력": "다양한 친구들과 어울리려는 적극적인 노력이 필요함." } },
-          { word: "소통", s: { "매우우수": "자신의 의사를 명확히 전달하고 타인의 의견을 존중하는 소통 능력이 탁월함.", "우수": "친구들과 대화가 잘 통하고 소통이 원활함.", "보통": "친구들과 대화를 나누며 생각을 교환함.", "노력": "자신의 생각을 조리 있게 말하는 연습이 필요함." } },
-          { word: "양보", s: { "매우우수": "자신의 이익보다 친구를 위해 기꺼이 양보하는 미덕을 보임.", "우수": "필요한 경우 친구에게 양보할 줄 아는 마음을 가짐.", "보통": "상황에 따라 친구에게 양보하는 모습을 보임.", "노력": "친구와 나누고 양보하는 기쁨을 알 필요가 있음." } },
-          { word: "신뢰", s: { "매우우수": "약속을 철저히 지켜 친구들 사이에서 두터운 신뢰를 얻음.", "우수": "정직한 태도로 친구들에게 믿음을 줌.", "보통": "친구들과의 약속을 지키려 노력함.", "노력": "사소한 약속이라도 소중히 여기는 태도가 필요함." } },
-          { word: "친화력", s: { "매우우수": "처음 만난 친구와도 금방 친해지는 놀라운 친화력을 보임.", "우수": "낯가림 없이 친구들에게 먼저 다가감.", "보통": "새로운 친구들과 어울리는 데 큰 어려움이 없음.", "노력": "먼저 다가가는 용기를 기르도록 격려가 필요함." } }
+        교우관계: [
+          {
+            word: "리더십",
+            s: {
+              매우우수:
+                "탁월한 리더십으로 친구들의 의견을 조율하고 학급을 올바른 방향으로 이끔.",
+              우수: "친구들을 잘 통솔하며 모둠 활동에서 리더 역할을 훌륭히 수행함.",
+              보통: "필요시 친구들을 이끄는 모습을 보임.",
+              노력: "친구들의 의견을 수용하며 이끄는 방법을 배울 필요가 있음.",
+            },
+          },
+          {
+            word: "배려",
+            s: {
+              매우우수:
+                "친구의 입장을 먼저 생각하고 깊이 배려하는 따뜻한 마음씨를 지님.",
+              우수: "어려움에 처한 친구를 기꺼이 도와주는 배려심이 있음.",
+              보통: "친구들에게 친절하게 대하며 배려하려 노력함.",
+              노력: "타인의 입장을 이해하고 배려하는 태도를 기를 필요가 있음.",
+            },
+          },
+          {
+            word: "경청",
+            s: {
+              매우우수:
+                "친구의 이야기를 진심으로 경청하며 깊이 공감해 주는 태도가 훌륭함.",
+              우수: "대화할 때 상대방의 눈을 맞추고 귀 기울여 들음.",
+              보통: "친구들의 이야기에 적절히 반응하며 경청함.",
+              노력: "상대방의 말이 끝날 때까지 듣는 경청의 자세가 필요함.",
+            },
+          },
+          {
+            word: "중재",
+            s: {
+              매우우수:
+                "친구 간의 갈등 발생 시 공정하게 중재하여 원만하게 해결함.",
+              우수: "다툼이 있을 때 친구들을 화해시키려 노력함.",
+              보통: "갈등 상황에서 친구들을 말리거나 선생님께 도움을 요청함.",
+              노력: "갈등 상황을 합리적으로 해결하는 방법을 배울 필요가 있음.",
+            },
+          },
+          {
+            word: "협동",
+            s: {
+              매우우수:
+                "공동의 목표를 위해 자신의 역할을 다하며 훌륭한 협동심을 발휘함.",
+              우수: "모둠 활동에서 친구들과 협력하여 과제를 성실히 수행함.",
+              보통: "친구들과 어울려 활동하는 것에 거부감이 없음.",
+              노력: "친구들과 협력하여 과제를 완성하는 경험이 더 필요함.",
+            },
+          },
+          {
+            word: "인기",
+            s: {
+              매우우수:
+                "유머와 재치로 주변을 즐겁게 하여 친구들에게 인기가 매우 많음.",
+              우수: "원만한 성격으로 많은 친구들과 두루 친하게 지냄.",
+              보통: "친하게 지내는 친구들이 있으며 관계가 원만함.",
+              노력: "다양한 친구들과 어울리려는 적극적인 노력이 필요함.",
+            },
+          },
+          {
+            word: "소통",
+            s: {
+              매우우수:
+                "자신의 의사를 명확히 전달하고 타인의 의견을 존중하는 소통 능력이 탁월함.",
+              우수: "친구들과 대화가 잘 통하고 소통이 원활함.",
+              보통: "친구들과 대화를 나누며 생각을 교환함.",
+              노력: "자신의 생각을 조리 있게 말하는 연습이 필요함.",
+            },
+          },
+          {
+            word: "양보",
+            s: {
+              매우우수:
+                "자신의 이익보다 친구를 위해 기꺼이 양보하는 미덕을 보임.",
+              우수: "필요한 경우 친구에게 양보할 줄 아는 마음을 가짐.",
+              보통: "상황에 따라 친구에게 양보하는 모습을 보임.",
+              노력: "친구와 나누고 양보하는 기쁨을 알 필요가 있음.",
+            },
+          },
+          {
+            word: "신뢰",
+            s: {
+              매우우수:
+                "약속을 철저히 지켜 친구들 사이에서 두터운 신뢰를 얻음.",
+              우수: "정직한 태도로 친구들에게 믿음을 줌.",
+              보통: "친구들과의 약속을 지키려 노력함.",
+              노력: "사소한 약속이라도 소중히 여기는 태도가 필요함.",
+            },
+          },
+          {
+            word: "친화력",
+            s: {
+              매우우수:
+                "처음 만난 친구와도 금방 친해지는 놀라운 친화력을 보임.",
+              우수: "낯가림 없이 친구들에게 먼저 다가감.",
+              보통: "새로운 친구들과 어울리는 데 큰 어려움이 없음.",
+              노력: "먼저 다가가는 용기를 기르도록 격려가 필요함.",
+            },
+          },
         ],
-        "생활태도": [
-          { word: "근면", s: { "매우우수": "매일 시간을 아껴 쓰며 근면 성실하게 학교 생활에 임함.", "우수": "주어진 일과를 성실하게 수행하며 부지런함.", "보통": "학교 일과에 맞춰 규칙적으로 생활함.", "노력": "조금 더 부지런하게 생활하려는 의지가 필요함." } },
-          { word: "정직", s: { "매우우수": "매사 정직하고 투명하게 행동하여 타의 모범이 됨.", "우수": "거짓말을 하지 않고 솔직하게 행동함.", "보통": "자신의 잘못을 인정할 줄 아는 정직함을 보임.", "노력": "자신의 행동에 대해 솔직하게 말하는 용기가 필요함." } },
-          { word: "절약", s: { "매우우수": "학용품과 에너지를 아껴 쓰는 절약 정신이 몸에 배어 있음.", "우수": "물건을 소중히 다루고 아껴 씀.", "보통": "자신의 물건을 챙기며 낭비를 줄이려 함.", "노력": "물건을 아껴 쓰고 정리 정돈하는 습관이 필요함." } },
-          { word: "청결", s: { "매우우수": "주변 환경을 항상 깨끗이 정리하며 청결 유지에 앞장섬.", "우수": "자신의 자리를 깨끗하게 정돈함.", "보통": "청소 시간에 맡은 구역을 청소함.", "노력": "주변 정리 정돈을 생활화하는 습관이 필요함." } },
-          { word: "질서", s: { "매우우수": "공공질서를 철저히 지키며 다른 친구들에게도 모범을 보임.", "우수": "줄 서기 등 질서를 잘 지킴.", "보통": "학교 규칙과 질서를 지키려 노력함.", "노력": "공공장소에서의 질서 의식을 높일 필요가 있음." } },
-          { word: "예절", s: { "매우우수": "때와 장소에 맞는 예절을 갖추어 행동하며 언행이 바름.", "우수": "선생님과 친구들에게 예의 바르게 행동함.", "보통": "기본적인 예절을 갖추고 있음.", "노력": "상황에 맞는 언어 예절을 익힐 필요가 있음." } },
-          { word: "준법", s: { "매우우수": "교칙을 자발적으로 준수하며 준법정신이 매우 투철함.", "우수": "학교 규칙을 잘 지키며 생활함.", "보통": "정해진 규칙을 따르려 노력함.", "노력": "공동체의 규칙을 이해하고 지키려는 노력이 필요함." } },
-          { word: "자주", s: { "매우우수": "자신의 일을 스스로 계획하고 실천하는 자주적인 태도가 돋보임.", "우수": "스스로 할 수 있는 일은 남에게 미루지 않음.", "보통": "자신의 일을 스스로 해결하려 함.", "노력": "스스로 해결하려는 자주성을 기를 필요가 있음." } },
-          { word: "건강", s: { "매우우수": "규칙적인 운동과 생활 습관으로 건강 관리에 철저함.", "우수": "건강한 생활을 위해 노력함.", "보통": "체육 활동에 무리 없이 참여함.", "노력": "기초 체력을 기르기 위한 꾸준한 운동이 필요함." } },
-          { word: "안전", s: { "매우우수": "안전 수칙을 철저히 준수하며 교내 안전 문화 정착에 기여함.", "우수": "생활 속 안전 수칙을 잘 지킴.", "보통": "위험한 장난을 하지 않고 안전하게 생활함.", "노력": "안전 수칙을 숙지하고 실천하는 자세가 필요함." } }
+        생활태도: [
+          {
+            word: "근면",
+            s: {
+              매우우수: "매일 시간을 아껴 쓰며 근면 성실하게 학교 생활에 임함.",
+              우수: "주어진 일과를 성실하게 수행하며 부지런함.",
+              보통: "학교 일과에 맞춰 규칙적으로 생활함.",
+              노력: "조금 더 부지런하게 생활하려는 의지가 필요함.",
+            },
+          },
+          {
+            word: "정직",
+            s: {
+              매우우수: "매사 정직하고 투명하게 행동하여 타의 모범이 됨.",
+              우수: "거짓말을 하지 않고 솔직하게 행동함.",
+              보통: "자신의 잘못을 인정할 줄 아는 정직함을 보임.",
+              노력: "자신의 행동에 대해 솔직하게 말하는 용기가 필요함.",
+            },
+          },
+          {
+            word: "절약",
+            s: {
+              매우우수:
+                "학용품과 에너지를 아껴 쓰는 절약 정신이 몸에 배어 있음.",
+              우수: "물건을 소중히 다루고 아껴 씀.",
+              보통: "자신의 물건을 챙기며 낭비를 줄이려 함.",
+              노력: "물건을 아껴 쓰고 정리 정돈하는 습관이 필요함.",
+            },
+          },
+          {
+            word: "청결",
+            s: {
+              매우우수: "주변 환경을 항상 깨끗이 정리하며 청결 유지에 앞장섬.",
+              우수: "자신의 자리를 깨끗하게 정돈함.",
+              보통: "청소 시간에 맡은 구역을 청소함.",
+              노력: "주변 정리 정돈을 생활화하는 습관이 필요함.",
+            },
+          },
+          {
+            word: "질서",
+            s: {
+              매우우수:
+                "공공질서를 철저히 지키며 다른 친구들에게도 모범을 보임.",
+              우수: "줄 서기 등 질서를 잘 지킴.",
+              보통: "학교 규칙과 질서를 지키려 노력함.",
+              노력: "공공장소에서의 질서 의식을 높일 필요가 있음.",
+            },
+          },
+          {
+            word: "예절",
+            s: {
+              매우우수: "때와 장소에 맞는 예절을 갖추어 행동하며 언행이 바름.",
+              우수: "선생님과 친구들에게 예의 바르게 행동함.",
+              보통: "기본적인 예절을 갖추고 있음.",
+              노력: "상황에 맞는 언어 예절을 익힐 필요가 있음.",
+            },
+          },
+          {
+            word: "준법",
+            s: {
+              매우우수: "교칙을 자발적으로 준수하며 준법정신이 매우 투철함.",
+              우수: "학교 규칙을 잘 지키며 생활함.",
+              보통: "정해진 규칙을 따르려 노력함.",
+              노력: "공동체의 규칙을 이해하고 지키려는 노력이 필요함.",
+            },
+          },
+          {
+            word: "자주",
+            s: {
+              매우우수:
+                "자신의 일을 스스로 계획하고 실천하는 자주적인 태도가 돋보임.",
+              우수: "스스로 할 수 있는 일은 남에게 미루지 않음.",
+              보통: "자신의 일을 스스로 해결하려 함.",
+              노력: "스스로 해결하려는 자주성을 기를 필요가 있음.",
+            },
+          },
+          {
+            word: "건강",
+            s: {
+              매우우수: "규칙적인 운동과 생활 습관으로 건강 관리에 철저함.",
+              우수: "건강한 생활을 위해 노력함.",
+              보통: "체육 활동에 무리 없이 참여함.",
+              노력: "기초 체력을 기르기 위한 꾸준한 운동이 필요함.",
+            },
+          },
+          {
+            word: "안전",
+            s: {
+              매우우수:
+                "안전 수칙을 철저히 준수하며 교내 안전 문화 정착에 기여함.",
+              우수: "생활 속 안전 수칙을 잘 지킴.",
+              보통: "위험한 장난을 하지 않고 안전하게 생활함.",
+              노력: "안전 수칙을 숙지하고 실천하는 자세가 필요함.",
+            },
+          },
         ],
         "적성·활동": [
-          { word: "창의", s: { "매우우수": "독창적인 아이디어로 문제를 해결하는 창의력이 매우 뛰어남.", "우수": "새로운 관점에서 문제를 바라보는 창의성을 보임.", "보통": "기존 방식과 다르게 생각해 보려 노력함.", "노력": "다양한 각도에서 생각해보는 연습이 필요함." } },
-          { word: "탐구", s: { "매우우수": "호기심을 가지고 깊이 있게 파고드는 탐구 정신이 탁월함.", "우수": "관심 분야에 대해 지속적으로 탐구함.", "보통": "궁금한 점을 해결하기 위해 자료를 찾아봄.", "노력": "관심 대상을 끈기 있게 관찰하는 태도가 필요함." } },
-          { word: "분석", s: { "매우우수": "자료를 체계적으로 분석하여 핵심을 파악하는 능력이 뛰어남.", "우수": "주어진 정보를 논리적으로 분석함.", "보통": "자료의 내용을 이해하고 정리함.", "노력": "정보의 핵심을 파악하는 분석력을 기를 필요가 있음." } },
-          { word: "체육", s: { "매우우수": "운동 신경이 뛰어나고 각종 스포츠 활동에서 두각을 나타냄.", "우수": "체육 활동에 적극적으로 참여하며 즐김.", "보통": "체육 시간에 맡은 활동을 성실히 수행함.", "노력": "신체 활동에 흥미를 갖고 참여하도록 격려가 필요함." } },
-          { word: "예술", s: { "매우우수": "예술적 감수성이 풍부하고 표현력이 매우 뛰어남.", "우수": "자신의 생각과 느낌을 예술적으로 잘 표현함.", "보통": "예술 활동에 관심을 가지고 참여함.", "노력": "자신을 표현하는 다양한 예술 활동을 경험할 필요가 있음." } },
-          { word: "독서", s: { "매우우수": "다양한 분야의 책을 깊이 있게 읽고 비판적으로 사고함.", "우수": "틈틈이 책을 읽으며 독서 습관이 잘 형성됨.", "보통": "권장 도서를 읽고 내용을 이해함.", "노력": "독서에 흥미를 붙일 수 있도록 쉬운 책부터 읽는 지도가 필요함." } },
-          { word: "정보", s: { "매우우수": "정보 활용 능력이 뛰어나 필요한 정보를 신속 정확하게 수집함.", "우수": "컴퓨터 및 기기 활용 능력이 우수함.", "보통": "필요한 정보를 검색하여 활용할 수 있음.", "노력": "올바른 정보 활용 윤리를 익힐 필요가 있음." } },
-          { word: "과학", s: { "매우우수": "과학적 원리를 정확히 이해하고 실험 설계 능력이 탁월함.", "우수": "과학 현상에 흥미를 가지고 탐구함.", "보통": "과학 수업 및 실험에 성실히 참여함.", "노력": "과학적 현상에 호기심을 갖도록 유도가 필요함." } },
-          { word: "언어", s: { "매우우수": "어휘력이 풍부하고 자신의 생각을 논리정연하게 표현함.", "우수": "상황에 맞는 적절한 언어를 구사함.", "보통": "자신의 의사를 말과 글로 표현함.", "노력": "어휘력을 기르고 문장 구성 능력을 키울 필요가 있음." } },
-          { word: "수리", s: { "매우우수": "수리적 사고력이 뛰어나 복잡한 문제도 논리적으로 해결함.", "우수": "수학적 개념을 잘 이해하고 문제 해결에 적용함.", "보통": "수학 교과 내용을 이해하고 따라감.", "노력": "기초적인 수리 개념을 다지는 노력이 필요함." } }
+          {
+            word: "창의",
+            s: {
+              매우우수:
+                "독창적인 아이디어로 문제를 해결하는 창의력이 매우 뛰어남.",
+              우수: "새로운 관점에서 문제를 바라보는 창의성을 보임.",
+              보통: "기존 방식과 다르게 생각해 보려 노력함.",
+              노력: "다양한 각도에서 생각해보는 연습이 필요함.",
+            },
+          },
+          {
+            word: "탐구",
+            s: {
+              매우우수:
+                "호기심을 가지고 깊이 있게 파고드는 탐구 정신이 탁월함.",
+              우수: "관심 분야에 대해 지속적으로 탐구함.",
+              보통: "궁금한 점을 해결하기 위해 자료를 찾아봄.",
+              노력: "관심 대상을 끈기 있게 관찰하는 태도가 필요함.",
+            },
+          },
+          {
+            word: "분석",
+            s: {
+              매우우수:
+                "자료를 체계적으로 분석하여 핵심을 파악하는 능력이 뛰어남.",
+              우수: "주어진 정보를 논리적으로 분석함.",
+              보통: "자료의 내용을 이해하고 정리함.",
+              노력: "정보의 핵심을 파악하는 분석력을 기를 필요가 있음.",
+            },
+          },
+          {
+            word: "체육",
+            s: {
+              매우우수:
+                "운동 신경이 뛰어나고 각종 스포츠 활동에서 두각을 나타냄.",
+              우수: "체육 활동에 적극적으로 참여하며 즐김.",
+              보통: "체육 시간에 맡은 활동을 성실히 수행함.",
+              노력: "신체 활동에 흥미를 갖고 참여하도록 격려가 필요함.",
+            },
+          },
+          {
+            word: "예술",
+            s: {
+              매우우수: "예술적 감수성이 풍부하고 표현력이 매우 뛰어남.",
+              우수: "자신의 생각과 느낌을 예술적으로 잘 표현함.",
+              보통: "예술 활동에 관심을 가지고 참여함.",
+              노력: "자신을 표현하는 다양한 예술 활동을 경험할 필요가 있음.",
+            },
+          },
+          {
+            word: "독서",
+            s: {
+              매우우수: "다양한 분야의 책을 깊이 있게 읽고 비판적으로 사고함.",
+              우수: "틈틈이 책을 읽으며 독서 습관이 잘 형성됨.",
+              보통: "권장 도서를 읽고 내용을 이해함.",
+              노력: "독서에 흥미를 붙일 수 있도록 쉬운 책부터 읽는 지도가 필요함.",
+            },
+          },
+          {
+            word: "정보",
+            s: {
+              매우우수:
+                "정보 활용 능력이 뛰어나 필요한 정보를 신속 정확하게 수집함.",
+              우수: "컴퓨터 및 기기 활용 능력이 우수함.",
+              보통: "필요한 정보를 검색하여 활용할 수 있음.",
+              노력: "올바른 정보 활용 윤리를 익힐 필요가 있음.",
+            },
+          },
+          {
+            word: "과학",
+            s: {
+              매우우수:
+                "과학적 원리를 정확히 이해하고 실험 설계 능력이 탁월함.",
+              우수: "과학 현상에 흥미를 가지고 탐구함.",
+              보통: "과학 수업 및 실험에 성실히 참여함.",
+              노력: "과학적 현상에 호기심을 갖도록 유도가 필요함.",
+            },
+          },
+          {
+            word: "언어",
+            s: {
+              매우우수: "어휘력이 풍부하고 자신의 생각을 논리정연하게 표현함.",
+              우수: "상황에 맞는 적절한 언어를 구사함.",
+              보통: "자신의 의사를 말과 글로 표현함.",
+              노력: "어휘력을 기르고 문장 구성 능력을 키울 필요가 있음.",
+            },
+          },
+          {
+            word: "수리",
+            s: {
+              매우우수:
+                "수리적 사고력이 뛰어나 복잡한 문제도 논리적으로 해결함.",
+              우수: "수학적 개념을 잘 이해하고 문제 해결에 적용함.",
+              보통: "수학 교과 내용을 이해하고 따라감.",
+              노력: "기초적인 수리 개념을 다지는 노력이 필요함.",
+            },
+          },
         ],
-        "진로태도": [
-          { word: "계획", s: { "매우우수": "구체적이고 실현 가능한 진로 계획을 수립하고 체계적으로 준비함.", "우수": "자신의 진로를 위해 계획을 세우고 실천함.", "보통": "진로에 대한 대략적인 계획을 가지고 있음.", "노력": "자신의 진로에 대해 진지하게 고민하고 계획을 세울 필요가 있음." } },
-          { word: "실천", s: { "매우우수": "꿈을 이루기 위해 꾸준히 노력하며 실천하는 의지가 강함.", "우수": "계획한 바를 실천하기 위해 노력함.", "보통": "관심 있는 분야에 대해 알아보려 함.", "노력": "작은 목표부터 세우고 실천하는 경험이 필요함." } },
-          { word: "탐색", s: { "매우우수": "다양한 진로 정보를 주도적으로 탐색하고 분석함.", "우수": "진로 관련 정보에 관심을 갖고 찾아봄.", "보통": "학교에서 제공하는 진로 탐색 활동에 참여함.", "노력": "자신에게 맞는 진로를 찾기 위해 다양한 탐색이 필요함." } },
-          { word: "흥미", s: { "매우우수": "특정 분야에 깊은 흥미를 보이며 관련 활동에 몰입함.", "우수": "자신의 흥미 분야를 파악하고 있음.", "보통": "여러 분야에 관심을 보임.", "노력": "자신이 무엇을 좋아하는지 탐색하는 시간이 필요함." } },
-          { word: "가치", s: { "매우우수": "직업의 건전한 가치관을 확립하고 자신의 직업관이 뚜렷함.", "우수": "일의 보람과 가치를 중요하게 생각함.", "보통": "직업의 필요성을 이해함.", "노력": "올바른 직업 가치관을 형성하도록 지도가 필요함." } },
-          { word: "의지", s: { "매우우수": "진로 목표 달성을 위한 의지가 확고하고 열정적임.", "우수": "꿈을 향한 도전 의식을 가지고 있음.", "보통": "자신의 진로에 대해 긍정적으로 생각함.", "노력": "진로를 개척하려는 적극적인 의지가 필요함." } },
-          { word: "결정", s: { "매우우수": "합리적인 의사결정 과정을 통해 자신의 진로를 주체적으로 결정함.", "우수": "신중하게 자신의 진로를 결정하려 함.", "보통": "진로 결정에 대해 고민하고 있음.", "노력": "진로 결정 시 다양한 요소를 고려하는 태도가 필요함." } },
-          { word: "준비", s: { "매우우수": "진로에 필요한 역량을 갖추기 위해 다방면으로 철저히 준비함.", "우수": "자신의 꿈을 위해 필요한 공부를 함.", "보통": "진로와 관련된 기초 소양을 쌓고 있음.", "노력": "진로 준비를 위한 구체적인 행동이 필요함." } },
-          { word: "체험", s: { "매우우수": "진로 체험 활동에 적극적으로 참여하여 직업 세계를 깊이 이해함.", "우수": "다양한 직업 체험 활동에 참여함.", "보통": "진로 체험의 기회를 가짐.", "노력": "직접적인 경험을 통해 진로를 탐색할 기회가 필요함." } },
-          { word: "상담", s: { "매우우수": "진로 문제에 대해 적극적으로 상담을 요청하고 조언을 수용함.", "우수": "선생님이나 부모님과 진로에 대해 대화함.", "보통": "진로 상담 시간에 성실히 임함.", "노력": "자신의 고민을 열린 마음으로 상담하는 자세가 필요함." } }
+        진로태도: [
+          {
+            word: "계획",
+            s: {
+              매우우수:
+                "구체적이고 실현 가능한 진로 계획을 수립하고 체계적으로 준비함.",
+              우수: "자신의 진로를 위해 계획을 세우고 실천함.",
+              보통: "진로에 대한 대략적인 계획을 가지고 있음.",
+              노력: "자신의 진로에 대해 진지하게 고민하고 계획을 세울 필요가 있음.",
+            },
+          },
+          {
+            word: "실천",
+            s: {
+              매우우수:
+                "꿈을 이루기 위해 꾸준히 노력하며 실천하는 의지가 강함.",
+              우수: "계획한 바를 실천하기 위해 노력함.",
+              보통: "관심 있는 분야에 대해 알아보려 함.",
+              노력: "작은 목표부터 세우고 실천하는 경험이 필요함.",
+            },
+          },
+          {
+            word: "탐색",
+            s: {
+              매우우수: "다양한 진로 정보를 주도적으로 탐색하고 분석함.",
+              우수: "진로 관련 정보에 관심을 갖고 찾아봄.",
+              보통: "학교에서 제공하는 진로 탐색 활동에 참여함.",
+              노력: "자신에게 맞는 진로를 찾기 위해 다양한 탐색이 필요함.",
+            },
+          },
+          {
+            word: "흥미",
+            s: {
+              매우우수: "특정 분야에 깊은 흥미를 보이며 관련 활동에 몰입함.",
+              우수: "자신의 흥미 분야를 파악하고 있음.",
+              보통: "여러 분야에 관심을 보임.",
+              노력: "자신이 무엇을 좋아하는지 탐색하는 시간이 필요함.",
+            },
+          },
+          {
+            word: "가치",
+            s: {
+              매우우수:
+                "직업의 건전한 가치관을 확립하고 자신의 직업관이 뚜렷함.",
+              우수: "일의 보람과 가치를 중요하게 생각함.",
+              보통: "직업의 필요성을 이해함.",
+              노력: "올바른 직업 가치관을 형성하도록 지도가 필요함.",
+            },
+          },
+          {
+            word: "의지",
+            s: {
+              매우우수: "진로 목표 달성을 위한 의지가 확고하고 열정적임.",
+              우수: "꿈을 향한 도전 의식을 가지고 있음.",
+              보통: "자신의 진로에 대해 긍정적으로 생각함.",
+              노력: "진로를 개척하려는 적극적인 의지가 필요함.",
+            },
+          },
+          {
+            word: "결정",
+            s: {
+              매우우수:
+                "합리적인 의사결정 과정을 통해 자신의 진로를 주체적으로 결정함.",
+              우수: "신중하게 자신의 진로를 결정하려 함.",
+              보통: "진로 결정에 대해 고민하고 있음.",
+              노력: "진로 결정 시 다양한 요소를 고려하는 태도가 필요함.",
+            },
+          },
+          {
+            word: "준비",
+            s: {
+              매우우수:
+                "진로에 필요한 역량을 갖추기 위해 다방면으로 철저히 준비함.",
+              우수: "자신의 꿈을 위해 필요한 공부를 함.",
+              보통: "진로와 관련된 기초 소양을 쌓고 있음.",
+              노력: "진로 준비를 위한 구체적인 행동이 필요함.",
+            },
+          },
+          {
+            word: "체험",
+            s: {
+              매우우수:
+                "진로 체험 활동에 적극적으로 참여하여 직업 세계를 깊이 이해함.",
+              우수: "다양한 직업 체험 활동에 참여함.",
+              보통: "진로 체험의 기회를 가짐.",
+              노력: "직접적인 경험을 통해 진로를 탐색할 기회가 필요함.",
+            },
+          },
+          {
+            word: "상담",
+            s: {
+              매우우수:
+                "진로 문제에 대해 적극적으로 상담을 요청하고 조언을 수용함.",
+              우수: "선생님이나 부모님과 진로에 대해 대화함.",
+              보통: "진로 상담 시간에 성실히 임함.",
+              노력: "자신의 고민을 열린 마음으로 상담하는 자세가 필요함.",
+            },
+          },
         ],
-        "학업태도": [
-          { word: "집중", s: { "매우우수": "수업 시간에 고도의 집중력을 발휘하여 학습 내용을 완벽히 이해함.", "우수": "수업에 집중하여 참여하는 태도가 좋음.", "보통": "대체로 수업에 집중하는 편임.", "노력": "수업 시간 중 집중력을 유지하려는 노력이 필요함." } },
-          { word: "경청", s: { "매우우수": "선생님의 설명을 놓치지 않고 경청하며 핵심을 잘 파악함.", "우수": "수업 내용을 귀담아듣는 태도가 바름.", "보통": "선생님의 말씀에 귀를 기울임.", "노력": "수업 내용에 관심을 갖고 경청하는 습관이 필요함." } },
-          { word: "발표", s: { "매우우수": "자신의 의견을 논리정연하게 발표하여 친구들의 이해를 도움.", "우수": "자신감을 가지고 발표에 참여함.", "보통": "지명되면 자신의 생각을 발표함.", "노력": "자발적으로 발표하려는 용기가 필요함." } },
-          { word: "과제", s: { "매우우수": "과제를 창의적으로 해결하여 기한 내에 완성도 높게 제출함.", "우수": "성실하게 과제를 수행하여 제출함.", "보통": "주어진 과제를 수행함.", "노력": "과제를 꼼꼼하게 챙겨서 제출하는 습관이 필요함." } },
-          { word: "노트", s: { "매우우수": "학습 내용을 체계적으로 정리하여 자신만의 학습 자료를 만듦.", "우수": "수업 내용을 꼼꼼하게 필기함.", "보통": "칠판의 내용을 필기함.", "노력": "중요한 내용을 요약 정리하는 기술이 필요함." } },
-          { word: "질문", s: { "매우우수": "학습 중 모르는 부분에 대해 날카로운 질문을 하여 심화 학습함.", "우수": "궁금한 점을 적극적으로 질문함.", "보통": "이해가 안 되는 부분을 질문함.", "노력": "모르는 것을 부끄러워하지 않고 질문하는 태도가 필요함." } },
-          { word: "복습", s: { "매우우수": "매일 꾸준한 복습으로 배운 내용을 자신의 것으로 만듦.", "우수": "배운 내용을 복습하여 익힘.", "보통": "시험 기간에 맞추어 복습함.", "노력": "그날 배운 내용을 다시 보는 복습 습관이 필요함." } },
-          { word: "예습", s: { "매우우수": "철저한 예습을 통해 수업 참여도와 이해도를 높임.", "우수": "배울 내용을 미리 읽어보고 옴.", "보통": "수업 준비를 해옴.", "노력": "다음 시간에 배울 내용을 확인하는 습관이 필요함." } },
-          { word: "협력", s: { "매우우수": "모둠 학습 시 동료를 돕고 협력하여 최선의 결과를 도출함.", "우수": "모둠원들과 협력하여 과제를 해결함.", "보통": "모둠 활동에 참여하여 역할을 수행함.", "노력": "학습 활동에서 친구들과 협력하는 태도가 필요함." } },
-          { word: "성취", s: { "매우우수": "높은 학업 성취 목표를 세우고 이를 달성하기 위해 끊임없이 노력함.", "우수": "자신의 목표를 달성하기 위해 노력함.", "보통": "학업 성적 향상에 관심을 가짐.", "노력": "자신에게 맞는 학습 목표를 세우고 실천하는 노력이 필요함." } }
+        학업태도: [
+          {
+            word: "집중",
+            s: {
+              매우우수:
+                "수업 시간에 고도의 집중력을 발휘하여 학습 내용을 완벽히 이해함.",
+              우수: "수업에 집중하여 참여하는 태도가 좋음.",
+              보통: "대체로 수업에 집중하는 편임.",
+              노력: "수업 시간 중 집중력을 유지하려는 노력이 필요함.",
+            },
+          },
+          {
+            word: "경청",
+            s: {
+              매우우수:
+                "선생님의 설명을 놓치지 않고 경청하며 핵심을 잘 파악함.",
+              우수: "수업 내용을 귀담아듣는 태도가 바름.",
+              보통: "선생님의 말씀에 귀를 기울임.",
+              노력: "수업 내용에 관심을 갖고 경청하는 습관이 필요함.",
+            },
+          },
+          {
+            word: "발표",
+            s: {
+              매우우수:
+                "자신의 의견을 논리정연하게 발표하여 친구들의 이해를 도움.",
+              우수: "자신감을 가지고 발표에 참여함.",
+              보통: "지명되면 자신의 생각을 발표함.",
+              노력: "자발적으로 발표하려는 용기가 필요함.",
+            },
+          },
+          {
+            word: "과제",
+            s: {
+              매우우수:
+                "과제를 창의적으로 해결하여 기한 내에 완성도 높게 제출함.",
+              우수: "성실하게 과제를 수행하여 제출함.",
+              보통: "주어진 과제를 수행함.",
+              노력: "과제를 꼼꼼하게 챙겨서 제출하는 습관이 필요함.",
+            },
+          },
+          {
+            word: "노트",
+            s: {
+              매우우수:
+                "학습 내용을 체계적으로 정리하여 자신만의 학습 자료를 만듦.",
+              우수: "수업 내용을 꼼꼼하게 필기함.",
+              보통: "칠판의 내용을 필기함.",
+              노력: "중요한 내용을 요약 정리하는 기술이 필요함.",
+            },
+          },
+          {
+            word: "질문",
+            s: {
+              매우우수:
+                "학습 중 모르는 부분에 대해 날카로운 질문을 하여 심화 학습함.",
+              우수: "궁금한 점을 적극적으로 질문함.",
+              보통: "이해가 안 되는 부분을 질문함.",
+              노력: "모르는 것을 부끄러워하지 않고 질문하는 태도가 필요함.",
+            },
+          },
+          {
+            word: "복습",
+            s: {
+              매우우수: "매일 꾸준한 복습으로 배운 내용을 자신의 것으로 만듦.",
+              우수: "배운 내용을 복습하여 익힘.",
+              보통: "시험 기간에 맞추어 복습함.",
+              노력: "그날 배운 내용을 다시 보는 복습 습관이 필요함.",
+            },
+          },
+          {
+            word: "예습",
+            s: {
+              매우우수: "철저한 예습을 통해 수업 참여도와 이해도를 높임.",
+              우수: "배울 내용을 미리 읽어보고 옴.",
+              보통: "수업 준비를 해옴.",
+              노력: "다음 시간에 배울 내용을 확인하는 습관이 필요함.",
+            },
+          },
+          {
+            word: "협력",
+            s: {
+              매우우수:
+                "모둠 학습 시 동료를 돕고 협력하여 최선의 결과를 도출함.",
+              우수: "모둠원들과 협력하여 과제를 해결함.",
+              보통: "모둠 활동에 참여하여 역할을 수행함.",
+              노력: "학습 활동에서 친구들과 협력하는 태도가 필요함.",
+            },
+          },
+          {
+            word: "성취",
+            s: {
+              매우우수:
+                "높은 학업 성취 목표를 세우고 이를 달성하기 위해 끊임없이 노력함.",
+              우수: "자신의 목표를 달성하기 위해 노력함.",
+              보통: "학업 성적 향상에 관심을 가짐.",
+              노력: "자신에게 맞는 학습 목표를 세우고 실천하는 노력이 필요함.",
+            },
+          },
         ],
-        "기타": [
-          { word: "일반", s: { "매우우수": "학교생활 전반에 걸쳐 모범적이고 타의 귀감이 됨.", "우수": "학교생활을 성실하게 함.", "보통": "무난하게 학교생활을 함.", "노력": "학교생활에 좀 더 적극적으로 참여할 필요가 있음." } },
-          { word: "종합", s: { "매우우수": "지덕체를 겸비한 학생으로 앞으로의 성장이 매우 기대됨.", "우수": "다방면에서 고른 발달을 보임.", "보통": "전반적으로 원만한 발달을 보임.", "노력": "자신의 잠재력을 발휘하기 위한 노력이 필요함." } },
-          { word: "발전", s: { "매우우수": "학기 초에 비해 비약적인 발전을 보여 칭찬할 만함.", "우수": "꾸준히 노력하여 점진적인 발전을 보임.", "보통": "조금씩 나아지는 모습을 보임.", "노력": "현재보다 더 나은 모습을 위해 지속적인 노력이 필요함." } },
-          { word: "변화", s: { "매우우수": "긍정적인 방향으로 큰 행동의 변화가 관찰됨.", "우수": "단점을 고치고 긍정적으로 변화하려 노력함.", "보통": "생활 태도에 변화를 주려 함.", "노력": "바람직한 방향으로의 변화를 위한 계기가 필요함." } },
-          { word: "성장", s: { "매우우수": "내적으로 크게 성숙하여 의젓한 모습을 보임.", "우수": "생각과 행동이 많이 성장함.", "보통": "학교생활을 통해 성장해 가고 있음.", "노력": "내면의 성장을 위한 독서나 사색이 필요함." } },
-          { word: "적응", s: { "매우우수": "새로운 환경에 빠르게 적응하고 주도적으로 생활함.", "우수": "학교생활에 잘 적응하여 지냄.", "보통": "학급 분위기에 적응하고 있음.", "노력": "새로운 환경에 대한 두려움을 없애고 적응하려 노력해야 함." } },
-          { word: "극복", s: { "매우우수": "자신의 단점이나 어려움을 의지적으로 극복해 냄.", "우수": "어려움을 이겨내려는 의지를 보임.", "보통": "문제를 해결하려 노력함.", "노력": "어려움에 직면했을 때 포기하지 않는 자세가 필요함." } },
-          { word: "개선", s: { "매우우수": "지적받은 사항을 즉시 개선하여 더 나은 결과를 만듦.", "우수": "자신의 부족한 점을 개선하려 노력함.", "보통": "조언을 듣고 고치려 함.", "노력": "잘못된 습관을 개선하려는 꾸준한 노력이 필요함." } },
-          { word: "노력", s: { "매우우수": "목표를 향해 끊임없이 노력하는 성실함이 돋보임.", "우수": "자신의 목표를 위해 꾸준히 노력함.", "보통": "맡은 일에 노력을 기울임.", "노력": "목표 달성을 위해 끈기 있게 노력하는 자세가 필요함." } },
-          { word: "관심", s: { "매우우수": "주변에 대한 따뜻한 관심으로 학급의 소외된 친구를 챙김.", "우수": "학급 일에 관심을 가지고 참여함.", "보통": "친구들에게 관심을 보임.", "노력": "주변 사람과 환경에 대해 조금 더 관심을 가질 필요가 있음." } }
-        ]
+        기타: [
+          {
+            word: "일반",
+            s: {
+              매우우수: "학교생활 전반에 걸쳐 모범적이고 타의 귀감이 됨.",
+              우수: "학교생활을 성실하게 함.",
+              보통: "무난하게 학교생활을 함.",
+              노력: "학교생활에 좀 더 적극적으로 참여할 필요가 있음.",
+            },
+          },
+          {
+            word: "종합",
+            s: {
+              매우우수: "지덕체를 겸비한 학생으로 앞으로의 성장이 매우 기대됨.",
+              우수: "다방면에서 고른 발달을 보임.",
+              보통: "전반적으로 원만한 발달을 보임.",
+              노력: "자신의 잠재력을 발휘하기 위한 노력이 필요함.",
+            },
+          },
+          {
+            word: "발전",
+            s: {
+              매우우수: "학기 초에 비해 비약적인 발전을 보여 칭찬할 만함.",
+              우수: "꾸준히 노력하여 점진적인 발전을 보임.",
+              보통: "조금씩 나아지는 모습을 보임.",
+              노력: "현재보다 더 나은 모습을 위해 지속적인 노력이 필요함.",
+            },
+          },
+          {
+            word: "변화",
+            s: {
+              매우우수: "긍정적인 방향으로 큰 행동의 변화가 관찰됨.",
+              우수: "단점을 고치고 긍정적으로 변화하려 노력함.",
+              보통: "생활 태도에 변화를 주려 함.",
+              노력: "바람직한 방향으로의 변화를 위한 계기가 필요함.",
+            },
+          },
+          {
+            word: "성장",
+            s: {
+              매우우수: "내적으로 크게 성숙하여 의젓한 모습을 보임.",
+              우수: "생각과 행동이 많이 성장함.",
+              보통: "학교생활을 통해 성장해 가고 있음.",
+              노력: "내면의 성장을 위한 독서나 사색이 필요함.",
+            },
+          },
+          {
+            word: "적응",
+            s: {
+              매우우수: "새로운 환경에 빠르게 적응하고 주도적으로 생활함.",
+              우수: "학교생활에 잘 적응하여 지냄.",
+              보통: "학급 분위기에 적응하고 있음.",
+              노력: "새로운 환경에 대한 두려움을 없애고 적응하려 노력해야 함.",
+            },
+          },
+          {
+            word: "극복",
+            s: {
+              매우우수: "자신의 단점이나 어려움을 의지적으로 극복해 냄.",
+              우수: "어려움을 이겨내려는 의지를 보임.",
+              보통: "문제를 해결하려 노력함.",
+              노력: "어려움에 직면했을 때 포기하지 않는 자세가 필요함.",
+            },
+          },
+          {
+            word: "개선",
+            s: {
+              매우우수: "지적받은 사항을 즉시 개선하여 더 나은 결과를 만듦.",
+              우수: "자신의 부족한 점을 개선하려 노력함.",
+              보통: "조언을 듣고 고치려 함.",
+              노력: "잘못된 습관을 개선하려는 꾸준한 노력이 필요함.",
+            },
+          },
+          {
+            word: "노력",
+            s: {
+              매우우수: "목표를 향해 끊임없이 노력하는 성실함이 돋보임.",
+              우수: "자신의 목표를 위해 꾸준히 노력함.",
+              보통: "맡은 일에 노력을 기울임.",
+              노력: "목표 달성을 위해 끈기 있게 노력하는 자세가 필요함.",
+            },
+          },
+          {
+            word: "관심",
+            s: {
+              매우우수:
+                "주변에 대한 따뜻한 관심으로 학급의 소외된 친구를 챙김.",
+              우수: "학급 일에 관심을 가지고 참여함.",
+              보통: "친구들에게 관심을 보임.",
+              노력: "주변 사람과 환경에 대해 조금 더 관심을 가질 필요가 있음.",
+            },
+          },
+        ],
       };
 
       let db = {};
@@ -234,7 +1213,9 @@
       window.onload = () => {
         students.forEach((name) => (db[name] = []));
         initModalList();
-        document.getElementById("logDate").value = new Date().toISOString().split("T")[0];
+        document.getElementById("logDate").value = new Date()
+          .toISOString()
+          .split("T")[0];
       };
 
       function showToast(m) {
@@ -247,30 +1228,76 @@
       const searchInput = document.getElementById("studentSearch");
       const autoList = document.getElementById("autoList");
       searchInput.addEventListener("input", () => {
-        const val = searchInput.value; autoList.innerHTML = ""; selectedIndex = -1;
-        if (!val) { autoList.style.display = "none"; return; }
+        const val = searchInput.value;
+        autoList.innerHTML = "";
+        selectedIndex = -1;
+        if (!val) {
+          autoList.style.display = "none";
+          return;
+        }
         const matched = students.filter((s) => s.includes(val));
         matched.forEach((name, idx) => {
-          const div = document.createElement("div"); div.className = "auto-item"; div.textContent = name;
-          div.onclick = () => selectStudent(name); autoList.appendChild(div);
+          const div = document.createElement("div");
+          div.className = "auto-item";
+          div.textContent = name;
+          div.onclick = () => selectStudent(name);
+          autoList.appendChild(div);
         });
         autoList.style.display = matched.length ? "block" : "none";
       });
       searchInput.addEventListener("keydown", (e) => {
         const items = autoList.getElementsByClassName("auto-item");
-        if (e.key === "ArrowDown") { e.preventDefault(); selectedIndex++; if (selectedIndex >= items.length) selectedIndex = 0; updateSelection(items); }
-        else if (e.key === "ArrowUp") { e.preventDefault(); selectedIndex--; if (selectedIndex < 0) selectedIndex = items.length - 1; updateSelection(items); }
-        else if (e.key === "Enter") { if (selectedIndex > -1) selectStudent(items[selectedIndex].textContent); else if (items.length > 0) selectStudent(items[0].textContent); }
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          selectedIndex++;
+          if (selectedIndex >= items.length) selectedIndex = 0;
+          updateSelection(items);
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          selectedIndex--;
+          if (selectedIndex < 0) selectedIndex = items.length - 1;
+          updateSelection(items);
+        } else if (e.key === "Enter") {
+          if (selectedIndex > -1)
+            selectStudent(items[selectedIndex].textContent);
+          else if (items.length > 0) selectStudent(items[0].textContent);
+        }
       });
-      function updateSelection(items) { Array.from(items).forEach((item, idx) => item.classList.toggle("selected", idx === selectedIndex)); }
-      function selectStudent(name) { searchInput.value = name; autoList.style.display = "none"; loadMainSummary(); showToast(`${name} 학생이 선택되었습니다.`); }
-      function openModal() { document.getElementById("logModal").style.display = "block"; }
-      function closeModal() { document.getElementById("logModal").style.display = "none"; }
+      function updateSelection(items) {
+        Array.from(items).forEach((item, idx) =>
+          item.classList.toggle("selected", idx === selectedIndex)
+        );
+      }
+      function selectStudent(name) {
+        searchInput.value = name;
+        autoList.style.display = "none";
+        loadMainSummary();
+        showToast(`${name} 학생이 선택되었습니다.`);
+      }
+      function openModal() {
+        document.getElementById("logModal").style.display = "block";
+      }
+      function closeModal() {
+        document.getElementById("logModal").style.display = "none";
+      }
       function initModalList() {
         const list = document.getElementById("modalStudentList");
         students.forEach((name) => {
-          const div = document.createElement("div"); div.className = "student-item"; div.textContent = name;
-          div.onclick = () => { currentStudent = name; document.querySelectorAll(".student-item").forEach((i) => i.classList.remove("active")); div.classList.add("active"); document.getElementById("modalStudentTitle").textContent = `[${name}] 학생 행동 기록 상세`; resetInputRows(); renderHistory(); };
+          const div = document.createElement("div");
+          div.className = "student-item";
+          div.textContent = name;
+          div.onclick = () => {
+            currentStudent = name;
+            document
+              .querySelectorAll(".student-item")
+              .forEach((i) => i.classList.remove("active"));
+            div.classList.add("active");
+            document.getElementById(
+              "modalStudentTitle"
+            ).textContent = `[${name}] 학생 행동 기록 상세`;
+            resetInputRows();
+            renderHistory();
+          };
           list.appendChild(div);
         });
       }
@@ -284,21 +1311,25 @@
         const container = document.getElementById("inputRowsContainer");
         const wrapper = document.createElement("div");
         wrapper.className = "input-wrapper";
-        
+
         const rowDiv = document.createElement("div");
         rowDiv.className = "input-row";
         rowDiv.style.display = "flex";
         rowDiv.style.gap = "12px";
         rowDiv.style.alignItems = "center";
-        
+
         rowDiv.innerHTML = `
-            <select class="input cat-select" style="width:130px;" onchange="updateKeywordTray(this)">${cats.map((c) => `<option>${c}</option>`).join("")}</select>
-            <select class="input level-select" style="width:110px;">${levels.map((l) => `<option>${l}</option>`).join("")}</select>
+            <select class="input cat-select" style="width:130px;" onchange="updateKeywordTray(this)">${cats
+              .map((c) => `<option>${c}</option>`)
+              .join("")}</select>
+            <select class="input level-select" style="width:110px;">${levels
+              .map((l) => `<option>${l}</option>`)
+              .join("")}</select>
             <input type="text" class="input case-input" style="flex:1;" placeholder="직접 입력하거나 아래 [키워드 선택]을 누르세요">
             <button class="btn sm" onclick="toggleKeywordTray(this)">키워드 선택 ▼</button>
             <button class="btn sm danger-btn" style="color:red; font-weight:bold; border: 1px solid #ffccc7; padding: 5px 8px; background: white;" onclick="removeInputRow(this)">✕</button>
         `;
-        
+
         const trayDiv = document.createElement("div");
         trayDiv.className = "keyword-tray";
         loadKeywordsToTray(trayDiv, "성격", rowDiv);
@@ -312,12 +1343,16 @@
         const wrapper = btn.closest(".input-wrapper");
         const tray = wrapper.querySelector(".keyword-tray");
         const catSelect = wrapper.querySelector(".cat-select");
-        
+
         if (tray.classList.contains("show")) {
           tray.classList.remove("show");
           btn.textContent = "키워드 선택 ▼";
         } else {
-          loadKeywordsToTray(tray, catSelect.value, wrapper.querySelector(".input-row"));
+          loadKeywordsToTray(
+            tray,
+            catSelect.value,
+            wrapper.querySelector(".input-row")
+          );
           tray.classList.add("show");
           btn.textContent = "키워드 닫기 ▲";
         }
@@ -333,16 +1368,16 @@
       function loadKeywordsToTray(tray, category, rowElement) {
         tray.innerHTML = "";
         const keywords = KEYWORD_DB[category] || [];
-        
-        keywords.forEach(kData => {
+
+        keywords.forEach((kData) => {
           const chip = document.createElement("div");
           chip.className = "keyword-chip";
           chip.textContent = kData.word;
           chip.onclick = () => {
-             const level = rowElement.querySelector(".level-select").value;
-             const input = rowElement.querySelector(".case-input");
-             const sentence = kData.s[level] || "";
-             input.value = sentence; 
+            const level = rowElement.querySelector(".level-select").value;
+            const input = rowElement.querySelector(".case-input");
+            const sentence = kData.s[level] || "";
+            input.value = sentence;
           };
           tray.appendChild(chip);
         });
@@ -351,9 +1386,9 @@
       function removeInputRow(btn) {
         const wrappers = document.querySelectorAll(".input-wrapper");
         if (wrappers.length > 1) {
-            btn.closest(".input-wrapper").remove();
+          btn.closest(".input-wrapper").remove();
         } else {
-            alert("최소 한 개의 행은 유지해야 합니다.");
+          alert("최소 한 개의 행은 유지해야 합니다.");
         }
       }
 
@@ -361,7 +1396,7 @@
         if (!currentStudent) return alert("학생을 먼저 선택하세요.");
         const date = document.getElementById("logDate").value;
         const wrappers = document.querySelectorAll(".input-wrapper");
-        
+
         let selectedCats = new Set();
         let tempRecords = [];
 
@@ -377,10 +1412,10 @@
           selectedCats.add(cat);
 
           if (!text) {
-             const kData = KEYWORD_DB[cat] ? KEYWORD_DB[cat][0] : null;
-             text = kData ? kData.s[level] : "기록 내용 없음";
+            const kData = KEYWORD_DB[cat] ? KEYWORD_DB[cat][0] : null;
+            text = kData ? kData.s[level] : "기록 내용 없음";
           }
-          
+
           tempRecords.push({ id: recordIdCounter++, date, cat, level, text });
         }
 
@@ -396,7 +1431,8 @@
         const view = document.getElementById("historyGroupView");
         const data = db[currentStudent];
         if (!data || data.length === 0) {
-          view.innerHTML = "기록이 없습니다. 활동 내용을 입력하고 [적용]을 눌러주세요.";
+          view.innerHTML =
+            "기록이 없습니다. 활동 내용을 입력하고 [적용]을 눌러주세요.";
           return;
         }
         const grouped = data.reduce((acc, obj) => {
@@ -406,7 +1442,10 @@
         }, {});
 
         let html = "";
-        Object.keys(grouped).sort().reverse().forEach((date) => {
+        Object.keys(grouped)
+          .sort()
+          .reverse()
+          .forEach((date) => {
             html += `<div class="date-group"><div class="date-header">📅 ${date}</div>`;
             grouped[date].forEach((item) => {
               html += `<div class="history-item">
@@ -431,16 +1470,18 @@
       function editRecord(id) {
         const r = db[currentStudent].find((item) => item.id === id);
         document.getElementById("logDate").value = r.date;
-        
+
         const container = document.getElementById("inputRowsContainer");
-        container.innerHTML = ""; 
-        
+        container.innerHTML = "";
+
         const wrapper = document.createElement("div");
         wrapper.className = "input-wrapper";
         const rowDiv = document.createElement("div");
         rowDiv.className = "input-row";
-        rowDiv.style.display = "flex"; rowDiv.style.gap = "12px"; rowDiv.style.alignItems = "center";
-        
+        rowDiv.style.display = "flex";
+        rowDiv.style.gap = "12px";
+        rowDiv.style.alignItems = "center";
+
         rowDiv.innerHTML = `
             <select class="input cat-select" style="width:130px;" onchange="updateKeywordTray(this)"></select>
             <select class="input level-select" style="width:110px;"></select>
@@ -448,39 +1489,58 @@
             <button class="btn sm" onclick="toggleKeywordTray(this)">키워드 선택 ▼</button>
             <button class="btn sm danger-btn" style="color:red; font-weight:bold; border: 1px solid #ffccc7; background: white;" onclick="removeInputRow(this)">✕</button>
         `;
-        
+
         const trayDiv = document.createElement("div");
         trayDiv.className = "keyword-tray";
-        loadKeywordsToTray(trayDiv, r.cat, rowDiv); 
-        
+        loadKeywordsToTray(trayDiv, r.cat, rowDiv);
+
         wrapper.appendChild(rowDiv);
         wrapper.appendChild(trayDiv);
         container.appendChild(wrapper);
 
         const catSel = rowDiv.querySelector(".cat-select");
-        cats.forEach(c => { const o = new Option(c, c); if(c===r.cat) o.selected=true; catSel.add(o); });
+        cats.forEach((c) => {
+          const o = new Option(c, c);
+          if (c === r.cat) o.selected = true;
+          catSel.add(o);
+        });
         const lvlSel = rowDiv.querySelector(".level-select");
-        levels.forEach(l => { const o = new Option(l, l); if(l===r.level) o.selected=true; lvlSel.add(o); });
-        
-        db[currentStudent] = db[currentStudent].filter((item) => item.id !== id);
+        levels.forEach((l) => {
+          const o = new Option(l, l);
+          if (l === r.level) o.selected = true;
+          lvlSel.add(o);
+        });
+
+        db[currentStudent] = db[currentStudent].filter(
+          (item) => item.id !== id
+        );
         renderHistory();
         showToast("수정 모드: 내용을 고친 후 다시 '기록 적용'을 눌러주세요.");
       }
 
-      function saveAllToDB() { showToast("모든 데이터가 서버에 저장되었습니다."); }
+      function saveAllToDB() {
+        showToast("모든 데이터가 서버에 저장되었습니다.");
+      }
       function loadMainSummary() {
         const name = searchInput.value;
         if (db[name]) {
-          const summary = db[name].sort((a, b) => a.date.localeCompare(b.date)).map((r) => `${r.date}: [${r.cat}] ${r.text} (${r.level})`).join("\n");
-          document.getElementById("rawDataDisplay").value = summary || "기록된 이력이 없습니다.";
+          const summary = db[name]
+            .sort((a, b) => a.date.localeCompare(b.date))
+            .map((r) => `${r.date}: [${r.cat}] ${r.text} (${r.level})`)
+            .join("\n");
+          document.getElementById("rawDataDisplay").value =
+            summary || "기록된 이력이 없습니다.";
         }
       }
       function generateSummaryAI() {
         const name = searchInput.value;
-        if (!db[name] || db[name].length === 0) return alert("데이터가 없습니다.");
+        if (!db[name] || db[name].length === 0)
+          return alert("데이터가 없습니다.");
         let result = `학기 전반에 걸쳐 `;
         db[name].forEach((r) => (result += `${r.text} `));
-        document.getElementById("tempDraft").value = result + "이러한 내용을 종합할 때 공동체 의식이 투철하며 지속적인 성장이 기대됨.";
+        document.getElementById("tempDraft").value =
+          result +
+          "이러한 내용을 종합할 때 공동체 의식이 투철하며 지속적인 성장이 기대됨.";
       }
       function moveToFinal() {
         const text = document.getElementById("tempDraft").value;
@@ -492,10 +1552,15 @@
       function updateByte() {
         const text = document.getElementById("finalPreview").innerText;
         let bytes = 0;
-        for (let i = 0; i < text.length; i++) bytes += text.charCodeAt(i) > 127 ? 3 : 1;
-        document.getElementById("byteCount").textContent = bytes;
+        for (let i = 0; i < text.length; i++)
+          bytes += text.charCodeAt(i) > 127 ? 3 : 1;
+
+        const countSpan = document.getElementById("byteCount");
+        countSpan.textContent = bytes;
+        countSpan.style.color = bytes > 1500 ? "red" : "#1f4ddc";
       }
-      document.getElementById("finalSubmitBtn").onclick = () => alert("작성된 내용을 NEIS에 입력합니다.");
+      document.getElementById("finalSubmitBtn").onclick = () =>
+        alert("작성된 내용을 NEIS에 입력합니다.");
     </script>
   </body>
 </html>
