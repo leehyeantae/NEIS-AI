@@ -368,6 +368,65 @@
         opacity: 1;
         bottom: 40px;
       }
+      /* --- 모바일 전용 스타일 (화면 폭이 768px 이하일 때 적용) --- */
+@media (max-width: 768px) {
+  
+  /* 1. 전체 컨테이너 크기 제한 해제 */
+  body, .app, .container {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 100vh;
+    display: block !important; /* Grid나 Flex를 풀고 블록으로 변경 */
+    overflow-y: auto !important; /* 전체 스크롤 허용 */
+  }
+
+  /* 2. 좌우 분할을 상하 배치로 변경 */
+  .container {
+    grid-template-columns: 1fr !important; /* 1열로 변경 */
+  }
+
+  /* 3. 좌측/우측 패널 스타일 조정 */
+  .left, .right, .left-panel, .right-panel {
+    width: 100% !important;
+    height: auto !important;
+    border-right: none !important;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 15px !important;
+    overflow: visible !important; /* 내부 스크롤 없애고 전체 스크롤로 */
+  }
+
+  /* 4. 모달창(팝업) 모바일 최적화 */
+  .modal-content {
+    width: 95% !important; /* 화면 꽉 차게 */
+    height: 90vh !important; /* 높이도 적당히 */
+    top: 50% !important;
+    left: 50% !important;
+  }
+  
+  .modal-body {
+    grid-template-columns: 1fr !important; /* 좌우 분할 제거 */
+    display: flex !important;
+    flex-direction: column;
+  }
+
+  /* 5. 학생 목록 등 내부 리스트 높이 제한 */
+  .student-list {
+    height: 150px !important; /* 목록은 짧게 */
+    border-right: none !important;
+    border-bottom: 1px solid #eee;
+    overflow-y: auto !important;
+  }
+
+  /* 6. 폰트 및 버튼 크기 조정 (터치하기 좋게) */
+  .btn {
+    padding: 12px 15px !important; /* 버튼 더 크게 */
+    font-size: 14px !important;
+  }
+  
+  input, select, textarea {
+    font-size: 16px !important; /* 아이폰에서 입력 시 줌인 방지 */
+  }
+}
     </style>
   </head>
 
