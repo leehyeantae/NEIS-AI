@@ -311,6 +311,86 @@
         padding-bottom: 10px;
         margin-bottom: 10px;
       }
+      /* --- [모바일/태블릿 반응형 패치] --- */
+      @media (max-width: 1024px) {
+        
+        /* 1. 전체 틀 고정 크기 해제 및 스크롤 허용 */
+        body, .app, .container {
+          width: 100% !important;
+          height: auto !important;
+          min-height: 100vh !important;
+          display: block !important; /* Grid/Flex 해제 */
+          overflow-y: auto !important; /* 세로 스크롤 허용 */
+          overflow-x: hidden !important; /* 가로 스크롤 방지 */
+        }
+
+        /* 2. 좌우 분할을 상하 배치로 변경 */
+        .container {
+          grid-template-columns: 1fr !important;
+        }
+
+        /* 3. 패널 스타일 재조정 */
+        .left, .right, .left-panel, .right-panel {
+          width: 100% !important;
+          height: auto !important;
+          border-right: none !important;
+          border-bottom: 8px solid #f0f2f5; /* 상하 구분선 */
+          padding: 20px !important;
+          overflow: visible !important; /* 내부 스크롤 제거 */
+        }
+
+        /* 4. 모달(팝업)창 화면 꽉 차게 수정 */
+        .modal-content {
+          width: 95% !important;
+          height: 90vh !important;
+          top: 50% !important;
+          left: 50% !important;
+          transform: translate(-50%, -50%) !important;
+          display: flex !important;
+          flex-direction: column !important;
+        }
+        
+        .modal-body {
+          display: flex !important;
+          flex-direction: column !important;
+          grid-template-columns: none !important;
+          height: 100% !important;
+          overflow: hidden !important;
+        }
+
+        /* 5. 모달 내 학생 목록은 짧게, 입력창은 길게 */
+        .student-list {
+          height: 120px !important; /* 목록 높이 고정 */
+          flex: none !important;
+          border-right: none !important;
+          border-bottom: 1px solid #eee;
+          width: 100% !important;
+        }
+        
+        .log-entry {
+          flex: 1 !important;
+          overflow-y: auto !important;
+          padding: 15px !important;
+        }
+
+        /* 6. 과세특(.card) 높이 문제 해결 */
+        .card {
+          height: auto !important;
+        }
+        textarea {
+          min-height: 100px;
+        }
+
+        /* 7. 터치 편의성 증대 */
+        .btn {
+          padding: 12px 16px !important;
+          font-size: 14px !important;
+          margin-bottom: 4px;
+        }
+        input, select, textarea {
+          font-size: 16px !important; /* 아이폰 확대 방지 */
+        }
+      }
     </style>
   </head>
   <body>
