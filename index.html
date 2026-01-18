@@ -1,27 +1,132 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>NEIS-AI</title>
   <style>
-    body{font-family:system-ui,-apple-system,Apple SD Gothic Neo,Segoe UI,Roboto,sans-serif;margin:0;background:#f6f7fb;color:#111;}
-    .wrap{max-width:980px;margin:0 auto;padding:48px 20px;}
-    h1{margin:0 0 8px;font-size:40px;letter-spacing:-0.5px}
-    p{margin:0 0 28px;color:#444}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
-    a.card{display:block;background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:16px 16px;text-decoration:none;color:#111;
-      box-shadow:0 6px 18px rgba(0,0,0,.05);}
-    a.card:hover{border-color:#c7d2fe;box-shadow:0 10px 22px rgba(0,0,0,.08)}
-    .title{font-weight:700;margin:0 0 6px}
-    .desc{margin:0;color:#555;font-size:14px;line-height:1.4}
-    .note{margin-top:18px;font-size:13px;color:#666}
+    body {
+      font-family: system-ui, -apple-system, Apple SD Gothic Neo, Segoe UI, Roboto, sans-serif;
+      margin: 0;
+      background: #f6f7fb;
+      color: #111;
+    }
+
+    /* [1] 상단 안내 배너 스타일 */
+    .notice-banner {
+      background-color: #fff3cd; /* 연한 노란색 */
+      color: #856404; /* 짙은 갈색 */
+      padding: 15px 20px;
+      text-align: center;
+      font-size: 15px;
+      border-bottom: 1px solid #ffeeba;
+      line-height: 1.5;
+      word-break: keep-all;
+    }
+    .notice-banner strong {
+      font-weight: 700;
+      color: #533f03;
+    }
+
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 48px 20px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 40px;
+      letter-spacing: -0.5px;
+    }
+    p {
+      margin: 0 0 28px;
+      color: #444;
+    }
+
+    /* [2] 유튜브 영상 컨테이너 스타일 */
+    .video-box {
+      position: relative;
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto 40px; /* 아래 간격 */
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      background: #000;
+    }
+    .video-box iframe {
+      display: block;
+      width: 100%;
+      height: 450px; /* PC 기준 높이 */
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+    }
+    a.card {
+      display: block;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 16px 16px;
+      text-decoration: none;
+      color: #111;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+      transition: 0.2s;
+    }
+    a.card:hover {
+      border-color: #c7d2fe;
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.08);
+      transform: translateY(-2px);
+    }
+    .title {
+      font-weight: 700;
+      margin: 0 0 6px;
+    }
+    .desc {
+      margin: 0;
+      color: #555;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    .note {
+      margin-top: 18px;
+      font-size: 13px;
+      color: #666;
+    }
+
+    /* 모바일 대응: 유튜브 높이 조절 */
+    @media (max-width: 768px) {
+      .video-box iframe {
+        height: 250px;
+      }
+    }
   </style>
 </head>
 <body>
+
+  <div class="notice-banner">
+    📢 <strong>안내 말씀:</strong> 본 시스템은 <strong>데스크톱(PC) 환경에 최적화</strong>되어 있습니다.<br>
+    보다 원활한 시연과 정확한 델파이 조사 참여를 위해, 가급적 <strong>PC 화면에서 접속</strong>해 주시기를 정중히 부탁드립니다.
+  </div>
+
   <div class="wrap">
     <h1>NEIS-AI</h1>
     <p>건국대학교 교육대학원 정보컴퓨터교육전공 이현태 석사 학위논문 — 화면 설계(시연) 링크</p>
+
+    <div class="video-box">
+      <iframe 
+        width="100%" 
+        height="450" 
+        src="https://youtu.be/MfSd_8g5XIQ" 
+        title="NEIS-AI 시연 영상" 
+        frameborder="0" 
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+        allowfullscreen>
+      </iframe>
+    </div>
 
     <div class="grid">
       <a class="card" href="./action.html">
