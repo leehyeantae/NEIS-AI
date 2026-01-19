@@ -12,10 +12,10 @@
       color: #111;
     }
 
-    /* [1] 상단 안내 배너 스타일 */
+    /* [1] 상단 안내 배너 */
     .notice-banner {
-      background-color: #fff3cd; /* 연한 노란색 */
-      color: #856404; /* 짙은 갈색 */
+      background-color: #fff3cd;
+      color: #856404;
       padding: 15px 20px;
       text-align: center;
       font-size: 15px;
@@ -43,12 +43,12 @@
       color: #444;
     }
 
-    /* [2] 유튜브 영상 컨테이너 스타일 */
+    /* [2] 유튜브 영상 컨테이너 */
     .video-box {
       position: relative;
       width: 100%;
       max-width: 800px;
-      margin: 0 auto 40px; /* 아래 간격 */
+      margin: 0 auto 30px; /* 아래 간격 */
       border-radius: 12px;
       overflow: hidden;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -57,9 +57,48 @@
     .video-box iframe {
       display: block;
       width: 100%;
-      height: 450px; /* PC 기준 높이 */
+      height: 450px;
     }
 
+    /* [3] 다운로드 섹션 스타일 (추가됨) */
+    .download-box {
+      max-width: 800px;
+      margin: 0 auto 40px;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+    }
+    .download-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 15px;
+      color: #374151;
+      display: block;
+    }
+    .btn-down {
+      display: inline-block;
+      text-decoration: none;
+      background: #4b5563; /* 회색 버튼 */
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      margin: 5px;
+      transition: 0.2s;
+    }
+    .btn-down:hover {
+      background: #374151;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .Delphi1.hwp { background: #3b82f6; } /* 한글은 파란색 */
+    .Delphi1.pdf { background: #ef4444; } /* PDF는 빨간색 */
+
+    /* 카드 그리드 */
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -97,11 +136,9 @@
       color: #666;
     }
 
-    /* 모바일 대응: 유튜브 높이 조절 */
     @media (max-width: 768px) {
-      .video-box iframe {
-        height: 250px;
-      }
+      .video-box iframe { height: 250px; }
+      .btn-down { display: block; margin: 10px auto; width: 90%; }
     }
   </style>
 </head>
@@ -116,35 +153,22 @@
     <h1>NEIS-AI</h1>
     <p>건국대학교 교육대학원 정보컴퓨터교육전공 이현태 석사 학위논문 — 화면 설계(시연) 링크</p>
 
-    <div style="text-align: center; margin-bottom: 40px;">
-      <div style="
-        max-width: 800px; 
-        margin: 0 auto; 
-        padding: 40px; 
-        background: #000; 
-        border-radius: 12px; 
-        color: #fff; 
-        display: flex; 
-        flex-direction: column; 
-        align-items: center; 
-        justify-content: center;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-        
-        <h3 style="margin-top: 0; color: #fff;">🎬 NEIS-AI 시연 영상 보기</h3>
-        <p style="color: #ccc; margin-bottom: 20px;">아래 버튼을 누르면 유튜브로 이동하여 영상을 시청할 수 있습니다.</p>
-        
-        <a href="https://youtu.be/MfSd_8g5XIQ" target="_blank" style="
-          background-color: #ff0000; 
-          color: white; 
-          padding: 12px 24px; 
-          text-decoration: none; 
-          font-weight: bold; 
-          border-radius: 4px; 
-          font-size: 16px;
-          display: inline-block;">
-          ▶ 유튜브에서 영상 재생하기
-        </a>
-      </div>
+    <div class="video-box">
+      <iframe 
+        width="100%" 
+        height="450" 
+        src="https://www.youtube.com/embed/MfSd_8g5XIQ" 
+        title="NEIS-AI 시연 영상" 
+        frameborder="0" 
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+        allowfullscreen>
+      </iframe>
+    </div>
+
+    <div class="download-box">
+      <span class="download-title">📄 델파이 조사 설문지 다운로드</span>
+      <a href="./Delhphi1.hwp" download class="Delhphi1 hwp">💾 한글파일(.hwp) 다운로드</a>
+      <a href="./Delhphi1.pdf" download class="Delhphi1 pdf">💾 PDF파일(.pdf) 다운로드</a>
     </div>
 
     <div class="grid">
