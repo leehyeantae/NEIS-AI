@@ -1,0 +1,2008 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>행동특성 및 종합의견 v6.0 (The Masterpiece)</title>
+    <style>
+      /* --- [공통 레이아웃] --- */
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: "Segoe UI", -apple-system, sans-serif;
+        background: #f5f6f8;
+        color: #333;
+        overflow: hidden;
+      }
+      .topbar {
+        height: 48px;
+        background: #f5c6cf;
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        font-weight: 700;
+        border-bottom: 1px solid #e5adba;
+        color: #333;
+        flex-shrink: 0;
+      }
+
+      .container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        height: calc(100vh - 48px);
+      }
+      .left,
+      .right {
+        padding: 25px;
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+        overflow-y: auto;
+        min-height: 0;
+      }
+      .left {
+        border-right: 1px solid #e5e7eb;
+        gap: 15px;
+      }
+
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 5px;
+        flex-shrink: 0;
+      }
+      .section-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1f2937;
+      }
+
+      .input,
+      .textarea,
+      .select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: 0.2s;
+      }
+      .textarea {
+        resize: none;
+        line-height: 1.6;
+      }
+
+      .btn {
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        border: 1px solid #d1d5db;
+        background: #fff;
+        transition: 0.2s;
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+      }
+      .btn.primary {
+        background: #1f4ddc;
+        color: #fff;
+        border-color: #163aa5;
+      }
+      .btn.success {
+        background: #10b981;
+        color: #fff;
+        border-color: #059669;
+      }
+      .btn.danger-btn {
+        color: #ef4444;
+        font-weight: bold;
+        border: 1px solid #fecaca;
+        background: #fff5f5;
+      }
+      .btn.sm {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+
+      /* --- [우측 마스터 패널] --- */
+      .preview-box {
+        flex: 6;
+        min-height: 150px;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 25px;
+        font-size: 15px;
+        line-height: 1.8;
+        outline: none;
+        background: #fff;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        word-break: break-all;
+        scroll-behavior: smooth;
+      }
+      .sentence-block {
+        cursor: text;
+        transition: background 0.4s ease-out;
+        border-radius: 4px;
+        padding: 2px 0;
+      }
+      .sentence-block:hover {
+        background-color: #eff6ff;
+      }
+      .highlight-active {
+        background-color: #fef08a !important;
+      }
+
+      .counter {
+        text-align: right;
+        margin-top: 10px;
+        font-size: 13px;
+        color: #6b7280;
+        flex-shrink: 0;
+      }
+      .info-layer {
+        flex: 4;
+        min-height: 150px;
+        border: 1px solid #e5e7eb;
+        background: #fafafa;
+        border-radius: 12px;
+        padding: 15px;
+        overflow-y: auto;
+        margin-top: 15px;
+      }
+
+      .info-card {
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        font-size: 13px;
+        border-left: 4px solid #1f4ddc;
+        transition: 0.2s;
+        position: relative;
+        cursor: pointer;
+        overflow: hidden;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+      }
+      .info-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border-color: #cbd5e1;
+      }
+      .info-card.duplicate {
+        border-left-color: #f59e0b;
+        background: #fffbeb;
+      }
+      .info-card.deleted {
+        border-left-color: #ef4444;
+        opacity: 0.5;
+        background: #fff5f5;
+        pointer-events: none;
+      }
+      .info-card.optimized {
+        border-left-color: #8b5cf6;
+        background: #f5f3ff;
+      }
+
+      .accordion-header {
+        padding: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 700;
+        color: #333;
+      }
+      .accordion-chevron {
+        transition: transform 0.3s ease;
+        color: #9ca3af;
+        font-size: 12px;
+      }
+      .info-card.expanded .accordion-chevron {
+        transform: rotate(180deg);
+      }
+
+      .accordion-body-wrapper {
+        display: grid;
+        grid-template-rows: 0fr;
+        transition: grid-template-rows 0.3s ease;
+      }
+      .info-card.expanded .accordion-body-wrapper {
+        grid-template-rows: 1fr;
+      }
+      .accordion-body {
+        overflow: hidden;
+        padding: 0 12px;
+      }
+      .accordion-content {
+        padding-bottom: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .tag {
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        background: #f3f4f6;
+        color: #4b5563;
+        border: 1px solid #e5e7eb;
+        display: inline-block;
+        font-weight: bold;
+      }
+      .dup-badge {
+        background: #f59e0b;
+        color: #fff;
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 12px;
+        font-weight: 700;
+        margin-left: 8px;
+      }
+      .status-badge {
+        font-size: 10px;
+        padding: 3px 6px;
+        border-radius: 4px;
+        color: #fff;
+        background: #10b981;
+      }
+      .delete-sentence-btn {
+        background: #fee2e2;
+        color: #ef4444;
+        border: 1px solid #fca5a5;
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 11px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.2s;
+        align-self: flex-end;
+      }
+      .delete-sentence-btn:hover {
+        background: #ef4444;
+        color: #fff;
+      }
+
+      /* --- [모달 및 키워드 패널] --- */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 2000;
+      }
+      .modal-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 1100px;
+        height: 90vh;
+        background: #fff;
+        border-radius: 16px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .modal-header {
+        padding: 20px 30px;
+        background: #f9fafb;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-shrink: 0;
+      }
+      .modal-body {
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        flex: 1;
+        overflow: hidden;
+      }
+
+      .student-list {
+        background: #f8fafc;
+        border-right: 1px solid #e5e7eb;
+        padding: 15px 0;
+        overflow-y: auto;
+      }
+      .student-item {
+        padding: 16px 30px;
+        cursor: pointer;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 15px;
+        transition: 0.2s;
+      }
+      .student-item.active {
+        background: #eff6ff;
+        color: #1f4ddc;
+        font-weight: 700;
+        border-right: 4px solid #1f4ddc;
+      }
+
+      .log-entry {
+        padding: 35px;
+        overflow-y: auto;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+      }
+
+      .input-wrapper {
+        border-bottom: 1px dashed #e5e7eb;
+        padding-bottom: 15px;
+        margin-bottom: 15px;
+      }
+      .keyword-tray {
+        display: flex;
+        background: #f0f7ff;
+        border: 1px solid #dbeafe;
+        border-radius: 8px;
+        padding: 10px;
+        margin-top: 10px;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .keyword-tray.hidden {
+        display: none;
+      }
+
+      .keyword-chip {
+        font-size: 12px;
+        background: #fff;
+        border: 1px solid #bbd1f8;
+        color: #1e40af;
+        padding: 6px 12px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: 0.2s;
+        user-select: none;
+      }
+      .keyword-chip:hover {
+        background: #dbeafe;
+      }
+      .keyword-chip.active {
+        background: #1f4ddc;
+        color: #fff;
+        border-color: #1f4ddc;
+        box-shadow: 0 2px 4px rgba(31, 77, 220, 0.2);
+      }
+
+      .keyword-chip.neg {
+        border-color: #fca5a5;
+        color: #b91c1c;
+        background: #fef2f2;
+      }
+      .keyword-chip.neg:hover {
+        background: #fecaca;
+      }
+      .keyword-chip.neg.active {
+        background: #ef4444;
+        color: #fff;
+        border-color: #ef4444;
+      }
+
+      .history-view {
+        margin-top: 15px;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 20px;
+        flex: 1;
+        overflow-y: auto;
+      }
+      .history-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 12px;
+        background: #f9fafb;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        font-size: 13.5px;
+        border-left: 4px solid transparent;
+        transition: 0.2s;
+      }
+      .history-item.checked {
+        border-left-color: #1f4ddc;
+        background: #eff6ff;
+      }
+      .history-chk {
+        margin-top: 4px;
+        transform: scale(1.3);
+        cursor: pointer;
+        accent-color: #1f4ddc;
+        margin-right: 10px;
+      }
+      .history-actions {
+        display: flex;
+        gap: 6px;
+        flex-shrink: 0;
+      }
+
+      #toast {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #333;
+        color: #fff;
+        padding: 12px 25px;
+        border-radius: 30px;
+        font-size: 13px;
+        font-weight: 600;
+        opacity: 0;
+        transition: 0.3s;
+        pointer-events: none;
+        z-index: 3000;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="toast">알림</div>
+    <div class="topbar">행동특성 및 종합의견 v6.0 (The Masterpiece)</div>
+
+    <div class="container">
+      <section class="left">
+        <div class="section-header">
+          <div class="section-title">학생 선택 및 기록 구성</div>
+          <button class="btn accent" onclick="openModal()">
+            📅 누가기록 (교사 작성용)
+          </button>
+        </div>
+
+        <div
+          style="
+            background: #eef2ff;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #c7d2fe;
+            margin-bottom: 10px;
+            flex-shrink: 0;
+          "
+        >
+          <strong
+            style="color: #3730a3; display: flex; align-items: center; gap: 8px"
+          >
+            🧑‍🎓 학생명: 이현태
+            <span style="font-size: 12px; color: #555">(고정)</span>
+          </strong>
+        </div>
+
+        <div
+          style="
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            margin-top: 5px;
+          "
+        >
+          <div class="section-header" style="flex-shrink: 0">
+            <label class="section-title">생성 대기 중인 활동 (선택됨)</label>
+          </div>
+          <textarea
+            id="rawDataDisplay"
+            class="textarea"
+            readonly
+            placeholder="[누가기록]에서 항목을 체크하면 요약이 표시됩니다."
+            style="
+              background: #f9fafb;
+              color: #555;
+              flex: 1;
+              margin-bottom: 15px;
+              line-height: 1.6;
+            "
+          ></textarea>
+        </div>
+
+        <button
+          class="btn primary"
+          style="height: 48px; font-size: 15px; flex-shrink: 0"
+          onclick="generateDraftAI()"
+        >
+          ✨ AI 종합의견 초안 생성
+        </button>
+
+        <div
+          style="
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            margin-top: 15px;
+          "
+        >
+          <label
+            class="section-title"
+            style="margin-bottom: 8px; flex-shrink: 0"
+            >AI 생성 초안 (검토 및 수정)</label
+          >
+          <textarea
+            id="tempDraft"
+            class="textarea"
+            style="
+              background: #fdfbff;
+              border-color: #c7d2fe;
+              flex: 1;
+              line-height: 1.6;
+            "
+          ></textarea>
+          <button
+            class="btn success"
+            style="width: 100%; margin-top: 10px; flex-shrink: 0"
+            onclick="moveToFinal()"
+          >
+            우측 최종 기재란으로 전송 ➔
+          </button>
+        </div>
+      </section>
+
+      <section class="right">
+        <div class="section-header" style="margin-bottom: 15px">
+          <div class="section-title">NEIS 기재 최종 내용</div>
+          <div style="display: flex; gap: 8px">
+            <button class="btn danger" onclick="clearFinal()">
+              🗑️ 전체 삭제
+            </button>
+            <button
+              class="btn"
+              style="background: #8b5cf6; color: white; border-color: #7c3aed"
+              onclick="checkAndUpgradeIntegrity()"
+            >
+              🪄 전체 AI 다듬기 (빈도/수준 분석 강화)
+            </button>
+            <button class="btn success" onclick="finalApply()">
+              💾 적용하기
+            </button>
+          </div>
+        </div>
+
+        <div
+          style="
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            gap: 15px;
+            min-height: 0;
+          "
+        >
+          <div
+            id="finalPreview"
+            class="preview-box"
+            contenteditable="true"
+            oninput="updateByte()"
+          ></div>
+
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              flex-shrink: 0;
+            "
+          >
+            <div class="counter" style="margin-top: 0">
+              글자수: <span id="charNum" style="font-weight: 700">0</span>자
+              &nbsp;|&nbsp; 실시간 용량:
+              <span id="byteNum" style="color: #1f4ddc; font-weight: 700"
+                >0</span
+              >
+              / 1500 Byte
+            </div>
+          </div>
+
+          <div class="info-layer" id="infoLayer">
+            <span
+              style="
+                font-weight: 700;
+                display: block;
+                margin-bottom: 8px;
+                color: #374151;
+              "
+              >📋 생성 이력 요약 (카드를 클릭하여 상세 확인 및 삭제)</span
+            >
+            <div
+              id="infoContentContainer"
+              style="color: #9ca3af; font-size: 13px"
+            >
+              생성된 문장에 대한 정보가 이곳에 아코디언 형태로 누적됩니다.
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div id="logModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span style="font-size: 18px; font-weight: 700; color: #374151"
+            >📅 학생별 누가 기록 관리</span
+          >
+          <button class="btn" onclick="closeModal()">닫기 (자동 저장됨)</button>
+        </div>
+        <div class="modal-body">
+          <div class="student-list" id="modalStudentList"></div>
+
+          <div class="log-entry">
+            <h3
+              id="modalStudentTitle"
+              style="
+                margin-top: 0;
+                margin-bottom: 15px;
+                color: #1f4ddc;
+                font-size: 20px;
+              "
+            >
+              [이현태] 누가기록 입력
+            </h3>
+
+            <div
+              style="
+                background: #f8fafc;
+                padding: 20px;
+                border-radius: 12px;
+                border: 1px solid #e5e7eb;
+                margin-bottom: 20px;
+              "
+            >
+              <div
+                style="
+                  margin-bottom: 15px;
+                  font-weight: 600;
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                "
+              >
+                기록 일자:
+                <input
+                  type="date"
+                  id="logDate"
+                  class="input"
+                  style="width: 150px"
+                />
+              </div>
+
+              <div id="inputRowsContainer"></div>
+
+              <div
+                style="
+                  margin-top: 15px;
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
+                <button class="btn sm" onclick="addRow()">
+                  + 활동 항목 추가
+                </button>
+                <button class="btn success" onclick="applyAndReset()">
+                  ✅ 현재 항목 리스트에 저장
+                </button>
+              </div>
+            </div>
+
+            <div
+              style="
+                background: #fff;
+                padding: 15px;
+                border: 1px solid #e5e7eb;
+                border-radius: 12px;
+                margin-bottom: 20px;
+              "
+            >
+              <div
+                class="section-title"
+                style="margin-bottom: 10px; font-size: 14px"
+              >
+                📝 학기말 종합 의견 (선택 사항)
+              </div>
+              <textarea
+                id="comprehensiveInput"
+                class="textarea"
+                style="height: 60px"
+                placeholder="누가기록 외에 학생의 전반적인 성향이나 변화를 자유롭게 작성하세요."
+                oninput="saveComprehensive()"
+              ></textarea>
+            </div>
+
+            <div
+              style="
+                display: flex;
+                flex-direction: column;
+                flex: 1;
+                min-height: 0;
+              "
+            >
+              <div
+                class="section-title"
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                "
+              >
+                <span>🕒 저장된 누가기록 목록 (체크된 항목만 생성)</span>
+                <div>
+                  <button class="btn sm" onclick="checkAllModal(true)">
+                    전체 선택
+                  </button>
+                  <button class="btn sm" onclick="checkAllModal(false)">
+                    전체 해제
+                  </button>
+                </div>
+              </div>
+              <div class="history-view" id="historyGroupView">
+                기록이 없습니다.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const currentStudent = "이현태";
+      const cats = [
+        "성격",
+        "교우관계",
+        "생활태도",
+        "적성·활동",
+        "진로태도",
+        "학업태도",
+        "기타",
+      ];
+      const levels = ["매우우수", "우수", "보통", "노력"];
+
+      const KEYWORD_DB = {
+        성격: [
+          {
+            word: "긍정적",
+            s: {
+              매우우수:
+                "매사 긍정적인 마인드로 학급의 어려운 상황을 밝게 전환시키는 탁월한 마인드를 지님.",
+              우수: "밝고 명랑한 태도로 주변에 긍정적인 에너지를 전파함.",
+              보통: "상황을 긍정적으로 바라보려 노력하며 원만하게 생활함.",
+              노력: "어려움 앞에서도 긍정적인 태도를 잃지 않으려 마인드 컨트롤을 하며 점진적으로 성장함.",
+            },
+          },
+          {
+            word: "차분함",
+            s: {
+              매우우수:
+                "어떤 상황에서도 동요하지 않고 침착하게 문제를 해결하는 능력이 탁월함.",
+              우수: "차분한 성품으로 매사 신중하게 생각하고 행동함.",
+              보통: "대체로 차분한 태도를 유지하며 과제를 수행함.",
+              노력: "급한 상황에서 침착함을 유지하려 노력하며 자기 조절 능력을 기르고 있음.",
+            },
+          },
+          {
+            word: "책임감",
+            s: {
+              매우우수:
+                "자신이 맡은 역할에 대한 책임감이 투철하여 끝까지 완수해내는 집념이 강함.",
+              우수: "자신의 임무를 성실하게 수행하려는 책임감이 강함.",
+              보통: "주어진 역할에 대해 끝까지 책임을 지고 수행함.",
+              노력: "책임감을 기르기 위해 스스로 계획을 세우고 실천하는 모습을 보임.",
+            },
+          },
+          {
+            word: "솔직함",
+            s: {
+              매우우수:
+                "자신의 감정과 생각을 가감 없이 솔직하고 정중하게 표현함.",
+              우수: "거짓 없이 솔직하게 행동하여 친구들의 신뢰를 얻음.",
+              보통: "자신의 의견을 대체로 솔직하게 표현함.",
+              노력: "자신의 생각을 적절한 방식으로 표현하기 위해 꾸준히 연습하며 소통 능력을 향상시킴.",
+            },
+          },
+          {
+            word: "유머",
+            s: {
+              매우우수:
+                "재치 있는 유머 감각으로 학급의 갈등 상황을 유연하게 넘기는 능력이 돋보임.",
+              우수: "적절한 유머로 친구들을 즐겁게 하며 분위기 메이커 역할을 함.",
+              보통: "친구들과 대화하며 즐거운 분위기를 형성함.",
+              노력: "때와 장소에 맞는 언어 습관을 기르며 긍정적인 교우관계를 형성하려 노력함.",
+            },
+          },
+          {
+            word: "온순함",
+            s: {
+              매우우수:
+                "성품이 온순하고 다정다감하여 친구들 사이에서 인기가 많음.",
+              우수: "친구들과 다투지 않고 온화하게 지냄.",
+              보통: "모나지 않은 성격으로 원만한 교우관계를 유지함.",
+              노력: "자신의 의사를 명확히 표현하는 방법을 배우며 자존감을 높여가고 있음.",
+            },
+          },
+          {
+            word: "자신감",
+            s: {
+              매우우수:
+                "매사 자신감 넘치는 태도로 새로운 과제에 주도적으로 도전함.",
+              우수: "자신의 능력을 믿고 적극적으로 활동에 참여함.",
+              보통: "주어진 과제를 수행할 때 자신감을 가지고 임함.",
+              노력: "발표나 활동 시 자신감을 갖고 참여하기 위해 꾸준히 연습하며 나아지는 모습을 보임.",
+            },
+          },
+          {
+            word: "도전",
+            s: {
+              매우우수:
+                "어려운 과제에도 굴하지 않고 끊임없이 도전하는 끈기가 돋보임.",
+              우수: "새로운 분야에 흥미를 가지고 주저 없이 도전하는 것을 즐김.",
+              보통: "새로운 활동에 대해 관심을 보이고 긍정적으로 참여함.",
+              노력: "실패를 두려워하지 않고 자신의 한계를 극복하기 위해 도전하는 용기 있는 모습을 보여줌.",
+            },
+          },
+          {
+            word: "예의",
+            s: {
+              매우우수:
+                "웃어른을 공경하고 친구를 존중하는 예의 바른 태도가 몸에 배어 있음.",
+              우수: "인사를 잘하고 예절을 잘 지켜 타의 모범이 됨.",
+              보통: "기본적인 예절을 지키며 학교생활을 함.",
+              노력: "상황에 맞는 예절을 익히고 실천하려 노력하며 바른 인성을 길러가고 있음.",
+            },
+          },
+          {
+            word: "인내심",
+            s: {
+              매우우수:
+                "힘든 상황에서도 포기하지 않고 끝까지 견뎌내는 인내심이 매우 뛰어남.",
+              우수: "과제를 수행하는 과정에서 끈기 있게 노력하는 모습을 보임.",
+              보통: "주어진 일을 마칠 때까지 인내심을 가지고 참여함.",
+              노력: "다소 시간이 걸리더라도 끈기 있게 과제에 집중하며 인내심을 기르고 있음.",
+            },
+          },
+          {
+            word: "소극적(성장)",
+            isNeg: true,
+            s: {
+              매우우수: "",
+              우수: "",
+              보통: "다소 조용한 편이나 내면의 깊이가 있으며 맡은 일을 묵묵히 수행함.",
+              노력: "자신감을 갖고 자신의 의견을 적극적으로 표현하려 노력하며 점차 활발한 모습으로 변화하고 있음.",
+            },
+          },
+        ],
+        교우관계: [
+          {
+            word: "리더십",
+            s: {
+              매우우수:
+                "탁월한 리더십으로 친구들의 의견을 조율하고 학급을 올바른 방향으로 이끄는 포용력을 갖춤.",
+              우수: "친구들을 잘 통솔하며 모둠 활동에서 리더 역할을 훌륭히 수행함.",
+              보통: "필요시 친구들을 이끄는 책임감 있는 모습을 보임.",
+              노력: "친구들의 의견을 경청하고 수용하며 자신만의 부드러운 리더십을 발휘하려 노력함.",
+            },
+          },
+          {
+            word: "배려",
+            s: {
+              매우우수:
+                "친구의 입장을 먼저 생각하고 진심으로 배려하는 따뜻한 마음씨를 지님.",
+              우수: "어려움에 처한 친구를 기꺼이 도와주는 이타심이 돋보임.",
+              보통: "친구들에게 친절하게 대하며 배려하려 노력함.",
+              노력: "타인의 입장을 이해하고 배려하는 태도를 기르며 교우관계의 폭을 넓혀가고 있음.",
+            },
+          },
+          {
+            word: "경청",
+            s: {
+              매우우수:
+                "친구의 이야기를 진심으로 경청하며 깊이 공감해 주는 태도가 훌륭함.",
+              우수: "대화할 때 상대방의 눈을 맞추고 귀 기울여 듣는 자세가 바름.",
+              보통: "친구들의 이야기에 적절히 반응하며 경청함.",
+              노력: "상대방의 말이 끝날 때까지 귀 기울여 듣는 경청의 자세를 꾸준히 함양함.",
+            },
+          },
+          {
+            word: "중재",
+            s: {
+              매우우수:
+                "친구 간의 갈등 발생 시 공정하게 중재하여 원만하게 해결하는 능력이 탁월함.",
+              우수: "다툼이 있을 때 이성적으로 친구들을 화해시키려 노력함.",
+              보통: "갈등 상황에서 친구들을 말리거나 대화로 유도함.",
+              노력: "갈등 상황을 합리적으로 해결하는 방법을 배우며 성숙하게 대처하려 노력함.",
+            },
+          },
+          {
+            word: "협동",
+            s: {
+              매우우수:
+                "공동의 목표를 위해 자신의 역할을 다하며 훌륭한 협동심과 시너지를 발휘함.",
+              우수: "모둠 활동에서 친구들과 협력하여 과제를 성실히 수행함.",
+              보통: "친구들과 어울려 단체 활동을 수행하는 데 거부감이 없음.",
+              노력: "친구들과 협력하여 과제를 완성하는 경험을 통해 협동의 가치를 깨달아가고 있음.",
+            },
+          },
+          {
+            word: "인기/친화력",
+            s: {
+              매우우수:
+                "유머와 재치로 주변을 즐겁게 하며 처음 만난 친구와도 금방 친해지는 친화력을 지님.",
+              우수: "원만한 성격과 낯가림 없는 태도로 친구들에게 먼저 다가감.",
+              보통: "새로운 친구들과 어울리는 데 큰 어려움이 없음.",
+              노력: "먼저 다가가는 용기를 기르며 다양한 친구들과 긍정적인 관계를 맺기 위해 노력함.",
+            },
+          },
+          {
+            word: "소통",
+            s: {
+              매우우수:
+                "자신의 의사를 명확히 전달하고 타인의 의견을 존중하는 소통 능력이 탁월함.",
+              우수: "친구들과 대화가 잘 통하고 합리적인 소통이 원활함.",
+              보통: "친구들과 대화를 나누며 생각을 활발히 교환함.",
+              노력: "자신의 생각을 조리 있게 말하는 연습을 통해 의사소통 역량을 발전시키고 있음.",
+            },
+          },
+          {
+            word: "양보",
+            s: {
+              매우우수:
+                "자신의 이익보다 단체를 위해 기꺼이 양보하는 미덕과 희생정신을 보임.",
+              우수: "필요한 경우 친구에게 양보할 줄 아는 성숙한 마음을 가짐.",
+              보통: "상황에 따라 친구의 입장을 수용하고 양보하는 모습을 보임.",
+              노력: "친구와 나누고 양보하는 기쁨을 알며 배려심을 키워나가고 있음.",
+            },
+          },
+          {
+            word: "신뢰",
+            s: {
+              매우우수:
+                "약속을 철저히 지켜 친구들 사이에서 두터운 신뢰와 존경을 받음.",
+              우수: "언행이 일치하는 정직한 태도로 친구들에게 믿음을 줌.",
+              보통: "친구들과의 약속을 소중히 생각하고 지키려 노력함.",
+              노력: "사소한 약속이라도 소중히 여기는 태도를 통해 대인관계의 신뢰를 쌓아가고 있음.",
+            },
+          },
+          {
+            word: "다툼(성장)",
+            isNeg: true,
+            s: {
+              매우우수: "",
+              우수: "",
+              보통: "갈등 상황 발생 시 대화로 타협점을 찾으려 노력함.",
+              노력: "의견 충돌 시 상대방의 입장에서 생각해보려 애쓰며 감정을 조절하는 성숙함을 보여줌.",
+            },
+          },
+        ],
+        생활태도: [
+          {
+            word: "근면/성실",
+            s: {
+              매우우수:
+                "매일 시간을 아껴 쓰며 근면 성실하게 학교 생활에 임하여 타의 모범이 됨.",
+              우수: "주어진 일과를 성실하게 수행하며 규칙적인 생활 습관이 배어 있음.",
+              보통: "학교 일과에 맞춰 성실하고 규칙적으로 생활함.",
+              노력: "스스로 시간 관리 계획을 세우고 이를 실천하며 생활 태도를 긍정적으로 개선해 나가고 있음.",
+            },
+          },
+          {
+            word: "정직",
+            s: {
+              매우우수:
+                "매사 정직하고 투명하게 행동하여 학급 내에서 바른 인성의 표본이 됨.",
+              우수: "거짓 없이 솔직하게 행동하며 자신의 책임을 다함.",
+              보통: "자신의 행동에 대해 인정할 줄 아는 정직함을 보임.",
+              노력: "자신의 행동에 대해 솔직하게 말하는 용기를 기르며 성숙해지고 있음.",
+            },
+          },
+          {
+            word: "절약",
+            s: {
+              매우우수:
+                "학용품과 에너지를 아껴 쓰는 절약 정신이 몸에 배어 있어 훌륭함.",
+              우수: "물건을 소중히 다루고 주변 자원을 아껴 씀.",
+              보통: "자신의 물건을 잘 챙기며 낭비를 줄이려 노력함.",
+              노력: "물건을 아껴 쓰고 정리 정돈하는 습관을 생활화하며 발전하고 있음.",
+            },
+          },
+          {
+            word: "청결",
+            s: {
+              매우우수:
+                "주변 환경을 항상 깨끗이 정리하며 학급 청결 유지에 솔선수범함.",
+              우수: "자신의 자리를 깨끗하게 정돈하고 위생 관리가 철저함.",
+              보통: "청소 시간에 맡은 구역을 책임감 있게 청소함.",
+              노력: "주변 정리 정돈을 생활화하는 습관을 들이며 자기 관리를 잘 해내고 있음.",
+            },
+          },
+          {
+            word: "질서",
+            s: {
+              매우우수:
+                "공공질서를 철저히 지키며 다른 친구들에게도 모범적인 선한 영향력을 행사함.",
+              우수: "줄 서기 등 학교 내 공공질서를 스스로 잘 지킴.",
+              보통: "학교 규칙과 질서를 지키려 노력하며 생활함.",
+              노력: "공공장소에서의 질서 의식을 높이며 민주 시민의 기본 소양을 익혀감.",
+            },
+          },
+          {
+            word: "예절",
+            s: {
+              매우우수:
+                "때와 장소에 맞는 훌륭한 예절을 갖추어 행동하며 언행이 매우 바름.",
+              우수: "선생님과 친구들에게 항상 예의 바르게 행동함.",
+              보통: "기본적인 예절을 갖추고 원만하게 지냄.",
+              노력: "상황에 맞는 올바른 언어 예절을 익히고 실천하려 노력함.",
+            },
+          },
+          {
+            word: "준법/규칙",
+            s: {
+              매우우수:
+                "교칙을 자발적으로 준수하며 공동체 의식과 준법정신이 매우 투철함.",
+              우수: "학교 규칙을 잘 숙지하고 어긋남 없이 바르게 생활함.",
+              보통: "정해진 학급 규칙을 따르려 성실히 노력함.",
+              노력: "공동체의 규칙을 깊이 이해하고 자발적으로 지키려는 노력을 통해 자질을 기름.",
+            },
+          },
+          {
+            word: "자주/자립",
+            s: {
+              매우우수:
+                "자신의 일을 스스로 계획하고 완벽히 실천하는 자주적인 태도가 매우 돋보임.",
+              우수: "스스로 할 수 있는 일은 주도적으로 해결하려는 의지가 강함.",
+              보통: "자신의 일을 남에게 미루지 않고 스스로 해결하려 함.",
+              노력: "어려운 일도 스스로 해결하려는 자주성을 기르며 독립심을 키워가고 있음.",
+            },
+          },
+          {
+            word: "건강/안전",
+            s: {
+              매우우수:
+                "안전 수칙을 철저히 준수하고 규칙적인 운동으로 자기 건강 관리에 완벽함.",
+              우수: "건강한 생활 습관을 유지하며 교내 안전 수칙을 잘 지킴.",
+              보통: "체육 활동에 무리 없이 참여하며 안전하게 생활함.",
+              노력: "안전 수칙을 숙지하고 체력을 기르기 위한 꾸준한 활동에 참여함.",
+            },
+          },
+          {
+            word: "규칙위반(성장)",
+            isNeg: true,
+            s: {
+              매우우수: "",
+              우수: "",
+              보통: "",
+              노력: "교칙 준수의 중요성을 스스로 인지하고 행동을 바르게 수정하며 긍정적인 변화를 보임.",
+            },
+          },
+        ],
+        "적성·활동": [
+          {
+            word: "창의",
+            s: {
+              매우우수:
+                "독창적인 아이디어로 기존의 틀을 깨고 문제를 해결하는 창의력이 매우 뛰어남.",
+              우수: "새로운 관점에서 문제를 바라보는 창의성과 유연성을 보임.",
+              보통: "기존 방식과 다르게 생각해 보려 다양한 시도를 함.",
+              노력: "다양한 각도에서 문제를 다각적으로 분석해보는 연습을 통해 창의성을 기르고 있음.",
+            },
+          },
+          {
+            word: "탐구",
+            s: {
+              매우우수:
+                "지적 호기심을 가지고 관심 분야를 깊이 있게 파고드는 탐구 정신이 탁월함.",
+              우수: "관심 분야에 대해 지속적으로 자료를 찾아보고 탐구함.",
+              보통: "궁금한 점을 해결하기 위해 스스로 조사하는 태도를 보임.",
+              노력: "관심 대상을 끈기 있게 관찰하며 탐구하려는 학구적 태도를 긍정적으로 발전시킴.",
+            },
+          },
+          {
+            word: "분석/정보",
+            s: {
+              매우우수:
+                "방대한 자료를 체계적으로 분석하여 핵심 정보를 추출하는 정보처리 능력이 탁월함.",
+              우수: "주어진 정보와 데이터를 논리적으로 분석하고 활용할 줄 앎.",
+              보통: "필요한 정보를 검색하여 내용을 이해하고 정리함.",
+              노력: "정보의 핵심을 파악하는 분석력을 기르며 올바른 정보 활용 윤리를 익혀감.",
+            },
+          },
+          {
+            word: "체육",
+            s: {
+              매우우수:
+                "운동 신경이 매우 뛰어나고 각종 스포츠 활동에서 탁월한 기량과 페어플레이 정신을 발휘함.",
+              우수: "체육 활동에 적극적으로 참여하며 스포츠를 진심으로 즐김.",
+              보통: "체육 시간에 맡은 활동을 성실하게 수행함.",
+              노력: "다양한 신체 활동에 흥미를 갖고 적극적으로 참여하며 활력을 더하고 있음.",
+            },
+          },
+          {
+            word: "예술",
+            s: {
+              매우우수:
+                "예술적 감수성이 매우 풍부하고 자신의 철학을 작품으로 구현하는 표현력이 뛰어남.",
+              우수: "자신의 생각과 느낌을 미적 감각을 발휘하여 훌륭하게 표현함.",
+              보통: "예술 활동에 관심을 가지고 즐겁게 참여함.",
+              노력: "자신을 표현하는 다양한 예술 활동을 경험하며 미적 감수성을 키워가고 있음.",
+            },
+          },
+          {
+            word: "독서",
+            s: {
+              매우우수:
+                "다양한 분야의 책을 깊이 있게 통독하고 이를 비판적으로 사고하여 글로 풀어내는 능력이 탁월함.",
+              우수: "틈틈이 책을 읽으며 올바른 독서 습관과 풍부한 배경지식을 갖춤.",
+              보통: "권장 도서를 성실히 읽고 내용을 잘 이해함.",
+              노력: "독서에 흥미를 붙이고 다양한 텍스트를 읽으며 문해력을 꾸준히 향상시킴.",
+            },
+          },
+          {
+            word: "과학/수리",
+            s: {
+              매우우수:
+                "복잡한 수리적, 과학적 원리를 정확히 꿰뚫고 실험 설계 및 논리적 문제 해결 능력이 탁월함.",
+              우수: "수학과 과학 현상에 흥미를 가지고 깊이 있게 탐구함.",
+              보통: "수리/과학 교과 내용에 성실히 참여하고 개념을 이해함.",
+              노력: "기초적인 수리 개념을 다지고 과학적 호기심을 확장하기 위해 노력함.",
+            },
+          },
+          {
+            word: "언어",
+            s: {
+              매우우수:
+                "어휘력이 매우 풍부하고 자신의 복잡한 생각을 논리정연하고 유창하게 표현하는 능력이 뛰어남.",
+              우수: "상황에 맞는 적절한 언어를 구사하며 설득력 있는 말하기를 함.",
+              보통: "자신의 의사를 말과 글로 무리 없이 표현함.",
+              노력: "어휘력을 기르고 문장 구성 능력을 키우며 의사소통의 질을 높이고 있음.",
+            },
+          },
+        ],
+        진로태도: [
+          {
+            word: "계획/준비",
+            s: {
+              매우우수:
+                "구체적이고 실현 가능한 진로 계획을 수립하고 목표 달성을 위해 철저하게 준비하는 실행력이 압도적임.",
+              우수: "자신의 진로를 위해 체계적인 계획을 세우고 실천에 옮김.",
+              보통: "진로에 대한 대략적인 계획을 가지고 소양을 쌓고 있음.",
+              노력: "자신의 진로에 대해 진지하게 고민하며 미래를 위한 준비를 차근차근 해나가고 있음.",
+            },
+          },
+          {
+            word: "탐색/체험",
+            s: {
+              매우우수:
+                "다양한 진로 정보를 주도적으로 탐색하고 체험 활동에 적극 참여하여 직업 세계를 깊이 이해함.",
+              우수: "진로 관련 정보와 체험 활동에 높은 관심을 갖고 찾아봄.",
+              보통: "학교에서 제공하는 진로 체험 활동에 성실히 참여함.",
+              노력: "자신에게 맞는 진로를 찾기 위해 직접 경험하고 탐색하는 기회를 적극적으로 늘려감.",
+            },
+          },
+          {
+            word: "흥미/가치",
+            s: {
+              매우우수:
+                "자신의 적성을 명확히 파악하고 건전한 직업 가치관을 확립하여 진로 방향성이 매우 뚜렷함.",
+              우수: "자신의 흥미 분야를 파악하고 일의 보람과 가치를 중요하게 생각함.",
+              보통: "여러 직업 분야에 관심을 보이며 직업의 필요성을 이해함.",
+              노력: "자신이 무엇을 좋아하는지 심도 있게 탐색하며 올바른 직업 가치관을 형성해 나감.",
+            },
+          },
+          {
+            word: "의지/실천",
+            s: {
+              매우우수:
+                "진로 목표 달성을 위한 열정과 의지가 확고하며, 어떤 장애물도 극복해 내는 강력한 실천력을 보임.",
+              우수: "꿈을 향한 도전 의식을 가지고 꾸준히 노력하며 실천함.",
+              보통: "자신의 진로에 대해 긍정적인 태도로 임함.",
+              노력: "작은 목표부터 세우고 달성하는 성취감을 맛보며 진로 개척 의지를 높여가고 있음.",
+            },
+          },
+          {
+            word: "상담",
+            s: {
+              매우우수:
+                "진로 문제에 대해 주도적으로 심층 상담을 요청하고 조언을 완벽히 수용하여 발전의 밑거름으로 삼음.",
+              우수: "선생님이나 멘토와 진로에 대해 깊이 있는 대화를 나눔.",
+              보통: "진로 상담 시간에 성실히 임하며 조언을 경청함.",
+              노력: "자신의 고민을 열린 마음으로 나누고 다양한 피드백을 수용하며 성장함.",
+            },
+          },
+        ],
+        학업태도: [
+          {
+            word: "집중/경청",
+            s: {
+              매우우수:
+                "수업 시간에 고도의 집중력을 발휘하여 선생님의 설명을 완벽히 흡수하고 이를 심화 탐구로 연결하는 능력이 탁월함.",
+              우수: "수업에 완벽히 몰입하여 참여하며 핵심을 잘 파악함.",
+              보통: "수업 시간에 귀를 기울이고 충실히 참여함.",
+              노력: "수업 집중력을 높이기 위해 스스로 학습 환경을 정돈하고 몰입하는 훈련을 통해 학업 의지를 다짐.",
+            },
+          },
+          {
+            word: "주도/질문",
+            s: {
+              매우우수:
+                "모르는 부분에 대해 날카로운 질문을 던지고 스스로 해답을 찾는 자기주도적 학습 능력이 타의 추종을 불허함.",
+              우수: "궁금한 점을 적극적으로 질문하며 배운 내용을 온전히 자신의 것으로 만듦.",
+              보통: "주어진 과제를 스스로 해결하려 노력하며 질문함.",
+              노력: "어려운 과제에 직면했을 때 포기하지 않고 교사에게 다가가 해결책을 묻는 등 주도성을 띠기 시작함.",
+            },
+          },
+          {
+            word: "복습/예습",
+            s: {
+              매우우수:
+                "철저한 예습과 매일 꾸준한 누적 복습을 통해 지식을 구조화하고 학습 효율을 극대화함.",
+              우수: "배울 내용을 미리 확인하고, 배운 내용은 당일 복습하여 완벽히 익힘.",
+              보통: "시험 기간과 일상에서 꾸준히 수업 준비 및 복습을 해옴.",
+              노력: "스스로 예복습 계획을 세우고 실천하는 습관을 들이며 기초 학력을 탄탄히 다짐.",
+            },
+          },
+          {
+            word: "발표/과제",
+            s: {
+              매우우수:
+                "과제를 창의적으로 해결하여 제출하고, 자신의 의견을 논리정연하게 발표하여 동료들의 학업적 통찰을 도움.",
+              우수: "자신감을 가지고 조리 있게 발표하며 성실하게 과제를 수행함.",
+              보통: "지명 시 자신의 생각을 무리 없이 발표하고 과제를 완수함.",
+              노력: "자발적으로 발표하려는 용기를 내며 과제를 꼼꼼히 챙겨 기한 내에 제출하는 책임감을 그림.",
+            },
+          },
+          {
+            word: "협력/성취",
+            s: {
+              매우우수:
+                "모둠 학습 시 동료의 부족한 점을 채워주고 협력하여 최선의 결과를 도출하는 학업적 리더십과 성취욕이 빛남.",
+              우수: "모둠원들과 훌륭히 협력하고 높은 학업 성취 목표를 향해 매진함.",
+              보통: "모둠 활동에서 맡은 역할을 수행하며 학업 향상에 관심을 가짐.",
+              노력: "학습 활동에서 친구들과 긍정적으로 협력하며 자신에게 맞는 학습 목표를 세워 실천하는 노력을 보임.",
+            },
+          },
+        ],
+        기타: [
+          {
+            word: "종합/일반",
+            s: {
+              매우우수:
+                "지덕체를 완벽히 겸비한 학생으로, 학교생활 전반에 걸쳐 타의 귀감이 되며 훌륭한 미래 인재로의 성장이 확신됨.",
+              우수: "다방면에서 고른 발달을 보이며 학교생활을 매우 훌륭하고 성실하게 해냄.",
+              보통: "학교생활에 무난하게 적응하며 자신의 역할을 다하는 성실한 학생임.",
+              노력: "스스로 부족한 점을 인지하고 개선하고자 노력하며 학교생활 전반에서 점진적으로 나아지는 모습을 보임.",
+            },
+          },
+          {
+            word: "발전/변화",
+            s: {
+              매우우수:
+                "학기 초에 비해 비약적인 학업적/인성적 발전을 이루어내며 긍정적 변화의 아이콘이 됨.",
+              우수: "꾸준히 노력하여 자신의 단점을 고치고 다방면에서 긍정적인 성장을 보여줌.",
+              보통: "생활 태도에 긍정적인 변화를 주며 조금씩 나아지는 모습을 보임.",
+              노력: "바람직한 방향으로 변화하기 위한 동기를 다지고 지속적인 노력을 통해 성장 궤도에 오름.",
+            },
+          },
+          {
+            word: "적응/극복",
+            s: {
+              매우우수:
+                "새로운 환경에 빠르게 적응하고 어떤 어려움이나 역경도 흔들림 없이 주도적으로 극복해 내는 멘탈이 훌륭함.",
+              우수: "학교생활에 잘 적응하며 마주한 어려움을 이겨내려는 굳은 의지를 보임.",
+              보통: "학급 분위기에 잘 융화되며 문제를 해결하려 노력함.",
+              노력: "새로운 환경과 과제에 대한 두려움을 없애고 포기하지 않는 자세로 적응력을 키워감.",
+            },
+          },
+        ],
+      };
+
+      let db = {};
+      let recordIdCounter = 0;
+      let finalHistoryStack = [];
+      let tempContext = null;
+
+      window.onload = () => {
+        db[currentStudent] = { logs: [], comprehensive: "" };
+        initModalList();
+        document.getElementById("logDate").value = new Date()
+          .toISOString()
+          .split("T")[0];
+        updateByte();
+      };
+
+      function showToast(m) {
+        const t = document.getElementById("toast");
+        t.textContent = m;
+        t.style.opacity = 1;
+        setTimeout(() => (t.style.opacity = 0), 2000);
+      }
+
+      function initModalList() {
+        const list = document.getElementById("modalStudentList");
+        const div = document.createElement("div");
+        div.className = "student-item active";
+        div.textContent = currentStudent;
+        list.appendChild(div);
+      }
+
+      function openModal() {
+        document.getElementById("logModal").style.display = "block";
+      }
+      function closeModal() {
+        document.getElementById("logModal").style.display = "none";
+        loadMainSummary();
+      }
+
+      function saveComprehensive() {
+        db[currentStudent].comprehensive =
+          document.getElementById("comprehensiveInput").value;
+      }
+
+      function resetInputRows() {
+        document.getElementById("inputRowsContainer").innerHTML = "";
+        addRow();
+      }
+
+      function addRow() {
+        const container = document.getElementById("inputRowsContainer");
+        const wrapper = document.createElement("div");
+        wrapper.className = "input-wrapper";
+
+        const rowDiv = document.createElement("div");
+        rowDiv.style.display = "flex";
+        rowDiv.style.gap = "12px";
+        rowDiv.style.alignItems = "center";
+        rowDiv.className = "input-row";
+
+        rowDiv.innerHTML = `
+            <select class="input cat-select" style="width:130px;" onchange="updateKeywordTray(this)">
+              <option value="" disabled selected>영역 선택</option>
+              ${cats.map((c) => `<option>${c}</option>`).join("")}
+            </select>
+            <select class="input level-select" style="width:110px;" onchange="updateSentenceByLevel(this)">
+                <option value="" disabled selected>수준</option>
+                ${levels.map((l) => `<option>${l}</option>`).join("")}
+            </select>
+            <input type="text" class="input case-input" style="flex:1;" placeholder="직접 입력하거나 아래 키워드를 다중 선택하세요">
+            <button class="btn sm danger-btn" onclick="removeInputRow(this)">✕ 삭제</button>
+        `;
+
+        const trayDiv = document.createElement("div");
+        trayDiv.className = "keyword-tray";
+        trayDiv.innerHTML =
+          "<span style='color:#999; font-size:12px;'>좌측에서 영역을 먼저 선택하세요.</span>";
+
+        wrapper.appendChild(rowDiv);
+        wrapper.appendChild(trayDiv);
+        container.appendChild(wrapper);
+      }
+
+      function updateKeywordTray(select) {
+        const wrapper = select.closest(".input-wrapper");
+        const tray = wrapper.querySelector(".keyword-tray");
+        const row = wrapper.querySelector(".input-row");
+        loadKeywordsToTray(tray, select.value, row);
+      }
+
+      function loadKeywordsToTray(tray, category, rowElement) {
+        tray.innerHTML = "";
+        const keywords = KEYWORD_DB[category] || [];
+        if (keywords.length === 0) {
+          tray.innerHTML =
+            "<span style='color:#999; font-size:12px;'>키워드가 없습니다. 직접 입력하세요.</span>";
+          return;
+        }
+
+        const levelSelect = rowElement.querySelector(".level-select");
+        const input = rowElement.querySelector(".case-input");
+
+        keywords.forEach((kData) => {
+          const chip = document.createElement("div");
+          chip.className = "keyword-chip";
+          if (kData.isNeg) chip.classList.add("neg");
+          chip.textContent = kData.word;
+
+          const updateActiveState = () => {
+            const level = levelSelect.value;
+            const sentence = level ? kData.s[level] || "" : "";
+            if (sentence && input.value.includes(sentence))
+              chip.classList.add("active");
+            else chip.classList.remove("active");
+          };
+          updateActiveState();
+
+          chip.onclick = () => {
+            const level = levelSelect.value;
+            if (!level) return alert("성취수준을 먼저 선택해주세요.");
+            const sentence = kData.s[level] || "";
+            if (!sentence) return; // 부정키워드 "매우우수" 대응
+
+            if (chip.classList.contains("active")) {
+              input.value = input.value
+                .replace(sentence, "")
+                .replace(/\s{2,}/g, " ")
+                .trim();
+              chip.classList.remove("active");
+            } else {
+              input.value = (input.value + " " + sentence).trim();
+              chip.classList.add("active");
+            }
+          };
+          tray.appendChild(chip);
+        });
+
+        input.addEventListener("input", () => {
+          const level = levelSelect.value;
+          if (!level) return;
+          tray.querySelectorAll(".keyword-chip").forEach((chip, idx) => {
+            const sentence = keywords[idx].s[level] || "";
+            if (sentence && input.value.includes(sentence))
+              chip.classList.add("active");
+            else chip.classList.remove("active");
+          });
+        });
+      }
+
+      function updateSentenceByLevel(selectElement) {
+        const wrapper = selectElement.closest(".input-wrapper");
+        const cat = wrapper.querySelector(".cat-select").value;
+        const newLevel = selectElement.value;
+        const input = wrapper.querySelector(".case-input");
+        let currentText = input.value;
+
+        if (!cat || !currentText) return;
+        const keywords = KEYWORD_DB[cat] || [];
+
+        keywords.forEach((kData) => {
+          for (let oldLevel in kData.s) {
+            if (
+              oldLevel !== newLevel &&
+              kData.s[oldLevel] &&
+              currentText.includes(kData.s[oldLevel])
+            ) {
+              currentText = currentText.replace(
+                kData.s[oldLevel],
+                kData.s[newLevel] || ""
+              );
+            }
+          }
+        });
+
+        input.value = currentText.replace(/\s{2,}/g, " ").trim();
+        const tray = wrapper.querySelector(".keyword-tray");
+        loadKeywordsToTray(tray, cat, wrapper.querySelector(".input-row"));
+      }
+
+      function removeInputRow(btn) {
+        const wrappers = document.querySelectorAll(".input-wrapper");
+        if (wrappers.length > 1) btn.closest(".input-wrapper").remove();
+        else alert("최소 한 개의 항목은 유지해야 합니다.");
+      }
+
+      function applyAndReset() {
+        const date = document.getElementById("logDate").value;
+        const wrappers = document.querySelectorAll(".input-wrapper");
+        let tempRecords = [];
+
+        for (let w of wrappers) {
+          const cat = w.querySelector(".cat-select").value;
+          const level = w.querySelector(".level-select").value;
+          let text = w
+            .querySelector(".case-input")
+            .value.trim()
+            .replace(/\n/g, " ");
+
+          if (!cat) continue;
+          if (!level) return alert(`'${cat}' 영역의 성취수준을 선택해주세요.`);
+          if (!text) return alert("활동 내용을 입력해주세요.");
+
+          const isDup = db[currentStudent].logs.some(
+            (log) => log.date === date && log.cat === cat && log.text === text
+          );
+          if (isDup) {
+            alert(`[중복 경고] ${date}에 동일한 기록이 이미 존재합니다.`);
+            continue;
+          }
+
+          tempRecords.push({
+            id: ++recordIdCounter,
+            date,
+            cat,
+            level,
+            text,
+            checked: true,
+          });
+        }
+
+        if (tempRecords.length > 0) {
+          db[currentStudent].logs.forEach((l) => (l.checked = false));
+          db[currentStudent].logs.push(...tempRecords);
+          showToast(`${tempRecords.length}건 리스트 저장 완료`);
+          resetInputRows();
+          renderHistory();
+        }
+      }
+
+      function renderHistory() {
+        const view = document.getElementById("historyGroupView");
+        const data = db[currentStudent].logs;
+        if (!data || data.length === 0) {
+          view.innerHTML =
+            "<div style='text-align:center; padding: 20px; color:#999;'>기록이 없습니다.</div>";
+          return;
+        }
+
+        let html = "";
+        [...data].reverse().forEach((item) => {
+          html += `
+                <div class="history-item ${item.checked ? "checked" : ""}">
+                    <div style="display:flex; align-items:flex-start; flex:1;">
+                        <input type="checkbox" class="history-chk" ${
+                          item.checked ? "checked" : ""
+                        } onchange="toggleModalCheck(${item.id})">
+                        <div>
+                            <div style="font-size:12px; color:#666; margin-bottom:4px;">${
+                              item.date
+                            } <span style="background:#e0f2fe; color:#0369a1; padding:2px 6px; border-radius:4px; font-weight:bold;">${
+            item.cat
+          } (${item.level})</span></div>
+                            <div style="color:#333; line-height:1.4;">${
+                              item.text
+                            }</div>
+                        </div>
+                    </div>
+                    <div class="history-actions"><button class="btn sm danger-btn" onclick="deleteRecord(${
+                      item.id
+                    })">삭제</button></div>
+                </div>`;
+        });
+        view.innerHTML = html;
+      }
+
+      function toggleModalCheck(id) {
+        const item = db[currentStudent].logs.find((l) => l.id === id);
+        if (item) item.checked = !item.checked;
+        renderHistory();
+      }
+      function checkAllModal(state) {
+        db[currentStudent].logs.forEach((l) => (l.checked = state));
+        renderHistory();
+      }
+      function deleteRecord(id) {
+        if (!confirm("기록을 삭제하시겠습니까?")) return;
+        db[currentStudent].logs = db[currentStudent].logs.filter(
+          (r) => r.id !== id
+        );
+        renderHistory();
+      }
+
+      function loadMainSummary() {
+        const data = db[currentStudent];
+        let summary = "";
+        const checkedLogs = data.logs.filter((l) => l.checked);
+
+        if (checkedLogs.length > 0) {
+          summary += "[체크된 활동 요약]\n";
+          checkedLogs
+            .sort((a, b) => a.date.localeCompare(b.date))
+            .forEach((r) => {
+              summary += `- [${r.cat}] ${r.text}\n`;
+            });
+        }
+        if (data.comprehensive)
+          summary += `\n[종합 의견]\n${data.comprehensive}\n`;
+        document.getElementById("rawDataDisplay").value =
+          summary || "선택된 데이터가 없습니다.";
+      }
+
+      /* --- [핵심] 수준 인식형 빈도 강화 및 비문 완벽 정제 엔진 --- */
+      function assembleContext(targets, comprehensive) {
+        let uniqueTexts = {
+          "성격/생활": new Set(),
+          교우관계: new Set(),
+          "학업/진로": new Set(),
+          기타: new Set(),
+        };
+        let catLevels = {
+          "성격/생활": [],
+          교우관계: [],
+          "학업/진로": [],
+          기타: [],
+        };
+        let catFreq = { "성격/생활": 0, 교우관계: 0, "학업/진로": 0, 기타: 0 };
+
+        targets.forEach((l) => {
+          let text = l.text.trim();
+          // [패치] 비문 및 마침표 중복 완벽 제거
+          text = text.replace(/\.{2,}/g, ".");
+          if (!text.endsWith(".")) text += ".";
+
+          if (text.endsWith("하였다.") || text.endsWith("했다."))
+            text = text.slice(0, -3) + "함.";
+          if (text.endsWith("보였다.")) text = text.slice(0, -3) + "보임.";
+
+          let targetCat = "";
+          if (["성격", "생활태도"].includes(l.cat)) targetCat = "성격/생활";
+          else if (l.cat === "교우관계") targetCat = "교우관계";
+          else if (["학업태도", "진로태도", "적성·활동"].includes(l.cat))
+            targetCat = "학업/진로";
+          else targetCat = "기타";
+
+          if (!uniqueTexts[targetCat].has(text)) {
+            uniqueTexts[targetCat].add(text);
+            catLevels[targetCat].push(l.level);
+            catFreq[targetCat]++;
+          }
+        });
+
+        function getEnhancer(levelsArr) {
+          let count = levelsArr.length;
+          if (count < 2) return "";
+          let hasStruggle =
+            levelsArr.includes("보통") || levelsArr.includes("노력");
+
+          if (hasStruggle) {
+            if (count === 2) return "포기하지 않고 꾸준하게 ";
+            if (count >= 3)
+              return "여러 난관 속에서도 꺾이지 않는 집념으로 일관되게 ";
+          } else {
+            if (count === 2) return "한결같이 훌륭한 모습으로 ";
+            if (count >= 3)
+              return "누구보다도 돋보이고 타의 추종을 불허할 정도로 완벽하게 ";
+          }
+          return "";
+        }
+
+        let paras = [];
+
+        if (uniqueTexts["성격/생활"].size > 0) {
+          paras.push(
+            `성격 및 평소 생활 태도를 살펴보면, ${getEnhancer(
+              catLevels["성격/생활"]
+            )}` + Array.from(uniqueTexts["성격/생활"]).join(" ")
+          );
+        }
+        if (uniqueTexts["교우관계"].size > 0) {
+          let prefix =
+            paras.length > 0
+              ? "또한 교우 관계에 있어서는 "
+              : "교우 관계에 있어서는 ";
+          paras.push(
+            `${prefix}${getEnhancer(catLevels["교우관계"])}` +
+              Array.from(uniqueTexts["교우관계"]).join(" ")
+          );
+        }
+        if (uniqueTexts["학업/진로"].size > 0) {
+          let prefix =
+            paras.length > 0
+              ? "나아가 학업 성취 및 진로 탐색 측면에서는 "
+              : "학업 성취 및 진로 탐색 측면을 살펴보면, ";
+          paras.push(
+            `${prefix}${getEnhancer(catLevels["학업/진로"])}` +
+              Array.from(uniqueTexts["학업/진로"]).join(" ")
+          );
+        }
+        if (uniqueTexts["기타"].size > 0) {
+          let prefix = paras.length > 0 ? "그 외에도 " : "";
+          paras.push(`${prefix}` + Array.from(uniqueTexts["기타"]).join(" "));
+        }
+
+        let resultText = paras.join(" ");
+        if (comprehensive) {
+          let comp = comprehensive.trim();
+          // [패치] . ! ? 가 모두 올바르게 적용되도록 정규식 처리
+          if (!/[.!?]$/.test(comp)) comp += ".";
+          resultText += (paras.length > 0 ? " 종합적으로 볼 때, " : "") + comp;
+        }
+
+        return {
+          text: resultText.replace(/\s{2,}/g, " ").trim(),
+          freq: catFreq,
+        };
+      }
+
+      function generateDraftAI() {
+        const data = db[currentStudent];
+        const targets = data.logs.filter((l) => l.checked);
+        if (targets.length === 0 && !data.comprehensive)
+          return alert(
+            "생성할 데이터가 없습니다. 모달에서 기록을 작성하고 체크해주세요."
+          );
+
+        const { text: resultText, freq: catFreq } = assembleContext(
+          targets,
+          data.comprehensive
+        );
+        document.getElementById("tempDraft").value = resultText;
+
+        let hashKey =
+          "BHV|" +
+          targets.map((t) => t.id).join(",") +
+          "|" +
+          (data.comprehensive ? "COMP" : "");
+        tempContext = {
+          hashKey: hashKey,
+          logIds: targets.map((t) => t.id),
+          freq: catFreq,
+          comp: data.comprehensive,
+          len: resultText.length,
+        };
+
+        showToast("행특 문단 초안이 생성되었습니다.");
+      }
+
+      function updateDuplicateStatus() {
+        let catCounts = {
+          "성격/생활": 0,
+          교우관계: 0,
+          "학업/진로": 0,
+          기타: 0,
+        };
+        finalHistoryStack.forEach((item) => {
+          if (item.status !== "deleted") {
+            for (let cat in item.freq) {
+              if (item.freq[cat] > 0) catCounts[cat]++;
+            }
+          }
+        });
+
+        finalHistoryStack.forEach((item) => {
+          if (item.status !== "deleted") {
+            item.needsUpgrade = Object.keys(item.freq).some(
+              (cat) => item.freq[cat] > 0 && catCounts[cat] > 1
+            );
+          }
+        });
+      }
+
+      function moveToFinal() {
+        const text = document.getElementById("tempDraft").value;
+        const preview = document.getElementById("finalPreview");
+        if (!text || !tempContext) return alert("생성된 초안이 없습니다.");
+
+        let b = 0;
+        let testText = preview.innerText + " " + text;
+        for (let i = 0; i < testText.length; i++)
+          b += testText.charCodeAt(i) > 127 ? 3 : 1;
+        if (b > 1500)
+          return alert(
+            "⚠️ 생기부 최대 용량(1500 Byte)을 초과하여 전송할 수 없습니다."
+          );
+
+        let isExactDuplicate = finalHistoryStack.some(
+          (fh) => fh.status === "active" && fh.hashKey === tempContext.hashKey
+        );
+        if (isExactDuplicate)
+          return alert(
+            "⚠️ 완전히 동일한 조합의 기록이 이미 전송되어 있습니다. 중복 전송을 차단합니다."
+          );
+
+        if (preview.innerText.includes("학생을 선택하고"))
+          preview.innerText = "";
+        if (preview.innerText.trim() !== "")
+          preview.appendChild(document.createTextNode(" "));
+
+        const uniqueId = "block_" + Date.now();
+        const span = document.createElement("span");
+        span.className = "sentence-block";
+        span.id = uniqueId;
+        span.innerText = text;
+        preview.appendChild(span);
+
+        finalHistoryStack.push({
+          id: uniqueId,
+          hashKey: tempContext.hashKey,
+          logIds: tempContext.logIds,
+          freq: tempContext.freq,
+          comp: tempContext.comp,
+          len: text.length,
+          status: "active",
+          needsUpgrade: false,
+        });
+
+        updateDuplicateStatus();
+        renderInfoLayer();
+        updateByte();
+      }
+
+      function renderInfoLayer() {
+        const con = document.getElementById("infoContentContainer");
+        con.innerHTML = "";
+        if (finalHistoryStack.length === 0) {
+          con.innerHTML = "생성 이력이 없습니다.";
+          return;
+        }
+
+        finalHistoryStack.forEach((item, index) => {
+          const div = document.createElement("div");
+          div.className = `info-card ${item.status} ${
+            item.needsUpgrade ? "duplicate" : ""
+          }`;
+
+          div.onclick = () => {
+            div.classList.toggle("expanded");
+            highlightSentence(item.id);
+          };
+
+          let tagsHtml = "";
+          for (const [cat, count] of Object.entries(item.freq)) {
+            if (count > 0)
+              tagsHtml += `<span class="tag">${cat} <b style="color:#1f4ddc;">${count}건</b></span>`;
+          }
+          if (item.comp) tagsHtml += `<span class="tag">종합의견 포함</span>`;
+
+          let delBtn = `<button class="delete-sentence-btn" onclick="deleteFinalSentence(event, '${item.id}')">🗑️ 삭제</button>`;
+          let dupAlert = item.needsUpgrade
+            ? `<span class="dup-badge">⚠️ 카테고리 누적 (다듬기 요망)</span>`
+            : "";
+          let statBadge =
+            item.status === "deleted"
+              ? "<span class='status-badge' style='background:#ef4444;'>❌ 삭제됨</span>"
+              : item.status === "optimized"
+              ? "<span class='status-badge' style='background:#8b5cf6;'>🪄 통합 및 강화됨</span>"
+              : "";
+
+          div.innerHTML = `
+            <div class="accordion-header">
+                <span style="display:flex; align-items:center; gap:5px;">👤 융합 문단 #${
+                  index + 1
+                } ${dupAlert}</span>
+                <span class="accordion-chevron">▼</span>
+            </div>
+            <div class="accordion-body-wrapper">
+                <div class="accordion-body">
+                    <div class="accordion-content">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div>${statBadge}</div>
+                            ${delBtn}
+                        </div>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:4px;">${tagsHtml}</div>
+                    </div>
+                </div>
+            </div>
+          `;
+          con.appendChild(div);
+        });
+      }
+
+      function highlightSentence(id) {
+        document
+          .querySelectorAll(".sentence-block")
+          .forEach((el) => el.classList.remove("highlight-active"));
+        const target = document.getElementById(id);
+        if (target) {
+          target.scrollIntoView({ behavior: "smooth", block: "center" });
+          target.classList.add("highlight-active");
+          setTimeout(() => {
+            target.classList.remove("highlight-active");
+          }, 2000);
+        }
+      }
+
+      function deleteFinalSentence(event, id) {
+        event.stopPropagation();
+        const target = document.getElementById(id);
+        if (target) {
+          if (target.previousSibling && target.previousSibling.nodeType === 3)
+            target.previousSibling.remove();
+          target.remove();
+        }
+        finalHistoryStack = finalHistoryStack.filter((item) => item.id !== id);
+        updateDuplicateStatus();
+        renderInfoLayer();
+        updateByte();
+        showToast("문단이 삭제되었습니다.");
+      }
+
+      /* --- [패치] 수동 편집 보호 장치 추가 및 데이터 증발 방지 --- */
+      function checkAndUpgradeIntegrity() {
+        let activeItems = finalHistoryStack.filter(
+          (i) => i.status !== "deleted"
+        );
+        if (activeItems.length === 0) return alert("다듬을 내용이 없습니다.");
+
+        // 수동 편집 보호 장치
+        if (
+          !confirm(
+            "⚠️ [주의]\nAI 다듬기 실행 시 선생님이 직접 수정한 텍스트가 초기화되고, 원본 데이터를 바탕으로 최적화된 문장이 새롭게 생성됩니다.\n진행하시겠습니까?"
+          )
+        )
+          return;
+
+        let allActiveLogIds = [];
+        let compToUse = "";
+
+        activeItems.forEach((item) => {
+          if (item.logIds) allActiveLogIds.push(...item.logIds);
+          if (item.comp) compToUse = item.comp;
+        });
+
+        allActiveLogIds = [...new Set(allActiveLogIds)];
+        let allTargets = db[currentStudent].logs.filter((l) =>
+          allActiveLogIds.includes(l.id)
+        );
+
+        const { text: upgradedText, freq: mergedFreq } = assembleContext(
+          allTargets,
+          compToUse
+        );
+
+        // [패치] 다듬기 직후 용량 초과 검증 (경고)
+        let b = 0;
+        for (let i = 0; i < upgradedText.length; i++)
+          b += upgradedText.charCodeAt(i) > 127 ? 3 : 1;
+        if (b > 1500)
+          alert(
+            "⚠️ [경고] 최적화된 문장의 용량이 1500 Byte를 초과했습니다. 기재 내용을 줄여주세요."
+          );
+
+        const preview = document.getElementById("finalPreview");
+        preview.innerHTML = "";
+        const uniqueId = "opt_" + Date.now();
+        const span = document.createElement("span");
+        span.className = "sentence-block";
+        span.id = uniqueId;
+        span.innerText = upgradedText;
+        preview.appendChild(span);
+
+        finalHistoryStack = [
+          {
+            id: uniqueId,
+            hashKey: "BHV_MERGED_" + Date.now(),
+            logIds: allActiveLogIds,
+            freq: mergedFreq,
+            comp: compToUse,
+            len: upgradedText.length,
+            status: "optimized",
+            needsUpgrade: false,
+          },
+        ];
+
+        renderInfoLayer();
+        updateByte();
+        showToast("수준 및 빈도를 분석하여 문맥이 압도적으로 강화되었습니다!");
+      }
+
+      function clearFinal() {
+        if (confirm("전체 삭제하시겠습니까?")) {
+          document.getElementById("finalPreview").innerText =
+            "학생을 선택하고 문장을 생성해 주세요.";
+          finalHistoryStack = [];
+          renderInfoLayer();
+          updateByte();
+        }
+      }
+
+      function updateByte() {
+        const text = document.getElementById("finalPreview").innerText;
+        if (text.includes("학생을 선택하고")) {
+          document.getElementById("charNum").innerText = 0;
+          document.getElementById("byteNum").innerText = 0;
+          document.getElementById("byteNum").style.color = "#1f4ddc";
+          return;
+        }
+
+        document.getElementById("charNum").innerText = text.length;
+        let bytes = 0;
+        for (let i = 0; i < text.length; i++)
+          bytes += text.charCodeAt(i) > 127 ? 3 : 1;
+        document.getElementById("byteNum").innerText = bytes;
+        document.getElementById("byteNum").style.color =
+          bytes > 1500 ? "red" : "#1f4ddc";
+      }
+
+      function finalApply() {
+        alert("NEIS 입력 완료");
+      }
+    </script>
+  </body>
+</html>
