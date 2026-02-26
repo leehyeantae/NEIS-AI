@@ -1,36 +1,91 @@
 <!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>NEIS-AI</title>
-  <style>
-    body {
-      font-family: system-ui, -apple-system, Apple SD Gothic Neo, Segoe UI, Roboto, sans-serif;
-      margin: 0;
-      background: #f6f7fb;
-      color: #111;
     }
-
-    /* [1] 상단 안내 배너 */
-    .notice-banner {
-      background-color: #fff3cd;
-      color: #856404;
-      padding: 15px 20px;
-      text-align: center;
-      font-size: 15px;
-      border-bottom: 1px solid #ffeeba;
-      line-height: 1.5;
-      word-break: keep-all;
+    a.card:hover {
+      border-color: #c7d2fe;
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.08);
+      transform: translateY(-2px);
     }
-    .notice-banner strong {
+    .title {
       font-weight: 700;
-      color: #533f03;
+      margin: 0 0 6px;
+    }
+    .desc {
+      margin: 0;
+      color: #555;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    .note {
+      margin-top: 18px;
+      font-size: 13px;
+      color: #666;
     }
 
-    .wrap {
-      max-width: 980px;
-      margin: 0 auto;
-      padding: 48px 20px;
+    @media (max-width: 768px) {
+      .video-box iframe { height: 250px; }
+      .btn-down { display: block; margin: 10px auto; width: 90%; }
     }
-    h1 {
+  </style>
+</head>
+<body>
+
+  <div class="notice-banner">
+    📢 <strong>안내 말씀:</strong> 본 시스템은 <strong>데스크톱(PC) 환경에 최적화</strong>되어 있습니다.<br>
+    보다 원활한 시연과 정확한 델파이 조사 참여를 위해, 가급적 <strong>PC 화면에서 접속</strong>해 주시기를 정중히 부탁드립니다.
+  </div>
+
+  <div class="wrap">
+    <h1>NEIS-AI</h1>
+    <p>건국대학교 교육대학원 정보컴퓨터교육전공 이현태 석사 학위논문 — 화면 설계(시연) 링크</p>
+
+    <div class="video-box">
+      <iframe 
+        width="100%" 
+        height="450" 
+        src="https://www.youtube.com/embed/MfSd_8g5XIQ" 
+        title="NEIS-AI 시연 영상" 
+        frameborder="0" 
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+        allowfullscreen>
+      </iframe>
+    </div>
+
+    <div class="download-box">
+      <span class="download-title">📄 델파이 조사 설문지 다운로드</span>
+      <a href="./survey.hwp" download class="btn-down hwp">💾 한글파일(.hwp) 다운로드</a>
+      <a href="./survey.pdf" download class="btn-download pdf">💾 PDF파일(.pdf) 다운로드</a>
+    </div>
+
+    <div class="grid">
+      <a class="card" href="./action_2.html">
+        <div class="title">행동특성및종합의견</div>
+        <p class="desc">카테고리·성취수준·키워드 기반 입력 → 작성 내용 적용</p>
+      </a>
+
+      <a class="card" href="./subject_2.html">
+        <div class="title">과목별 세부능력 및 특이사항(과세특)</div>
+        <p class="desc">대단원/소단원/성취수준(A~E) 기반 입력 → 작성 내용 편집</p>
+      </a>
+
+      <a class="card" href="./career_2.html">
+        <div class="title">진로활동관리</div>
+        <p class="desc">희망분야 기반 검사/강연/기타 기록 → 작성 내용 편집</p>
+      </a>
+
+        <a class="card" href="./book_2.html">
+        <div class="title">독서활동상황관리</div>
+        <p class="desc">책 제목 + 진로 연계 여부 + 느낀점 입력 → 문장 다듬기</p>
+      </a>
+
+      <a class="card" href="./club_2.html">
+        <div class="title">동아리활동기록</div>
+        <p class="desc">정보 연계 동아리 활동 성취(A~E) 및 키워드 조합</p>
+      </a>
+
+    
+
+      <a class="card" href="./free_2.html">
+        <div class="title">자율·자치활동관리</div>
+        <p class="desc">교육, 자치 활동, 교내 행사 입력 → 작성 내용 적용</p>
+      </a>
+    </div>
