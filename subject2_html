@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>과목별 세부능력 및 특기사항 v7.1 (Final Ultimate)</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: "Segoe UI", -apple-system, sans-serif;
+        background: #f5f6f8;
+        color: #333;
+        overflow: hidden;
+      }
+      .topbar {
+        height: 48px;
+        background: #f5c6cf;
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        font-weight: 700;
+        border-bottom: 1px solid #e5adba;
+        color: #333;
+        flex-shrink: 0;
+      }
+
+      .container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        height: calc(100vh - 48px);
+      }
+      .left,
+      .right {
+        padding: 25px;
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+        overflow-y: auto;
+        min-height: 0;
+      }
+      .left {
+        border-right: 1px solid #e5e7eb;
+        gap: 15px;
+      }
+
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 5px;
+        flex-shrink: 0;
+      }
+      .section-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1f2937;
+      }
+
+      .label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #4b5563;
+        margin-bottom: 6px;
+        display: block;
+      }
+      .input,
+      .textarea,
+      .select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: 0.2s;
+      }
+      .textarea {
+        resize: none;
+        line-height: 1.6;
+      }
+
+      .btn {
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        border: 1px solid #d1d5db;
+        background: #fff;
+        transition: 0.2s;
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+      }
+      .btn.primary {
+        background: #1f4ddc;
+        color: #fff;
+        border-color: #163aa5;
+      }
+      .btn.success {
+        background: #10b981;
+        color: #fff;
+        border-color: #059669;
+      }
+      .btn.danger {
+        background: #fff;
+        color: #e11d48;
+        border-color: #ffcccc;
+      }
+      .btn.sm {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+
+      .chip-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 5px;
+      }
+      .chip {
+        padding: 8px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        border: 1px solid #d1d5db;
+        background: #fff;
+        cursor: pointer;
+        color: #4b5563;
+        transition: 0.2s;
+      }
+      .chip:hover {
+        background: #f3f4f6;
+        border-color: #cbd5e1;
+      }
+      .chip.active {
+        background: #1f4ddc;
+        color: #fff;
+        border-color: #1f4ddc;
+        font-weight: 600;
+        box-shadow: 0 2px 4px rgba(31, 77, 220, 0.2);
+      }
+
+      .subunit-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 5px;
+      }
+      .subunit-btn {
+        padding: 6px 12px;
+        border-radius: 6px;
+        border: 1px solid #e5e7eb;
+        background: #f9fafb;
+        font-size: 12px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .subunit-btn:hover {
+        background: #f3f4f6;
+      }
+      .subunit-btn.active {
+        background: #eff6ff;
+        border-color: #1f4ddc;
+        color: #1f4ddc;
+        font-weight: 600;
+      }
+
+      .radio-group {
+        display: flex;
+        gap: 15px;
+        padding: 10px;
+        background: #f9fafb;
+        border-radius: 8px;
+        border: 1px solid #f3f4f6;
+        margin-bottom: 5px;
+      }
+      .radio-group label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .radio-group input[type="radio"] {
+        accent-color: #1f4ddc;
+        transform: scale(1.1);
+      }
+
+      .checkbox-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 10px;
+        background: #f0fdf4;
+        border-radius: 8px;
+        border: 1px solid #dcfce7;
+        margin-bottom: 5px;
+      }
+      .checkbox-group label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+        color: #166534;
+      }
+      .checkbox-group input[type="checkbox"] {
+        accent-color: #15803d;
+        transform: scale(1.1);
+      }
+
+      .card-info-box {
+        padding: 12px;
+        background: #f8fafc;
+        border-left: 4px solid #94a3b8;
+        border-radius: 4px;
+        margin-bottom: 10px;
+      }
+      .card-title {
+        font-weight: 700;
+        font-size: 13px;
+        color: #334155;
+        margin-bottom: 4px;
+      }
+      .card-desc {
+        font-size: 12px;
+        color: #475569;
+        line-height: 1.4;
+      }
+
+      .preview-box {
+        flex: 6;
+        min-height: 150px;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 25px;
+        font-size: 15px;
+        line-height: 1.8;
+        outline: none;
+        background: #fff;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        word-break: break-all;
+        scroll-behavior: smooth;
+      }
+      .sentence-block {
+        cursor: text;
+        transition: background 0.4s ease-out;
+        border-radius: 4px;
+        padding: 2px 0;
+      }
+      .sentence-block:hover {
+        background-color: #eff6ff;
+      }
+      .highlight-active {
+        background-color: #fef08a !important;
+      }
+
+      .counter {
+        text-align: right;
+        margin-top: 10px;
+        font-size: 13px;
+        color: #6b7280;
+        flex-shrink: 0;
+      }
+      .info-layer {
+        flex: 4;
+        min-height: 150px;
+        border: 1px solid #e5e7eb;
+        background: #fafafa;
+        border-radius: 12px;
+        padding: 15px;
+        overflow-y: auto;
+        margin-top: 15px;
+      }
+
+      .info-card {
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        font-size: 13px;
+        border-left: 4px solid #1f4ddc;
+        transition: 0.2s;
+        position: relative;
+        cursor: pointer;
+        overflow: hidden;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+      }
+      .info-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border-color: #cbd5e1;
+      }
+      .info-card.deleted {
+        border-left-color: #ef4444;
+        opacity: 0.5;
+        background: #fff5f5;
+        pointer-events: none;
+      }
+
+      .accordion-header {
+        padding: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 700;
+        color: #333;
+      }
+      .accordion-chevron {
+        transition: transform 0.3s ease;
+        color: #9ca3af;
+        font-size: 12px;
+      }
+      .info-card.expanded .accordion-chevron {
+        transform: rotate(180deg);
+      }
+
+      .accordion-body-wrapper {
+        display: grid;
+        grid-template-rows: 0fr;
+        transition: grid-template-rows 0.3s ease;
+      }
+      .info-card.expanded .accordion-body-wrapper {
+        grid-template-rows: 1fr;
+      }
+      .accordion-body {
+        overflow: hidden;
+        padding: 0 12px;
+      }
+      .accordion-content {
+        padding-bottom: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .tag {
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        background: #f3f4f6;
+        color: #555;
+        border: 1px solid #e5e7eb;
+        display: inline-block;
+        font-weight: bold;
+      }
+      .status-badge {
+        font-size: 10px;
+        padding: 3px 6px;
+        border-radius: 4px;
+        color: #fff;
+        background: #10b981;
+      }
+      .delete-sentence-btn {
+        background: #fee2e2;
+        color: #ef4444;
+        border: 1px solid #fca5a5;
+        border-radius: 6px;
+        padding: 4px 10px;
+        font-size: 11px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.2s;
+        align-self: flex-end;
+      }
+      .delete-sentence-btn:hover {
+        background: #ef4444;
+        color: #fff;
+      }
+
+      #toast {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #333;
+        color: #fff;
+        padding: 12px 25px;
+        border-radius: 30px;
+        font-size: 13px;
+        font-weight: 600;
+        opacity: 0;
+        transition: 0.3s;
+        pointer-events: none;
+        z-index: 3000;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="toast">알림</div>
+    <div class="topbar">과목별 세부능력 및 특기사항 v7.1 (Final Ultimate)</div>
+
+    <div class="container">
+      <section class="left">
+        <div class="section-header">
+          <div class="section-title">학습 내용 및 성취 수준 설정</div>
+          <button
+            class="btn sm"
+            style="color: #6b7280; border-color: #d1d5db"
+            onclick="resetForm()"
+          >
+            🔄 폼 초기화
+          </button>
+        </div>
+
+        <div class="label" style="margin-top: 5px">1. 대단원 선택</div>
+        <div class="chip-row" id="unitChips">
+          <div class="chip active" data-unit="컴퓨팅 시스템">컴퓨팅 시스템</div>
+          <div class="chip" data-unit="데이터">데이터</div>
+          <div class="chip" data-unit="알고리즘과 프로그래밍">
+            알고리즘과 프로그래밍
+          </div>
+          <div class="chip" data-unit="인공지능">인공지능</div>
+          <div class="chip" data-unit="디지털 문화">디지털 문화</div>
+        </div>
+
+        <div class="label" style="margin-top: 10px">2. 소단원 선택</div>
+        <div class="subunit-row" id="subunitRow"></div>
+
+        <div class="card-info-box">
+          <div class="card-title" id="cardUnitTitle">
+            [컴퓨팅 시스템 / 유무선 네트워크]
+          </div>
+          <div class="card-desc" id="cardCriterion">성취기준 로딩 중...</div>
+        </div>
+
+        <div class="label">3. 심화 학습 목표/주제 (선택)</div>
+        <input
+          type="text"
+          id="customObjectiveInput"
+          class="input"
+          placeholder="예) 인공지능 윤리, 다이익스트라 알고리즘 탐구 (미입력 시 소단원명 자동 반영)"
+          maxlength="30"
+          style="margin-bottom: 10px"
+        />
+
+        <div class="label">4. 2022 개정 교과 핵심 역량</div>
+        <div class="checkbox-group" id="competencyGroup">
+          <label
+            ><input type="checkbox" value="지식정보처리" /> 지식정보처리</label
+          >
+          <label
+            ><input type="checkbox" value="창의적 사고" /> 창의적 사고</label
+          >
+          <label
+            ><input type="checkbox" value="협력적 소통" /> 협력적 소통</label
+          >
+          <label
+            ><input type="checkbox" value="공동체 역량" /> 공동체 역량</label
+          >
+        </div>
+
+        <div class="label">5. 성취수준 평가 (A~E)</div>
+        <div style="font-size: 11px; color: #6b7280; margin-bottom: 6px">
+          ※ 선택 수준에 따라 생기부 전용 고급 서술어와 역량이 서사 속에 자동
+          융합됩니다.
+        </div>
+        <div class="radio-group" id="levelGroup">
+          <label
+            ><input type="radio" name="level" value="A" checked /> A
+            (탁월)</label
+          >
+          <label><input type="radio" name="level" value="B" /> B (우수)</label>
+          <label><input type="radio" name="level" value="C" /> C (보통)</label>
+          <label
+            ><input type="radio" name="level" value="D" /> D (노력/성장)</label
+          >
+          <label><input type="radio" name="level" value="E" /> E (참여)</label>
+        </div>
+
+        <div class="label" style="margin-top: 10px">
+          6. 구체적 활동 사례 (생기부의 핵심)
+        </div>
+        <textarea
+          id="caseInput"
+          class="textarea"
+          style="height: 60px; min-height: 60px"
+          placeholder="예) 공공데이터 API를 활용하여 미세먼지 시각화 프로젝트를 수행함."
+        ></textarea>
+
+        <button
+          class="btn primary"
+          style="
+            height: 48px;
+            font-size: 15px;
+            margin-top: 15px;
+            flex-shrink: 0;
+          "
+          onclick="generateSubjectAI()"
+        >
+          ✨ AI 과세특 문장 생성
+        </button>
+
+        <div
+          style="
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 180px;
+            margin-top: 15px;
+          "
+        >
+          <label class="label">AI 생성 초안 (검토 및 수정)</label>
+          <textarea
+            id="tempDraft"
+            class="textarea"
+            style="
+              background: #fdfbff;
+              border-color: #c7d2fe;
+              flex: 1;
+              min-height: 120px;
+              line-height: 1.8;
+            "
+          ></textarea>
+          <button
+            class="btn success"
+            style="width: 100%; margin-top: 10px; flex-shrink: 0"
+            onclick="moveToFinal()"
+          >
+            우측 최종 기재란으로 반영 ➔
+          </button>
+        </div>
+      </section>
+
+      <section class="right">
+        <div class="section-header" style="margin-bottom: 15px">
+          <div class="section-title">NEIS 기재 최종 내용</div>
+          <div style="display: flex; gap: 8px">
+            <button class="btn danger" onclick="clearFinal()">
+              🗑️ 전체 삭제
+            </button>
+            <button
+              class="btn"
+              style="background: #8b5cf6; color: white; border-color: #7c3aed"
+              onclick="checkIntegrity()"
+            >
+              🪄 전체 AI 다듬기
+            </button>
+            <button class="btn success" onclick="finalApply()">
+              💾 적용하기
+            </button>
+          </div>
+        </div>
+
+        <div
+          style="
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            gap: 15px;
+            min-height: 0;
+          "
+        >
+          <div
+            id="finalPreview"
+            class="preview-box"
+            contenteditable="true"
+            oninput="updateByte()"
+          ></div>
+
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              flex-shrink: 0;
+            "
+          >
+            <div class="counter">
+              실시간 용량:
+              <span id="byteCount" style="color: #1f4ddc; font-weight: 700"
+                >0</span
+              >
+              / 1500 Byte
+            </div>
+          </div>
+
+          <div class="info-layer" id="infoLayer">
+            <span
+              style="
+                font-weight: 700;
+                display: block;
+                margin-bottom: 8px;
+                color: #374151;
+              "
+              >📋 작성된 소단원 요약 (클릭하여 상세 확인 및 삭제)</span
+            >
+            <div
+              id="infoContentContainer"
+              style="color: #9ca3af; font-size: 13px"
+            >
+              생성된 문장에 대한 정보가 이곳에 아코디언 형태로 누적됩니다.
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      /* --- [데이터베이스] --- */
+      const CURRICULUM_DATA = {
+        "컴퓨팅 시스템": {
+          subunits: ["유무선 네트워크", "사물 인터넷", "사물 인터넷 설계하기"],
+          standards: {
+            "유무선 네트워크":
+              "성취기준 [12정01-01]: 유무선 네트워크의 특성을 이해하고, 네트워크 환경을 구성한다.",
+            "사물 인터넷":
+              "성취기준 [12정01-02]: 사물인터넷의 구성과 동작 원리를 분석한다.",
+            "사물 인터넷 설계하기":
+              "성취기준 [12정01-03]: 문제 해결에 적합한 사물인터넷 시스템을 설계한다.",
+          },
+        },
+        데이터: {
+          subunits: [
+            "데이터 압축",
+            "데이터 암호화",
+            "빅데이터와 데이터 수집",
+            "데이터 시각화와 해석",
+          ],
+          standards: {
+            "데이터 압축":
+              "성취기준 [12정02-01]: 디지털 데이터 압축의 개념과 필요성을 이해한다.",
+            "데이터 암호화":
+              "성취기준 [12정02-02]: 암호화의 개념을 이해하고 사례를 분석한다.",
+            "빅데이터와 데이터 수집":
+              "성취기준 [12정02-03]: 빅데이터의 개념을 이해하고 데이터를 수집한다.",
+            "데이터 시각화와 해석":
+              "성취기준 [12정02-04]: 데이터를 시각화하고 그 의미를 해석한다.",
+          },
+        },
+        "알고리즘과 프로그래밍": {
+          subunits: [
+            "문제 분해와 모델링",
+            "정형 알고리즘",
+            "탐색 알고리즘",
+            "자료형",
+            "표준 입출력과 파일 입출력",
+            "다차원 데이터 구조",
+            "다양한 제어 구조",
+            "객체를 구현하는 클래스",
+            "문제 해결을 위한 협력적 프로젝트",
+          ],
+          standards: {
+            "문제 분해와 모델링":
+              "성취기준 [12정03-01]: 문제를 분해하고 모델링한다.",
+            "정형 알고리즘":
+              "성취기준 [12정03-02]: 정렬 알고리즘의 특징과 효율을 비교한다.",
+            "탐색 알고리즘":
+              "성취기준 [12정03-03]: 탐색 알고리즘의 특징과 효율을 비교한다.",
+            자료형:
+              "성취기준 [12정03-04]: 적합한 자료형을 선택하여 프로그램을 작성한다.",
+            "표준 입출력과 파일 입출력":
+              "성취기준 [12정03-05]: 입출력을 활용한 프로그램을 작성한다.",
+            "다차원 데이터 구조":
+              "성취기준 [12정03-06]: 다차원 데이터 구조를 활용한다.",
+            "다양한 제어 구조":
+              "성취기준 [12정03-07]: 다양한 제어 구조를 활용한다.",
+            "객체를 구현하는 클래스":
+              "성취기준 [12정03-08]: 클래스와 인스턴스를 활용한다.",
+            "문제 해결을 위한 협력적 프로젝트":
+              "성취기준 [12정03-09]: 프로그램을 협력적으로 설계 및 구현한다.",
+          },
+        },
+        인공지능: {
+          subunits: [
+            "지능 에이전트",
+            "기계학습의 개념과 유형",
+            "기계학습과 문제 해결",
+          ],
+          standards: {
+            "지능 에이전트":
+              "성취기준 [12정04-01]: 지능 에이전트의 개념과 특성을 이해한다.",
+            "기계학습의 개념과 유형":
+              "성취기준 [12정04-02]: 지도학습과 비지도학습의 차이를 비교한다.",
+            "기계학습과 문제 해결":
+              "성취기준 [12정04-03]: 사회문제 해결에 기계학습을 적용한다.",
+          },
+        },
+        "디지털 문화": {
+          subunits: [
+            "디지털 사회와 진로",
+            "정보 보호와 정보 공유",
+            "정보 보안",
+          ],
+          standards: {
+            "디지털 사회와 진로":
+              "성취기준 [12정05-01]: 디지털 기술의 영향력을 분석하고 진로를 설계한다.",
+            "정보 보호와 정보 공유":
+              "성취기준 [12정05-02]: 올바른 정보 보호 방법을 실천한다.",
+            "정보 보안":
+              "성취기준 [12정05-03]: 보안 기술을 활용하여 디지털 윤리를 실천한다.",
+          },
+        },
+      };
+
+      let state = { unit: "컴퓨팅 시스템", subunit: "유무선 네트워크" };
+      let finalHistoryStack = [];
+      let tempContext = null;
+
+      window.onload = () => {
+        renderSubunitButtons(state.unit);
+      };
+
+      document.getElementById("unitChips").addEventListener("click", (e) => {
+        const chip = e.target.closest(".chip");
+        if (!chip) return;
+        document
+          .querySelectorAll(".chip")
+          .forEach((c) => c.classList.remove("active"));
+        chip.classList.add("active");
+        state.unit = chip.dataset.unit;
+        renderSubunitButtons(state.unit);
+      });
+
+      document.getElementById("subunitRow").addEventListener("click", (e) => {
+        const btn = e.target.closest(".subunit-btn");
+        if (!btn) return;
+        document
+          .querySelectorAll(".subunit-btn")
+          .forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        state.subunit = btn.dataset.sub;
+        updateCardInfo();
+      });
+
+      function renderSubunitButtons(unit) {
+        const row = document.getElementById("subunitRow");
+        row.innerHTML = "";
+        const subunits = CURRICULUM_DATA[unit]?.subunits || [];
+        subunits.forEach((name, idx) => {
+          const btn = document.createElement("button");
+          btn.className = `subunit-btn ${idx === 0 ? "active" : ""}`;
+          btn.dataset.sub = name;
+          btn.textContent = name;
+          row.appendChild(btn);
+        });
+        state.subunit = subunits[0] || "";
+        updateCardInfo();
+      }
+
+      function updateCardInfo() {
+        document.getElementById(
+          "cardUnitTitle"
+        ).textContent = `[${state.unit} / ${state.subunit}]`;
+        document.getElementById("cardCriterion").textContent =
+          CURRICULUM_DATA[state.unit]?.standards?.[state.subunit] ||
+          "성취기준 로딩 중...";
+      }
+
+      function resetForm() {
+        document.getElementById("customObjectiveInput").value = "";
+        document.getElementById("caseInput").value = "";
+        document.getElementById("tempDraft").value = "";
+        document
+          .querySelectorAll("input[type=checkbox]")
+          .forEach((cb) => (cb.checked = false));
+        document.querySelector('input[name="level"][value="A"]').checked = true;
+        showToast("입력 폼이 초기화되었습니다.");
+      }
+
+      function resolveJosa(word, type) {
+        if (!word) return "";
+        const lastChar = word.charCodeAt(word.length - 1);
+        if (lastChar < 0xac00 || lastChar > 0xd7a3)
+          return type === "ul" ? "을(를)" : "이(가)";
+        const hasBatchim = (lastChar - 0xac00) % 28 > 0;
+        if (type === "ul") return hasBatchim ? "을" : "를";
+        if (type === "i") return hasBatchim ? "이" : "가";
+        return "";
+      }
+
+      function formatCompetencies(comps) {
+        if (!comps || comps.length === 0) return "";
+        if (comps.length === 1) return comps[0];
+        if (comps.length === 2) return `${comps[0]} 및 ${comps[1]}`;
+        const last = comps.pop();
+        return `${comps.join(", ")} 및 ${last}`;
+      }
+
+      /* --- [핵심] 풍부한 문장 DB 및 다이나믹 조립 엔진 (피드백 전면 수용) --- */
+      function generateSubjectAI() {
+        const level =
+          document.querySelector('input[name="level"]:checked')?.value || "C";
+        const customObj = document
+          .getElementById("customObjectiveInput")
+          .value.trim();
+        let activity = document
+          .getElementById("caseInput")
+          .value.replace(/\n/g, " ")
+          .trim()
+          .replace(/['"\[\]]/g, "");
+
+        const comps = [];
+        document
+          .querySelectorAll("input[type=checkbox]:checked")
+          .forEach((cb) => comps.push(cb.value));
+
+        const topic = customObj ? customObj : state.subunit;
+
+        // 1. 역동적인 도입부
+        const intros = [
+          `${state.unit} 단원의 '${topic}' 영역을 학습하는 과정에서, `,
+          `'${topic}'에 대한 깊은 학구적 호기심을 바탕으로 `,
+          `수업 중 다룬 '${topic}' 개념을 심층적으로 탐구하고자 `,
+          `'${topic}'의 핵심 원리를 이해하는 데 그치지 않고 이를 주도적으로 확장하여, `,
+          `평소 ${state.unit} 분야에 대한 관심이 높아 '${topic}' 파트에서 탁월한 수업 참여도를 보이며 `,
+        ];
+        const neutralIntros = [
+          `${state.unit} 단원의 '${topic}' 학습 과정에서 `,
+          `'${topic}' 개념을 학습하며 `,
+          `교과 수업 중 '${topic}' 파트에 참여하여 `,
+        ];
+        let intro =
+          level === "D" || level === "E"
+            ? neutralIntros[Math.floor(Math.random() * neutralIntros.length)]
+            : intros[Math.floor(Math.random() * intros.length)];
+
+        // 2. 활동 연결부
+        let actText = "";
+        if (activity) {
+          const actVariations = [
+            `[${activity}] 활동을 자기주도적으로 전개함. `,
+            `[${activity}] 과제를 기획하고 구체적으로 수행함. `,
+            `[${activity}]에 적극 참여하여 배운 지식을 실증적으로 적용함. `,
+          ];
+          actText =
+            actVariations[Math.floor(Math.random() * actVariations.length)];
+        }
+
+        // 3. 생기부 전용 고급 서술어 DB (과거형 지양, 명사형 종결어미 통일)
+        const bodies = {
+          A: [
+            `이 과정에서 핵심 원리를 깊이 있게 통찰하고 다각적인 시각으로 문제를 분석하여 최적의 해결책을 도출하는 등 뛰어난 교과 역량을 발휘함.`,
+            `복잡한 개념 간의 유기적 연결성을 파악하는 능력이 탁월하며, 창의적인 문제해결력을 바탕으로 완성도 높은 결과물을 산출하여 학업적 우수성을 증명함.`,
+            `단순한 지식 습득을 넘어 비판적 사고와 논리적 추론을 통해 스스로 결론을 도출하는 과정이 돋보이며, 탁월한 탐구 역량과 지적 성장을 보여줌.`,
+          ],
+          B: [
+            `개념을 정확하게 이해하고 있으며, 이를 논리적으로 적용하는 응용력이 돋보임. 적극적인 자료 탐색과 분석을 통해 과제를 훌륭히 해결하며 분석적 사고 역량을 나타냄.`,
+            `학습 내용에 대한 높은 이해도를 바탕으로 스스로 문제를 정의하고 해결해 나가는 자기주도적 학습 태도를 갖추고 있으며, 우수한 학업 성취도를 보임.`,
+            `수업 중 습득한 이론을 실제 상황에 적절히 대입하여 해석하는 능력이 우수하며, 주어진 과제를 체계적으로 분석하고 논리적으로 서술하는 역량을 발휘함.`,
+          ],
+          C: [
+            `해당 단원의 기본 개념을 충실히 학습하고, 주어진 과제를 책임감 있게 완수하는 성실함을 보임. 배운 지식을 실제 사례와 연결하려는 노력을 통해 실무적 역량을 기름.`,
+            `수업에 적극적으로 참여하며 교과 지식을 안정적으로 습득함. 특히 과제 수행 시 원활한 소통을 바탕으로 공동체 역량과 협력적 태도를 나타냄.`,
+            `자신에게 주어진 역할을 명확히 인지하고 성실한 태도로 탐구에 임하며, 교과에서 요구하는 기초 소양과 정보처리 능력을 안정적으로 함양함.`,
+          ],
+          D: [
+            `초기에는 새로운 개념 적용에 다소 어려움을 겪었으나, 포기하지 않고 적극적인 질문과 반복 학습을 통해 이해도를 높이는 끈기를 보임.`,
+            `과제 수행 중 마주한 한계를 극복하기 위해 지속적으로 노력하며, 꾸준한 성실함을 바탕으로 끝까지 완수해 내는 긍정적인 발전 가능성을 나타냄.`,
+            `학습 과정에서 부족한 부분을 스스로 인지하고 이를 보완하기 위해 적극적으로 소통하며 점진적으로 학업 역량을 성장시켜 나감.`,
+          ],
+          E: [
+            `기초적인 내용에 관심을 가지고 성실한 태도로 수업에 참여함. 자신만의 학습 속도에 맞춰 교과 내용을 이해하려 노력하며 정보화 소양을 기르고자 노력함.`,
+            `수업 활동에 적극적으로 참여하여 기본적인 개념을 습득하고, 교사의 피드백을 수용하며 과제를 수행해 나가는 등 꾸준한 참여도를 보임.`,
+          ],
+        };
+
+        let body =
+          bodies[level][Math.floor(Math.random() * bodies[level].length)];
+
+        let compText = "";
+        if (comps.length > 0) {
+          const formattedComps = formatCompetencies(comps);
+          const endings = [
+            `정보 교과 소양을 한층 더 신장시킴.`,
+            `교과 역량을 뚜렷하게 보여줌.`,
+            `실질적인 문제해결력을 입증함.`,
+          ];
+          let randomEnding =
+            endings[Math.floor(Math.random() * endings.length)];
+          compText = ` 특히, ${formattedComps} 역량을 바탕으로 ${randomEnding}`;
+        }
+
+        let resultText = (intro + actText + body + compText)
+          .replace(/\s+/g, " ")
+          .trim();
+
+        document.getElementById("tempDraft").value = resultText;
+
+        let hashKey = `SUBJ|${topic}`; // 완벽한 중복 방지를 위해 소단원/주제명 자체를 키로 사용
+
+        tempContext = {
+          topic: topic,
+          level: level,
+          comps: comps,
+          hashKey: hashKey,
+          len: resultText.length,
+        };
+        showToast("다채로운 어휘가 적용된 초안이 생성되었습니다.");
+      }
+
+      function moveToFinal() {
+        const text = document.getElementById("tempDraft").value;
+        const preview = document.getElementById("finalPreview");
+        if (!text || !tempContext) return alert("생성된 문장이 없습니다.");
+
+        // [핵심] 완벽한 소단원 중복 차단 (Strict Block)
+        let isDuplicateSubunit = finalHistoryStack.some(
+          (fh) => fh.topic === tempContext.topic && fh.status !== "deleted"
+        );
+        if (isDuplicateSubunit) {
+          alert(
+            `⚠️ [${tempContext.topic}]에 대한 기록이 이미 우측에 존재합니다.\n\n한 소단원(주제)에 대한 중복 기재를 피하기 위해, 기존 문장을 삭제한 후 새로운 내용으로 다시 생성해주시기 바랍니다.`
+          );
+          return;
+        }
+
+        let currentText = preview.innerText;
+        let b = 0;
+        let testText = currentText + " " + text;
+        for (let i = 0; i < testText.length; i++)
+          b += testText.charCodeAt(i) > 127 ? 3 : 1;
+        if (b > 1500)
+          return alert(
+            "⚠️ 생기부 최대 용량(1500 Byte)을 초과하여 더 이상 추가할 수 없습니다."
+          );
+
+        if (preview.innerText.trim() === "") preview.innerText = "";
+        else preview.appendChild(document.createTextNode(" "));
+
+        const uniqueId = "block_" + Date.now();
+        const span = document.createElement("span");
+        span.className = "sentence-block";
+        span.id = uniqueId;
+        span.innerText = text;
+        preview.appendChild(span);
+
+        finalHistoryStack.push({
+          id: uniqueId,
+          topic: tempContext.topic,
+          level: tempContext.level,
+          comps: tempContext.comps,
+          hashKey: tempContext.hashKey,
+          len: text.length,
+          status: "active",
+        });
+
+        renderInfoLayer();
+        updateByte();
+      }
+
+      function renderInfoLayer() {
+        const con = document.getElementById("infoContentContainer");
+        con.innerHTML = "";
+        if (finalHistoryStack.length === 0) {
+          con.innerHTML = "생성 이력이 없습니다.";
+          return;
+        }
+
+        finalHistoryStack.forEach((item) => {
+          const div = document.createElement("div");
+          div.className = `info-card ${item.status}`;
+
+          div.onclick = () => {
+            div.classList.toggle("expanded");
+            highlightSentence(item.id);
+          };
+
+          let levelColor =
+            item.level === "A"
+              ? "#1f4ddc"
+              : item.level === "B"
+              ? "#10b981"
+              : item.level === "C"
+              ? "#6b7280"
+              : "#f59e0b";
+          let tagsHtml = `<span class="tag" style="color: ${levelColor}; border-color: ${levelColor}; background: #fff;">성취수준: ${item.level}</span>`;
+          if (item.comps && item.comps.length > 0) {
+            tagsHtml += item.comps
+              .map((a) => `<span class="tag">${a}</span>`)
+              .join("");
+          }
+
+          let delBtn =
+            item.status === "optimized"
+              ? ""
+              : `<button class="delete-sentence-btn" onclick="deleteFinalSentence(event, '${item.id}')">🗑️ 삭제</button>`;
+
+          let statBadge = "";
+          if (item.status === "deleted")
+            statBadge =
+              "<span class='status-badge' style='background:#ef4444;'>❌ 삭제됨</span>";
+          else if (item.status === "modified")
+            statBadge = "<span class='status-badge'>✅ 직접 수정함</span>";
+
+          div.innerHTML = `
+            <div class="accordion-header">
+                <span style="display:flex; align-items:center; gap:5px;">📝 [${item.level}] ${item.topic}</span>
+                <span class="accordion-chevron">▼</span>
+            </div>
+            <div class="accordion-body-wrapper">
+                <div class="accordion-body">
+                    <div class="accordion-content">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <div>${statBadge}</div>
+                            ${delBtn}
+                        </div>
+                        <div style="display:flex; gap:4px; flex-wrap:wrap; margin-top:4px;">${tagsHtml}</div>
+                    </div>
+                </div>
+            </div>
+          `;
+          con.appendChild(div);
+        });
+      }
+
+      function highlightSentence(id) {
+        document
+          .querySelectorAll(".sentence-block")
+          .forEach((el) => el.classList.remove("highlight-active"));
+        const target = document.getElementById(id);
+        if (target) {
+          target.scrollIntoView({ behavior: "smooth", block: "center" });
+          target.classList.add("highlight-active");
+          setTimeout(() => {
+            target.classList.remove("highlight-active");
+          }, 2000);
+        }
+      }
+
+      function deleteFinalSentence(event, id) {
+        event.stopPropagation();
+        const target = document.getElementById(id);
+        if (target) {
+          if (target.previousSibling && target.previousSibling.nodeType === 3)
+            target.previousSibling.remove();
+          target.remove();
+        }
+        finalHistoryStack = finalHistoryStack.filter((item) => item.id !== id);
+        renderInfoLayer();
+        updateByte();
+        showToast("문장이 삭제되었습니다.");
+      }
+
+      function checkIntegrity() {
+        let change = false;
+        finalHistoryStack.forEach((item) => {
+          const el = document.getElementById(item.id);
+          if (!el) {
+            if (item.status !== "deleted") {
+              item.status = "deleted";
+              change = true;
+            }
+          } else if (el.innerText.length < item.len * 0.8) {
+            if (item.status !== "modified") {
+              item.status = "modified";
+              change = true;
+            }
+          } else {
+            if (item.status !== "active") {
+              item.status = "active";
+              change = true;
+            }
+          }
+        });
+
+        const preview = document.getElementById("finalPreview");
+        if (preview.innerText.trim()) {
+          let blocks = Array.from(preview.childNodes);
+          blocks.forEach((node) => {
+            if (node.nodeType === 3)
+              node.textContent = node.textContent.replace(/\s{2,}/g, " ");
+          });
+        }
+
+        renderInfoLayer();
+        updateByte();
+        showToast("띄어쓰기 찌꺼기 정제 및 상태가 동기화되었습니다.");
+      }
+
+      function clearFinal() {
+        if (confirm("전체 삭제하시겠습니까?")) {
+          document.getElementById("finalPreview").innerText = "";
+          finalHistoryStack = [];
+          renderInfoLayer();
+          updateByte();
+        }
+      }
+      function updateByte() {
+        const text = document.getElementById("finalPreview").innerText;
+        let bytes = 0;
+        for (let i = 0; i < text.length; i++)
+          bytes += text.charCodeAt(i) > 127 ? 3 : 1;
+        document.getElementById("byteCount").innerText = bytes;
+        document.getElementById("byteCount").style.color =
+          bytes > 1500 ? "red" : "#1f4ddc";
+      }
+      function finalApply() {
+        alert("NEIS 입력 완료");
+      }
+      function showToast(m) {
+        const t = document.getElementById("toast");
+        t.textContent = m;
+        t.style.opacity = 1;
+        setTimeout(() => (t.style.opacity = 0), 2000);
+      }
+    </script>
+  </body>
+</html>
