@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>진로활동 관리 시스템 v9.0 (Ultimate Master Engine)</title>
+    <style>
+      /* --- [스크롤 이탈 방지 및 공통 레이아웃] --- */
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: "Segoe UI", -apple-system, sans-serif;
+        background: #f5f6f8;
+        color: #333;
+        overflow: hidden;
+      }
+      .topbar {
+        height: 48px;
+        background: #f5c6cf;
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        font-weight: 700;
+        border-bottom: 1px solid #e5adba;
+        color: #333;
+        flex-shrink: 0;
+      }
+
+      .container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        height: calc(100vh - 48px);
+      }
+      .left,
+      .right {
+        padding: 25px;
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+        overflow-y: auto;
+        min-height: 0;
+      }
+      .left {
+        border-right: 1px solid #e5e7eb;
+        gap: 15px;
+      }
+
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 5px;
+        flex-shrink: 0;
+      }
+      .section-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1f2937;
+      }
+
+      .input,
+      .select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: 0.2s;
+      }
+      .textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 14px;
+        resize: none;
+        line-height: 1.6;
+      }
+
+      .btn {
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        border: 1px solid #d1d5db;
+        background: #fff;
+        transition: 0.2s;
+        flex-shrink: 0;
+      }
+      .btn.primary {
+        background: #1f4ddc;
+        color: #fff;
+        border-color: #163aa5;
+      }
+      .btn.success {
+        background: #10b981;
+        color: #fff;
+        border-color: #059669;
+      }
+      .btn.danger {
+        background: #fff;
+        color: #e11d48;
+        border-color: #ffcccc;
+      }
+      .btn.warning {
+        background: #f59e0b;
+        color: #fff;
+        border-color: #d97706;
+      }
+      .btn.sm {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+
+      .preview-box {
+        flex: 6;
+        min-height: 150px;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 25px;
+        font-size: 15px;
+        line-height: 1.8;
+        outline: none;
+        background: #fff;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        word-break: break-all;
+        scroll-behavior: smooth;
+      }
+      .sentence-block {
+        cursor: text;
+        transition: background 0.4s ease-out;
+        border-radius: 4px;
+        padding: 2px 0;
+      }
+      .sentence-block:hover {
+        background-color: #eff6ff;
+      }
+      .highlight-active {
+        background-color: #fef08a !important;
+      }
+
+      .counter {
+        text-align: right;
+        margin-top: 10px;
+        font-size: 13px;
+        color: #6b7280;
+        flex-shrink: 0;
+      }
+
+      .info-layer {
+        flex: 4;
+        min-height: 150px;
+        border: 1px solid #e5e7eb;
+        background: #fafafa;
+        border-radius: 12px;
+        padding: 15px;
+        overflow-y: auto;
+        margin-top: 15px;
+      }
+      .info-card {
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 8px;
+        font-size: 13px;
+        border-left: 4px solid #1f4ddc;
+        transition: 0.2s;
+        position: relative;
+        cursor: pointer;
+      }
+      .info-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      }
+      .info-card.deleted {
+        border-left-color: #ef4444;
+        opacity: 0.5;
+        background: #fff5f5;
+        pointer-events: none;
+      }
+      .info-card.modified {
+        border-left-color: #10b981;
+      }
+      .info-card.optimized {
+        border-left-color: #8b5cf6;
+        background: #f5f3ff;
+      }
+
+      .info-header {
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+      .tag {
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        background: #f3f4f6;
+        color: #555;
+        border: 1px solid #e5e7eb;
+        margin-right: 4px;
+        display: inline-block;
+        margin-top: 4px;
+      }
+      .dup-badge {
+        background: #f59e0b;
+        color: #fff;
+        font-size: 10px;
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-weight: 700;
+      }
+      .status-badge {
+        font-size: 10px;
+        padding: 3px 6px;
+        border-radius: 4px;
+        color: #fff;
+        background: #10b981;
+      }
+      .delete-sentence-btn {
+        background: #fee2e2;
+        color: #ef4444;
+        border: 1px solid #fca5a5;
+        border-radius: 6px;
+        padding: 4px 8px;
+        font-size: 11px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .delete-sentence-btn:hover {
+        background: #ef4444;
+        color: #fff;
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 2000;
+      }
+      .modal-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 1100px;
+        height: 90vh;
+        background: #fff;
+        border-radius: 16px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .modal-header {
+        padding: 20px 30px;
+        background: #f9fafb;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-shrink: 0;
+      }
+      .modal-body {
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        flex: 1;
+        overflow: hidden;
+        min-height: 0;
+      }
+
+      .student-list {
+        background: #f8fafc;
+        border-right: 1px solid #e5e7eb;
+        padding: 15px 0;
+        overflow-y: auto;
+      }
+      .student-item {
+        padding: 16px 30px;
+        background: #eff6ff;
+        color: #1f4ddc;
+        font-weight: 700;
+        border-right: 4px solid #1f4ddc;
+        font-size: 15px;
+      }
+      .log-entry {
+        padding: 30px;
+        overflow-y: auto;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+      }
+
+      .tab-menu {
+        display: flex;
+        border-bottom: 2px solid #e5e7eb;
+        margin-bottom: 20px;
+        flex-shrink: 0;
+      }
+      .tab-btn {
+        flex: 1;
+        padding: 12px;
+        text-align: center;
+        cursor: pointer;
+        font-weight: 700;
+        color: #6b7280;
+        font-size: 14px;
+        border-bottom: 3px solid transparent;
+        transition: 0.2s;
+      }
+      .tab-btn:hover {
+        color: #1f4ddc;
+      }
+      .tab-btn.active {
+        color: #1f4ddc;
+        border-bottom-color: #1f4ddc;
+      }
+      .tab-content {
+        display: none;
+      }
+      .tab-content.active {
+        display: block;
+      }
+
+      .form-box {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        flex-shrink: 0;
+      }
+      .form-row {
+        display: flex;
+        margin-bottom: 15px;
+        align-items: flex-start;
+        gap: 15px;
+      }
+      .form-label {
+        width: 110px;
+        font-weight: 600;
+        color: #4b5563;
+        font-size: 13px;
+        padding-top: 10px;
+        flex-shrink: 0;
+      }
+      .form-input-group {
+        flex: 1;
+      }
+
+      .radio-group {
+        display: flex;
+        gap: 15px;
+        padding-top: 10px;
+        font-size: 14px;
+      }
+      .radio-label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        cursor: pointer;
+      }
+
+      .history-item {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+        transition: 0.2s;
+      }
+      .history-chk {
+        margin-top: 4px;
+        transform: scale(1.3);
+        cursor: pointer;
+        accent-color: #1f4ddc;
+      }
+
+      .warning-text {
+        color: #b91c1c;
+        font-size: 12px;
+        margin-top: 8px;
+        display: none;
+        font-weight: 600;
+        background: #fef2f2;
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid #fecaca;
+      }
+
+      #toast {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #333;
+        color: #fff;
+        padding: 10px 25px;
+        border-radius: 30px;
+        font-size: 13px;
+        opacity: 0;
+        transition: 0.3s;
+        pointer-events: none;
+        z-index: 3000;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="toast">알림</div>
+    <div class="topbar">진로활동 관리 시스템 v9.0 (Ultimate Master Engine)</div>
+
+    <div class="container">
+      <section class="left">
+        <div class="section-header">
+          <div class="section-title">학생활동 데이터 구성</div>
+          <button class="btn accent" onclick="openModal()">
+            📅 누가기록 상세 관리
+          </button>
+        </div>
+
+        <div
+          style="
+            background: #eef2ff;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #c7d2fe;
+            margin-bottom: 10px;
+            flex-shrink: 0;
+          "
+        >
+          <strong
+            style="color: #3730a3; display: flex; align-items: center; gap: 8px"
+          >
+            🧑‍🎓 학생명: 이현태
+            <span style="font-size: 12px; color: #555">(고정)</span>
+          </strong>
+        </div>
+
+        <div
+          style="flex: 1; display: flex; flex-direction: column; min-height: 0"
+        >
+          <div class="section-header" style="margin-top: 5px; flex-shrink: 0">
+            <label class="section-title">생성 대기 중인 활동 (선택됨)</label>
+          </div>
+          <textarea
+            id="rawDataDisplay"
+            class="textarea"
+            readonly
+            placeholder="[누가기록 상세 관리]에서 체크된 진로 활동들이 표시됩니다."
+            style="background: #f9fafb; color: #555; flex: 1; line-height: 1.8"
+          ></textarea>
+        </div>
+
+        <button
+          class="btn primary"
+          style="height: 50px; font-size: 16px; margin: 15px 0; flex-shrink: 0"
+          onclick="generateCareerAI()"
+        >
+          ✨ AI 진로 문장 생성
+        </button>
+
+        <div
+          style="flex: 1; display: flex; flex-direction: column; min-height: 0"
+        >
+          <label
+            class="section-title"
+            style="margin-bottom: 8px; flex-shrink: 0"
+            >AI 생성 초안</label
+          >
+          <textarea
+            id="tempDraft"
+            class="textarea"
+            style="
+              background: #fdfbff;
+              border-color: #c7d2fe;
+              flex: 1;
+              line-height: 1.8;
+            "
+          ></textarea>
+          <button
+            class="btn success"
+            style="width: 100%; margin-top: 10px; flex-shrink: 0"
+            onclick="moveToFinal()"
+          >
+            우측 최종 결과로 반영 →
+          </button>
+        </div>
+      </section>
+
+      <section class="right">
+        <div class="section-header" style="margin-bottom: 15px">
+          <div class="section-title">NEIS 기재 최종 내용</div>
+          <div style="display: flex; gap: 8px">
+            <button class="btn danger" onclick="clearFinal()">
+              🗑️ 전체 삭제
+            </button>
+            <button
+              class="btn"
+              style="background: #8b5cf6; color: white; border-color: #7c3aed"
+              onclick="checkIntegrity()"
+            >
+              🪄 전체 문맥 다듬기 (흐름 최적화)
+            </button>
+            <button class="btn success" onclick="finalApply()">
+              💾 적용하기
+            </button>
+          </div>
+        </div>
+
+        <div
+          style="
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            gap: 15px;
+            min-height: 0;
+          "
+        >
+          <div
+            id="finalPreview"
+            class="preview-box"
+            contenteditable="true"
+            oninput="updateByte()"
+          ></div>
+
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              flex-shrink: 0;
+            "
+          >
+            <div class="counter">
+              실시간 용량:
+              <span id="byteCount" style="color: #1f4ddc; font-weight: 700"
+                >0</span
+              >
+              / 1500 Byte
+            </div>
+          </div>
+
+          <div class="info-layer" id="infoLayer">
+            <span style="font-weight: 700; display: block; margin-bottom: 8px"
+              >📋 포함된 정보 요약 (클릭 시 문장 위치 표시)</span
+            >
+            <div id="infoContentContainer" style="color: #999">
+              생성된 문단에 포함된 진로 활동 내역이 누적됩니다.
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div id="logModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span style="font-size: 18px; font-weight: 700; color: #374151"
+            >학생별 진로 누가기록 상세 관리</span
+          >
+          <button class="btn" onclick="closeModal()">닫기 (자동 저장됨)</button>
+        </div>
+        <div class="modal-body">
+          <div class="student-list" id="modalStudentList"></div>
+
+          <div class="log-entry">
+            <div class="tab-menu">
+              <div class="tab-btn active" onclick="switchTab('basic', this)">
+                📝 진로 검사 및 상담
+              </div>
+              <div class="tab-btn" onclick="switchTab('explore', this)">
+                🚀 전공 탐구 및 강연
+              </div>
+            </div>
+
+            <div id="tab-basic" class="tab-content active">
+              <div class="form-box">
+                <div class="form-row">
+                  <div class="form-label">활동 일자</div>
+                  <div class="form-input-group">
+                    <input
+                      type="date"
+                      id="basicDate"
+                      class="input"
+                      style="width: 200px"
+                    />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-label">해당 희망 진로</div>
+                  <div class="form-input-group">
+                    <div style="display: flex; gap: 10px">
+                      <select
+                        id="basicCareer"
+                        class="select"
+                        onchange="toggleCustomCareer('basic')"
+                        style="flex: 1"
+                      >
+                        <option value="" disabled selected>
+                          희망 직업군 선택 (활동 당시 기준)
+                        </option>
+                        <option value="developer">💻 컴퓨터/SW (개발자)</option>
+                        <option value="doctor">🩺 의학/보건 (의사)</option>
+                        <option value="teacher">🎓 교육 (교사)</option>
+                        <option value="business">💼 경영/경제 (CEO)</option>
+                        <option value="engineer">⚙️ 공학/엔지니어</option>
+                        <option value="art">🎨 예술/디자인</option>
+                        <option value="undecided">
+                          ❓ 진로 미정 (탐색 중)
+                        </option>
+                        <option value="custom">✏️ 기타 (직접 입력)</option>
+                      </select>
+                      <input
+                        type="text"
+                        id="basicCustomCareer"
+                        class="input"
+                        placeholder="직업명 직접 입력 (최대 15자)"
+                        maxlength="15"
+                        style="flex: 1; display: none"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-label">활동 유형</div>
+                  <div class="form-input-group radio-group">
+                    <label class="radio-label"
+                      ><input
+                        type="radio"
+                        name="basicType"
+                        value="test"
+                        checked
+                        onchange="toggleBasicForm()"
+                      />
+                      진로/적성 검사</label
+                    >
+                    <label class="radio-label"
+                      ><input
+                        type="radio"
+                        name="basicType"
+                        value="counsel"
+                        onchange="toggleBasicForm()"
+                      />
+                      진로/개인 상담</label
+                    >
+                  </div>
+                </div>
+
+                <div id="basicTestForm">
+                  <div class="form-row">
+                    <div class="form-label">진로 검사명</div>
+                    <div class="form-input-group">
+                      <select id="testName" class="select">
+                        <option value="" disabled selected>
+                          실시한 검사 선택
+                        </option>
+                        <option>커리어넷 직업흥미검사(H형)</option>
+                        <option>직업가치관검사</option>
+                        <option>직업적성검사</option>
+                        <option>다중지능검사</option>
+                        <option>MBTI 성격유형검사</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-label">검사 결과 (순위)</div>
+                    <div
+                      class="form-input-group"
+                      style="display: flex; gap: 10px"
+                    >
+                      <select id="testR1" class="select" style="flex: 1">
+                        <option value="" disabled selected>1순위</option>
+                        <option>현실형</option>
+                        <option>탐구형</option>
+                        <option>예술형</option>
+                        <option>사회형</option>
+                        <option>진취형</option>
+                        <option>관습형</option>
+                        <option>논리수학</option>
+                        <option>언어</option>
+                        <option>대인관계</option>
+                        <option>자연친화</option>
+                        <option>자기성찰</option>
+                      </select>
+                      <select id="testR2" class="select" style="flex: 1">
+                        <option value="" disabled selected>2순위</option>
+                        <option>현실형</option>
+                        <option>탐구형</option>
+                        <option>예술형</option>
+                        <option>사회형</option>
+                        <option>진취형</option>
+                        <option>관습형</option>
+                        <option>논리수학</option>
+                        <option>언어</option>
+                        <option>대인관계</option>
+                        <option>자연친화</option>
+                        <option>자기성찰</option>
+                      </select>
+                      <select id="testR3" class="select" style="flex: 1">
+                        <option value="" disabled selected>3순위</option>
+                        <option>현실형</option>
+                        <option>탐구형</option>
+                        <option>예술형</option>
+                        <option>사회형</option>
+                        <option>진취형</option>
+                        <option>관습형</option>
+                        <option>논리수학</option>
+                        <option>언어</option>
+                        <option>대인관계</option>
+                        <option>자연친화</option>
+                        <option>자기성찰</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div id="basicCounselForm" style="display: none">
+                  <div class="form-row">
+                    <div class="form-label">상담 내용/결과</div>
+                    <div class="form-input-group">
+                      <textarea
+                        id="counselContent"
+                        class="textarea"
+                        style="height: 80px"
+                        placeholder="상담한 내용과 결과, 느낀 점을 입력하세요."
+                      ></textarea>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="text-align: right">
+                  <button
+                    class="btn primary"
+                    id="btnSaveBasic"
+                    onclick="saveActivity('basic')"
+                  >
+                    + 목록에 추가/저장
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div id="tab-explore" class="tab-content">
+              <div class="form-box">
+                <div class="form-row">
+                  <div class="form-label">활동 일자</div>
+                  <div class="form-input-group">
+                    <input
+                      type="date"
+                      id="exploreDate"
+                      class="input"
+                      style="width: 200px"
+                    />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-label">해당 희망 진로</div>
+                  <div class="form-input-group">
+                    <div style="display: flex; gap: 10px">
+                      <select
+                        id="exploreCareer"
+                        class="select"
+                        onchange="toggleCustomCareer('explore')"
+                        style="flex: 1"
+                      >
+                        <option value="" disabled selected>
+                          희망 직업군 선택 (활동 당시 기준)
+                        </option>
+                        <option value="developer">💻 컴퓨터/SW (개발자)</option>
+                        <option value="doctor">🩺 의학/보건 (의사)</option>
+                        <option value="teacher">🎓 교육 (교사)</option>
+                        <option value="business">💼 경영/경제 (CEO)</option>
+                        <option value="engineer">⚙️ 공학/엔지니어</option>
+                        <option value="art">🎨 예술/디자인</option>
+                        <option value="undecided">
+                          ❓ 진로 미정 (탐색 중)
+                        </option>
+                        <option value="custom">✏️ 기타 (직접 입력)</option>
+                      </select>
+                      <input
+                        type="text"
+                        id="exploreCustomCareer"
+                        class="input"
+                        placeholder="직업명 직접 입력 (최대 15자)"
+                        maxlength="15"
+                        style="flex: 1; display: none"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-label">활동 유형</div>
+                  <div class="form-input-group radio-group">
+                    <label class="radio-label"
+                      ><input
+                        type="radio"
+                        name="exploreType"
+                        value="lecture"
+                        checked
+                      />
+                      외부 특강 및 강연</label
+                    >
+                    <label class="radio-label"
+                      ><input
+                        type="radio"
+                        name="exploreType"
+                        value="activity"
+                      />
+                      전공 자율 탐구(연구)</label
+                    >
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-label">강연/탐구 주제</div>
+                  <div class="form-input-group">
+                    <input
+                      type="text"
+                      id="exploreTopic"
+                      class="input"
+                      placeholder="강연명 또는 탐구 주제를 명확히 입력하세요."
+                    />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-label">핵심 내용/성과</div>
+                  <div class="form-input-group">
+                    <textarea
+                      id="exploreContent"
+                      class="textarea"
+                      style="height: 80px"
+                      placeholder="새롭게 알게 된 지식, 전공 적합성 등 활동의 성과를 입력하세요."
+                    ></textarea>
+                  </div>
+                </div>
+
+                <div style="text-align: right">
+                  <button
+                    class="btn primary"
+                    id="btnSaveExplore"
+                    onclick="saveActivity('explore')"
+                  >
+                    + 목록에 추가/저장
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div
+              style="
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                min-height: 0;
+              "
+            >
+              <div
+                style="
+                  margin-bottom: 10px;
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  flex-shrink: 0;
+                "
+              >
+                <span style="font-weight: 700; color: #374151"
+                  >🕒 입력된 기록 목록</span
+                >
+                <div>
+                  <button class="btn sm" onclick="checkAll(true)">
+                    전체 선택
+                  </button>
+                  <button class="btn sm" onclick="checkAll(false)">
+                    전체 해제
+                  </button>
+                </div>
+              </div>
+              <div
+                id="historyListContainer"
+                style="overflow-y: auto; flex: 1; padding-right: 5px"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let studentHistory = [];
+      let finalHistoryStack = [];
+      let historyIdCounter = 0;
+      let tempContext = null;
+      let currentEditId = null; // 수정 롤백 방어 변수
+
+      /* 조사 처리 고도화 (받침 유무 수학적 계산) */
+      function resolveJosa(word, type) {
+        if (!word) return "";
+        const lastChar = word.charCodeAt(word.length - 1);
+        if (lastChar < 0xac00 || lastChar > 0xd7a3)
+          return type === "ul" ? "을(를)" : "이(가)";
+        const hasBatchim = (lastChar - 0xac00) % 28 > 0;
+        if (type === "ul") return hasBatchim ? "을" : "를";
+        if (type === "i") return hasBatchim ? "이" : "가";
+        return "";
+      }
+
+      window.onload = () => {
+        const list = document.getElementById("modalStudentList");
+        const div = document.createElement("div");
+        div.className = "student-item active";
+        div.textContent = "이현태";
+        list.appendChild(div);
+        renderHistory();
+      };
+
+      function openModal() {
+        document.getElementById("logModal").style.display = "block";
+      }
+      function closeModal() {
+        document.getElementById("logModal").style.display = "none";
+        updateMainSummary();
+        currentEditId = null;
+        resetButtons();
+      }
+
+      function switchTab(tabId, btn) {
+        document
+          .querySelectorAll(".tab-btn")
+          .forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        document
+          .querySelectorAll(".tab-content")
+          .forEach((c) => c.classList.remove("active"));
+        document.getElementById("tab-" + tabId).classList.add("active");
+      }
+
+      function toggleCustomCareer(tabType) {
+        const val = document.getElementById(tabType + "Career").value;
+        const input = document.getElementById(tabType + "CustomCareer");
+        input.style.display = val === "custom" ? "block" : "none";
+      }
+
+      function toggleBasicForm() {
+        const type = document.querySelector(
+          "input[name=basicType]:checked"
+        ).value;
+        document.getElementById("basicTestForm").style.display =
+          type === "test" ? "block" : "none";
+        document.getElementById("basicCounselForm").style.display =
+          type === "counsel" ? "block" : "none";
+      }
+
+      /* 안전 롤백 저장을 위한 버튼 초기화 */
+      function resetButtons() {
+        document.getElementById("btnSaveBasic").innerText =
+          "+ 목록에 추가/저장";
+        document.getElementById("btnSaveExplore").innerText =
+          "+ 목록에 추가/저장";
+        currentEditId = null;
+      }
+
+      /* --- [1차 방어] 활동 저장 및 줄바꿈/입력 검증 로직 --- */
+      function saveActivity(tabId) {
+        let data = {
+          id: currentEditId ? currentEditId : ++historyIdCounter,
+          tabId,
+          checked: true,
+        };
+
+        data.date = document.getElementById(tabId + "Date").value;
+        let jobCode = document.getElementById(tabId + "Career").value;
+        let customJob = document
+          .getElementById(tabId + "CustomCareer")
+          .value.trim();
+
+        if (!data.date) return alert("활동 일자를 입력하세요.");
+        if (!jobCode) return alert("희망 진로를 선택하세요.");
+        if (jobCode === "custom" && !customJob)
+          return alert("희망 진로(직업명)를 입력하세요.");
+
+        data.jobCode = jobCode;
+        data.jobLabel =
+          jobCode === "custom"
+            ? customJob
+            : document
+                .querySelector(`#${tabId}Career option[value="${jobCode}"]`)
+                .text.split("(")[1]
+                .replace(")", "");
+
+        if (tabId === "basic") {
+          data.subType = document.querySelector(
+            "input[name=basicType]:checked"
+          ).value;
+          if (data.subType === "test") {
+            data.topic = document.getElementById("testName").value;
+            data.r1 = document.getElementById("testR1").value;
+            data.r2 = document.getElementById("testR2").value;
+            data.r3 = document.getElementById("testR3").value;
+            if (!data.topic || !data.r1 || !data.r2 || !data.r3)
+              return alert("검사명과 1~3순위 결과를 모두 선택하세요.");
+            if (
+              data.r1 === data.r2 ||
+              data.r1 === data.r3 ||
+              data.r2 === data.r3
+            )
+              return alert("순위 결과는 중복될 수 없습니다.");
+
+            data.hashKey = `TEST|${data.date}|${data.topic}|${data.r1}`;
+          } else {
+            // 줄바꿈 방어 (엔터 테러 방지)
+            data.content = document
+              .getElementById("counselContent")
+              .value.replace(/\n/g, " ")
+              .trim();
+            if (!data.content) return alert("상담 내용을 입력하세요.");
+            data.hashKey = `COUNSEL|${data.date}|${data.content.substring(
+              0,
+              10
+            )}`;
+          }
+        } else {
+          data.subType = document.querySelector(
+            "input[name=exploreType]:checked"
+          ).value;
+          data.topic = document.getElementById("exploreTopic").value.trim();
+          data.content = document
+            .getElementById("exploreContent")
+            .value.replace(/\n/g, " ")
+            .trim();
+          if (!data.topic || !data.content)
+            return alert("주제와 내용을 모두 입력하세요.");
+
+          data.hashKey = `EXPLORE|${data.subType}|${data.date}|${data.topic}`;
+        }
+
+        // 수정(Edit) 모드일 경우 기존 데이터 갈아끼우기 (데이터 증발 방어)
+        if (currentEditId) {
+          studentHistory = studentHistory.map((h) =>
+            h.id === currentEditId ? data : h
+          );
+          currentEditId = null;
+          resetButtons();
+        } else {
+          if (studentHistory.some((h) => h.hashKey === data.hashKey))
+            return alert("이미 등록된 동일한 활동이 있습니다.");
+          studentHistory.forEach((h) => (h.checked = false));
+          studentHistory.push(data);
+        }
+
+        // 폼 초기화
+        document.getElementById(tabId + "Date").value = "";
+        if (tabId === "basic") {
+          document.getElementById("testName").value = "";
+          document.getElementById("testR1").value = "";
+          document.getElementById("testR2").value = "";
+          document.getElementById("testR3").value = "";
+          document.getElementById("counselContent").value = "";
+        } else {
+          document.getElementById("exploreTopic").value = "";
+          document.getElementById("exploreContent").value = "";
+        }
+
+        renderHistory();
+        showToast("목록에 저장되었습니다.");
+      }
+
+      function renderHistory() {
+        const container = document.getElementById("historyListContainer");
+        if (!studentHistory.length) {
+          container.innerHTML =
+            '<div style="text-align:center;color:#999;padding:20px; border:1px solid #e5e7eb; border-radius:8px;">기록이 없습니다.</div>';
+          return;
+        }
+
+        let html = "";
+        [...studentHistory]
+          .sort((a, b) => b.date.localeCompare(a.date))
+          .forEach((item) => {
+            let badgeColor =
+              item.subType === "test"
+                ? "#8b5cf6"
+                : item.subType === "counsel"
+                ? "#10b981"
+                : item.subType === "lecture"
+                ? "#f59e0b"
+                : "#3b82f6";
+            let badgeText =
+              item.subType === "test"
+                ? "진로검사"
+                : item.subType === "counsel"
+                ? "진로상담"
+                : item.subType === "lecture"
+                ? "외부강연"
+                : "전공탐구";
+
+            let dTitle =
+              item.subType === "counsel" ? "[진로/개인 상담]" : item.topic;
+            let dDesc =
+              item.subType === "test"
+                ? `${item.r1}, ${item.r2}, ${item.r3} 영역 강점`
+                : item.content;
+
+            html += `
+            <div class="history-item" style="${
+              item.checked
+                ? "border-left:4px solid #1f4ddc;"
+                : "border-left:4px solid transparent;"
+            }">
+                <input type="checkbox" class="history-chk" ${
+                  item.checked ? "checked" : ""
+                } onchange="toggleCheck(${item.id})" style="margin-top:2px;">
+                <div style="flex:1;">
+                    <div style="font-size:12px; color:#666; margin-bottom:4px;">
+                        <span style="background:#e0f2fe; color:#0369a1; padding:2px 6px; border-radius:4px; font-weight:bold; margin-right:5px;">희망: ${
+                          item.jobLabel
+                        }</span>
+                        ${item.date}
+                    </div>
+                    <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+                        <span style="background:${badgeColor}; color:#fff; font-size:11px; padding:2px 6px; border-radius:4px; font-weight:bold;">${badgeText}</span>
+                        <strong style="font-size:14px; color:#333;">${dTitle}</strong>
+                    </div>
+                    <div style="font-size:13px; color:#555; line-height:1.4;">${dDesc}</div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:5px;">
+                    <button class="btn sm warning" onclick="editHistory(${
+                      item.id
+                    })">수정</button>
+                    <button class="btn sm" style="color:red; border:1px solid #ffcccc; background:#fff;" onclick="deleteHistory(${
+                      item.id
+                    })">삭제</button>
+                </div>
+            </div>`;
+          });
+        container.innerHTML = html;
+      }
+
+      function editHistory(id) {
+        const item = studentHistory.find((i) => i.id === id);
+        if (!item) return;
+
+        currentEditId = id; // [핵심] 안전 롤백을 위해 ID 유지
+
+        let btnIndex = item.tabId === "basic" ? 0 : 1;
+        document.querySelectorAll(".tab-btn")[btnIndex].click();
+
+        document.getElementById(item.tabId + "Date").value = item.date;
+        document.getElementById(item.tabId + "Career").value = item.jobCode;
+        toggleCustomCareer(item.tabId);
+        if (item.jobCode === "custom")
+          document.getElementById(item.tabId + "CustomCareer").value =
+            item.jobLabel;
+
+        if (item.tabId === "basic") {
+          document.querySelector(
+            `input[name=basicType][value=${item.subType}]`
+          ).checked = true;
+          toggleBasicForm();
+          if (item.subType === "test") {
+            document.getElementById("testName").value = item.topic;
+            document.getElementById("testR1").value = item.r1;
+            document.getElementById("testR2").value = item.r2;
+            document.getElementById("testR3").value = item.r3;
+          } else {
+            document.getElementById("counselContent").value = item.content;
+          }
+          document.getElementById("btnSaveBasic").innerText = "💾 수정 완료";
+        } else {
+          document.querySelector(
+            `input[name=exploreType][value=${item.subType}]`
+          ).checked = true;
+          document.getElementById("exploreTopic").value = item.topic;
+          document.getElementById("exploreContent").value = item.content;
+          document.getElementById("btnSaveExplore").innerText = "💾 수정 완료";
+        }
+      }
+
+      function toggleCheck(id) {
+        const item = studentHistory.find((i) => i.id === id);
+        if (item) item.checked = !item.checked;
+        renderHistory();
+        updateMainSummary();
+      }
+      function checkAll(state) {
+        studentHistory.forEach((h) => (h.checked = state));
+        renderHistory();
+        updateMainSummary();
+      }
+      function deleteHistory(id) {
+        if (!confirm("삭제하시겠습니까?")) return;
+        studentHistory = studentHistory.filter((i) => i.id !== id);
+        renderHistory();
+        updateMainSummary();
+      }
+
+      function updateMainSummary() {
+        const active = studentHistory.filter((h) => h.checked);
+        let text = "[생성 대기 중인 활동]\n\n";
+        active
+          .sort((a, b) => a.date.localeCompare(b.date))
+          .forEach((h, i) => {
+            let dTitle = h.subType === "counsel" ? "진로 상담" : h.topic;
+            text += `${i + 1}. [${h.jobLabel}] ${dTitle} (${h.date})\n\n`;
+          });
+        document.getElementById("rawDataDisplay").value = active.length
+          ? text
+          : "체크된 활동이 없습니다.";
+      }
+
+      /* --- [핵심] 다중 진로 융합 생성 엔진 & 전문 어휘 DB --- */
+      function generateCareerAI() {
+        let targets = studentHistory.filter((h) => h.checked);
+        if (targets.length === 0) return alert("생성할 활동을 선택하세요.");
+
+        targets.sort((a, b) => a.date.localeCompare(b.date));
+
+        // 진로 흐름(Timeline) 추적
+        let jobs = [...new Set(targets.map((t) => t.jobLabel))];
+        let lastJob = jobs[jobs.length - 1];
+        let intro = "";
+
+        if (jobs.length === 1) {
+          intro = `평소 ${lastJob} 분야에 깊은 관심을 가지고 있으며, 관련 역량을 키우기 위해 주도적으로 진로 탐색에 임하는 학생임. `;
+        } else if (jobs.length === 2) {
+          intro = `초기에는 ${jobs[0]} 분야에 관심이 있었으나, 이후 다양한 탐색 과정을 거치며 ${lastJob} 분야로 진로를 구체화하고 역량을 개발함. `;
+        } else {
+          intro = `다양한 분야에 대한 호기심을 바탕으로 진로를 탐색한 끝에, 최종적으로 ${lastJob} 분야로 진로 방향성을 뚜렷하게 확립함. `;
+        }
+        if (["미정", "탐색 중"].includes(lastJob)) {
+          intro = `자신의 적성을 찾기 위해 다양한 진로 체험 활동에 적극적으로 참여하며 폭넓은 시각을 기르고 있음. `;
+        }
+
+        let body = "";
+        let actsMapping = [];
+        let summaryNames = [];
+
+        targets.forEach((item) => {
+          actsMapping.push({
+            hashKey: item.hashKey,
+            name: item.topic || "진로 상담",
+          });
+          summaryNames.push(item.topic || "진로 상담");
+
+          if (item.subType === "test") {
+            body += `${item.topic}에 참여하여 ${item.r1}, ${item.r2}, ${item.r3} 성향이 높게 나타남을 확인하고, 이를 바탕으로 자신의 강점을 객관적으로 파악함. `;
+          } else if (item.subType === "counsel") {
+            body += `진로 상담을 통해 ${item.content}에 대해 심도 있게 논의하고 구체적인 진로 로드맵을 수립함. `;
+          } else if (item.subType === "lecture") {
+            const josa = resolveJosa(item.topic, "ul");
+            body += `${item.topic}${josa} 주제로 한 특강을 경청하고 ${item.content}를 학습하며 관련 분야의 실무적 지식과 직업 가치관을 정립함. `;
+          } else {
+            const josa = resolveJosa(item.topic, "ul");
+            body += `${item.topic}${josa} 주제로 탐구 활동을 주도적으로 수행하며 ${item.content} 등 전공에 대한 심도 있는 이해도와 자기주도적 탐구 역량을 보여줌. `;
+          }
+        });
+
+        let outro = `이러한 일련의 진로 탐색 과정을 통해 미래의 ${
+          !["미정", "탐색 중"].includes(lastJob) ? lastJob : "핵심 인재"
+        }로서의 자질을 탄탄히 함양함.`;
+
+        let resultText = (intro + body + outro).replace(/\s+/g, " ").trim();
+
+        document.getElementById("tempDraft").value = resultText;
+        tempContext = {
+          actsMap: actsMapping,
+          len: resultText.length,
+          summary: summaryNames,
+        };
+        showToast("진로 AI 문단이 생성되었습니다.");
+      }
+
+      /* --- 딥 듀플리케이션 & 전송 제어 (1500 Byte 락) --- */
+      function updateDuplicateStatus() {
+        let hashCounts = {};
+        finalHistoryStack.forEach((item) => {
+          if (item.status === "active" && item.actsMap) {
+            item.actsMap.forEach((act) => {
+              hashCounts[act.hashKey] = (hashCounts[act.hashKey] || 0) + 1;
+            });
+          }
+        });
+        finalHistoryStack.forEach((item) => {
+          if (item.status === "active" && item.actsMap) {
+            let dupActs = item.actsMap.filter(
+              (act) => hashCounts[act.hashKey] > 1
+            );
+            item.isDuplicate = dupActs.length > 0;
+            item.dupNames = dupActs.map((a) => a.name);
+          } else {
+            item.isDuplicate = false;
+            item.dupNames = [];
+          }
+        });
+      }
+
+      function moveToFinal() {
+        const text = document.getElementById("tempDraft").value;
+        const preview = document.getElementById("finalPreview");
+        if (!text || !tempContext) return alert("생성된 문단이 없습니다.");
+
+        // [하드 락] 바이트 제한 검사
+        let currentText = preview.innerText;
+        let b = 0;
+        let testText = currentText + " " + text;
+        for (let i = 0; i < testText.length; i++)
+          b += testText.charCodeAt(i) > 127 ? 3 : 1;
+        if (b > 1500)
+          return alert(
+            "⚠️ 생기부 최대 용량(1500 Byte)을 초과하여 더 이상 전송할 수 없습니다."
+          );
+
+        let duplicateNames = [];
+        tempContext.actsMap.forEach((act) => {
+          if (
+            finalHistoryStack.some(
+              (fh) =>
+                fh.status === "active" &&
+                fh.actsMap &&
+                fh.actsMap.some((a) => a.hashKey === act.hashKey)
+            )
+          ) {
+            duplicateNames.push(act.name);
+          }
+        });
+        let isDuplicate = duplicateNames.length > 0;
+
+        if (preview.innerText.trim() === "") preview.innerText = "";
+        else preview.appendChild(document.createTextNode(" "));
+
+        const uniqueId = "block_" + Date.now();
+        const span = document.createElement("span");
+        span.className = "sentence-block";
+        span.id = uniqueId;
+        span.innerText = text;
+        preview.appendChild(span);
+
+        finalHistoryStack.push({
+          id: uniqueId,
+          summary: tempContext.summary,
+          actsMap: tempContext.actsMap,
+          len: text.length,
+          status: "active",
+          isDuplicate: isDuplicate,
+          dupNames: duplicateNames,
+        });
+
+        updateDuplicateStatus();
+        renderInfoLayer();
+        updateByte();
+        if (isDuplicate)
+          showToast(`⚠️ 중복 감지: 이미 작성된 활동이 포함되어 있습니다.`);
+      }
+
+      function renderInfoLayer() {
+        const con = document.getElementById("infoContentContainer");
+        con.innerHTML = "";
+        if (finalHistoryStack.length === 0) {
+          con.innerHTML = "생성 이력이 없습니다.";
+          return;
+        }
+
+        finalHistoryStack.forEach((item) => {
+          const div = document.createElement("div");
+          div.className = `info-card ${item.status} ${
+            item.isDuplicate ? "duplicate" : ""
+          }`;
+          div.onclick = () => highlightSentence(item.id);
+
+          let tagsHtml = item.summary
+            .map((a) => `<span class="tag">${a}</span>`)
+            .join("");
+          let delBtn = `<button class="delete-sentence-btn" onclick="deleteFinalSentence(event, '${item.id}')">🗑️ 삭제</button>`;
+          let dupAlert = item.isDuplicate
+            ? `<span class="dup-badge" style="margin-left:8px;" title="${item.dupNames.join(
+                ", "
+              )} 중복">⚠️ 중복 감지</span>`
+            : "";
+
+          let statBadge = "";
+          if (item.status === "deleted")
+            statBadge =
+              "<span class='status-badge' style='background:#ef4444;'>❌ 삭제됨</span>";
+          else if (item.status === "modified")
+            statBadge = "<span class='status-badge'>✅ 직접 수정함</span>";
+          else if (item.status === "optimized")
+            statBadge =
+              "<span class='status-badge' style='background:#8b5cf6;'>🪄 흐름 최적화됨</span>";
+
+          div.innerHTML = `
+            <div class="info-header">
+                <span style="display:flex; align-items:center;">📝 진로 생성 기록 ${dupAlert}</span>
+                ${delBtn}
+            </div>
+            ${
+              item.status !== "active"
+                ? `<div style="margin-bottom:6px;">${statBadge}</div>`
+                : ""
+            }
+            <div class="info-tags">${tagsHtml}</div>`;
+          con.appendChild(div);
+        });
+      }
+
+      function highlightSentence(id) {
+        document
+          .querySelectorAll(".sentence-block")
+          .forEach((el) => el.classList.remove("highlight-active"));
+        const target = document.getElementById(id);
+        if (target) {
+          target.scrollIntoView({ behavior: "smooth", block: "center" });
+          target.classList.add("highlight-active");
+          setTimeout(() => {
+            target.classList.remove("highlight-active");
+          }, 2000);
+        }
+      }
+
+      function deleteFinalSentence(event, id) {
+        event.stopPropagation();
+        const target = document.getElementById(id);
+        if (target) {
+          if (target.previousSibling && target.previousSibling.nodeType === 3)
+            target.previousSibling.remove();
+          target.remove();
+        }
+        finalHistoryStack = finalHistoryStack.filter((item) => item.id !== id);
+        updateDuplicateStatus();
+        renderInfoLayer();
+        updateByte();
+        showToast("기록이 삭제되었습니다.");
+      }
+
+      /* --- [핵심: 문맥 융합 알고리즘] 주어/결론 반복 소거 --- */
+      function checkIntegrity() {
+        let text = document.getElementById("finalPreview").innerText;
+        if (!text.trim()) return showToast("다듬을 내용이 없습니다."); // 에러 7번 방어
+
+        // 1. 인트로(관심 분야 선언) 중복 제거
+        const knownIntros = [
+          "평소 ",
+          "초기에는 ",
+          "다양한 분야에 대한 호기심을 바탕으로 ",
+          "자신의 적성을 찾기 위해 ",
+        ];
+
+        let introCount = 0;
+        let segments = text.split(
+          /(?=평소 |초기에는 |다양한 분야에 대한 호기심을 바탕으로 |자신의 적성을 찾기 위해 )/g
+        );
+
+        if (segments.length > 1) {
+          let optimizedText = segments[0]; // 보통 빈 문자열
+          for (let i = 1; i < segments.length; i++) {
+            let seg = segments[i];
+            if (introCount === 0) {
+              optimizedText += seg; // 첫 번째 인트로는 살림
+              introCount++;
+            } else {
+              // 두 번째 인트로 이후는 첫 번째 마침표(학생임. 등)까지를 날려버림
+              let dotIndex = seg.indexOf("함. ");
+              if (dotIndex === -1) dotIndex = seg.indexOf("학생임. ");
+              if (dotIndex !== -1) {
+                optimizedText += " " + seg.substring(dotIndex + 4).trimStart();
+              } else {
+                optimizedText += " " + seg;
+              }
+            }
+          }
+          text = optimizedText;
+        }
+
+        // 2. 아웃트로 중복 제거
+        let outroParts = text.split("이러한 일련의 진로 탐색 과정을 통해");
+        if (outroParts.length > 1) {
+          let finalOutro =
+            "이러한 일련의 진로 탐색 과정을 통해" +
+            outroParts[outroParts.length - 1];
+          let newBody = outroParts[0];
+          for (let i = 1; i < outroParts.length - 1; i++) {
+            let cutIdx = outroParts[i].indexOf("함양함.");
+            if (cutIdx !== -1)
+              newBody += outroParts[i].substring(cutIdx + 4).trimStart();
+          }
+          text = newBody.trim() + " " + finalOutro;
+        }
+
+        text = text.replace(/\s+/g, " ").trim();
+
+        const preview = document.getElementById("finalPreview");
+        preview.innerHTML = "";
+
+        const uniqueId = "opt_" + Date.now();
+        const span = document.createElement("span");
+        span.className = "sentence-block";
+        span.id = uniqueId;
+        span.innerText = text;
+        preview.appendChild(span);
+
+        let mergedActs = [];
+        let mergedSummary = [];
+        finalHistoryStack.forEach((item) => {
+          if (item.status !== "deleted") {
+            if (item.actsMap) mergedActs.push(...item.actsMap);
+            if (item.summary) mergedSummary.push(...item.summary);
+          }
+        });
+        mergedSummary = [...new Set(mergedSummary)];
+
+        finalHistoryStack = [
+          {
+            id: uniqueId,
+            summary: mergedSummary,
+            actsMap: mergedActs,
+            len: text.length,
+            status: "optimized",
+            isDuplicate: false,
+            dupNames: [],
+          },
+        ];
+
+        renderInfoLayer();
+        updateByte();
+        showToast("진로 흐름 및 문맥이 완벽하게 최적화되었습니다.");
+      }
+
+      function clearFinal() {
+        if (confirm("전체 삭제하시겠습니까?")) {
+          document.getElementById("finalPreview").innerText = "";
+          finalHistoryStack = [];
+          renderInfoLayer();
+          updateByte();
+        }
+      }
+
+      function updateByte() {
+        const text = document.getElementById("finalPreview").innerText;
+        let bytes = 0;
+        for (let i = 0; i < text.length; i++)
+          bytes += text.charCodeAt(i) > 127 ? 3 : 1;
+        document.getElementById("byteCount").innerText = bytes;
+        document.getElementById("byteCount").style.color =
+          bytes > 1500 ? "red" : "#1f4ddc";
+      }
+      function finalApply() {
+        alert("NEIS 입력 완료");
+      }
+      function showToast(m) {
+        const t = document.getElementById("toast");
+        t.textContent = m;
+        t.style.opacity = 1;
+        setTimeout(() => (t.style.opacity = 0), 2000);
+      }
+    </script>
+  </body>
+</html>
