@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>동아리활동 관리 시스템 v11.0 (Final Polished Edition)</title>
+    <style>
+      /* --- [스크롤 및 레이아웃 최적화] --- */
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: "Segoe UI", -apple-system, sans-serif;
+        background: #f5f6f8;
+        color: #333;
+        overflow: hidden;
+      }
+      .topbar {
+        height: 48px;
+        background: #f5c6cf;
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        font-weight: 700;
+        border-bottom: 1px solid #e5adba;
+        color: #333;
+        flex-shrink: 0;
+      }
+
+      .container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        height: calc(100vh - 48px);
+      }
+      .left,
+      .right {
+        padding: 25px;
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+        overflow-y: auto;
+        min-height: 0;
+      }
+      .left {
+        border-right: 1px solid #e5e7eb;
+        gap: 15px;
+      }
+
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 5px;
+        flex-shrink: 0;
+      }
+      .section-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1f2937;
+      }
+
+      .input,
+      .select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: 0.2s;
+      }
+      .textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 14px;
+        resize: none;
+        line-height: 1.6;
+      }
+
+      .btn {
+        padding: 10px 18px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        border: 1px solid #d1d5db;
+        background: #fff;
+        transition: 0.2s;
+        flex-shrink: 0;
+      }
+      .btn.primary {
+        background: #1f4ddc;
+        color: #fff;
+        border-color: #163aa5;
+      }
+      .btn.success {
+        background: #10b981;
+        color: #fff;
+        border-color: #059669;
+      }
+      .btn.danger {
+        background: #fff;
+        color: #e11d48;
+        border-color: #ffcccc;
+      }
+      .btn.warning {
+        background: #f59e0b;
+        color: #fff;
+        border-color: #d97706;
+      }
+      .btn.sm {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+
+      .preview-box {
+        flex: 6;
+        min-height: 150px;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 25px;
+        font-size: 15px;
+        line-height: 1.8;
+        outline: none;
+        background: #fff;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        word-break: break-all;
+        scroll-behavior: smooth;
+      }
+      .sentence-block {
+        cursor: text;
+        transition: background 0.4s ease-out;
+        border-radius: 4px;
+        padding: 2px 0;
+      }
+      .sentence-block:hover {
+        background-color: #eff6ff;
+      }
+      .highlight-active {
+        background-color: #fef08a !important;
+      }
+
+      .counter {
+        text-align: right;
+        margin-top: 10px;
+        font-size: 13px;
+        color: #6b7280;
+        flex-shrink: 0;
+      }
+
+      .info-layer {
+        flex: 4;
+        min-height: 150px;
+        border: 1px solid #e5e7eb;
+        background: #fafafa;
+        border-radius: 12px;
+        padding: 15px;
+        overflow-y: auto;
+        margin-top: 15px;
+      }
+      .info-card {
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 8px;
+        font-size: 13px;
+        border-left: 4px solid #1f4ddc;
+        transition: 0.2s;
+        position: relative;
+        cursor: pointer;
+      }
+      .info-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      }
+      .info-card.deleted {
+        border-left-color: #ef4444;
+        opacity: 0.5;
+        background: #fff5f5;
+        pointer-events: none;
+      }
+      .info-card.modified {
+        border-left-color: #10b981;
+      }
+      .info-card.optimized {
+        border-left-color: #8b5cf6;
+        background: #f5f3ff;
+      }
+
+      .info-header {
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+      .tag {
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        background: #f3f4f6;
+        color: #555;
+        border: 1px solid #e5e7eb;
+        margin-right: 4px;
+        display: inline-block;
+        margin-top: 4px;
+      }
+      .status-badge {
+        font-size: 10px;
+        padding: 3px 6px;
+        border-radius: 4px;
+        color: #fff;
+        background: #10b981;
+      }
+      .delete-sentence-btn {
+        background: #fee2e2;
+        color: #ef4444;
+        border: 1px solid #fca5a5;
+        border-radius: 6px;
+        padding: 4px 8px;
+        font-size: 11px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .delete-sentence-btn:hover {
+        background: #ef4444;
+        color: #fff;
+      }
+
+      .info-role-group {
+        margin-bottom: 8px;
+        border-bottom: 1px dashed #eee;
+        padding-bottom: 5px;
+      }
+      .info-role-group:last-child {
+        border-bottom: none;
+      }
+      .info-role-title {
+        font-weight: 700;
+        color: #1e40af;
+        margin-bottom: 4px;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .dup-badge {
+        background: #f59e0b;
+        color: #fff;
+        font-size: 10px;
+        padding: 3px 8px;
+        border-radius: 12px;
+        font-weight: 700;
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 2000;
+      }
+      .modal-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 1100px;
+        height: 90vh;
+        background: #fff;
+        border-radius: 16px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .modal-header {
+        padding: 20px 30px;
+        background: #f9fafb;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-shrink: 0;
+      }
+      .modal-body {
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        flex: 1;
+        overflow: hidden;
+        min-height: 0;
+      }
+
+      .student-list {
+        background: #f8fafc;
+        border-right: 1px solid #e5e7eb;
+        padding: 15px 0;
+        overflow-y: auto;
+      }
+      .student-item {
+        padding: 16px 30px;
+        background: #eff6ff;
+        color: #1f4ddc;
+        font-weight: 700;
+        border-right: 4px solid #1f4ddc;
+        font-size: 15px;
+      }
+      .log-entry {
+        padding: 30px;
+        overflow-y: auto;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+      }
+
+      .tab-menu {
+        display: flex;
+        border-bottom: 2px solid #e5e7eb;
+        margin-bottom: 20px;
+        flex-shrink: 0;
+      }
+      .tab-btn {
+        flex: 1;
+        padding: 12px;
+        text-align: center;
+        cursor: pointer;
+        font-weight: 700;
+        color: #6b7280;
+        font-size: 14px;
+        border-bottom: 3px solid transparent;
+        transition: 0.2s;
+      }
+      .tab-btn:hover {
+        color: #1f4ddc;
+      }
+      .tab-btn.active {
+        color: #1f4ddc;
+        border-bottom-color: #1f4ddc;
+      }
+      .tab-content {
+        display: none;
+      }
+      .tab-content.active {
+        display: block;
+      }
+
+      .form-box {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        flex-shrink: 0;
+      }
+      .form-row {
+        display: flex;
+        margin-bottom: 15px;
+        align-items: flex-start;
+        gap: 15px;
+      }
+      .form-label {
+        width: 100px;
+        font-weight: 600;
+        color: #4b5563;
+        font-size: 13px;
+        padding-top: 10px;
+        flex-shrink: 0;
+      }
+      .form-input-group {
+        flex: 1;
+      }
+
+      .history-item {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+        transition: 0.2s;
+      }
+      .history-chk {
+        margin-top: 4px;
+        transform: scale(1.3);
+        cursor: pointer;
+        accent-color: #1f4ddc;
+      }
+      #toast {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #333;
+        color: #fff;
+        padding: 10px 25px;
+        border-radius: 30px;
+        font-size: 13px;
+        opacity: 0;
+        transition: 0.3s;
+        pointer-events: none;
+        z-index: 3000;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="toast">알림</div>
+    <div class="topbar">동아리활동 관리 시스템 v11.0 (Final Polished)</div>
+
+    <div class="container">
+      <section class="left">
+        <div class="section-header">
+          <div class="section-title">학생활동 데이터 구성</div>
+          <button class="btn accent" onclick="openModal()">
+            📅 누가기록 상세 관리
+          </button>
+        </div>
+
+        <div
+          style="
+            background: #eef2ff;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #c7d2fe;
+            margin-bottom: 10px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+          "
+        >
+          <div style="display: flex; align-items: center; gap: 15px">
+            <strong style="color: #3730a3; white-space: nowrap; font-size: 15px"
+              >🧑‍🎓 이현태</strong
+            >
+            <div style="flex: 1; display: flex; align-items: center; gap: 8px">
+              <span style="font-size: 13px; font-weight: 600; color: #4f46e5"
+                >소속 동아리명:</span
+              >
+              <input
+                type="text"
+                id="globalClubName"
+                class="input"
+                style="
+                  flex: 1;
+                  padding: 8px 12px;
+                  font-weight: bold;
+                  background: #e5e7eb;
+                  color: #6b7280;
+                  border: 1px solid #d1d5db;
+                  cursor: not-allowed;
+                "
+                value="방송부"
+                readonly
+              />
+            </div>
+          </div>
+          <div
+            style="
+              font-size: 12px;
+              color: #ef4444;
+              font-weight: 600;
+              text-align: right;
+            "
+          >
+            (※ 본 프로그램은 '방송부' 기준으로 세팅되어 동아리명 수정이
+            제한됩니다.)
+          </div>
+        </div>
+
+        <div
+          style="flex: 1; display: flex; flex-direction: column; min-height: 0"
+        >
+          <div class="section-header" style="margin-top: 5px; flex-shrink: 0">
+            <label class="section-title">생성 대기 중인 활동 (선택됨)</label>
+          </div>
+          <textarea
+            id="rawDataDisplay"
+            class="textarea"
+            readonly
+            placeholder="[누가기록 상세 관리]에서 체크된 활동들이 표시됩니다."
+            style="background: #f9fafb; color: #555; flex: 1"
+          ></textarea>
+        </div>
+
+        <button
+          class="btn primary"
+          style="height: 50px; font-size: 16px; margin: 15px 0; flex-shrink: 0"
+          onclick="generateClubAI()"
+        >
+          ✨ AI 동아리 문단 생성
+        </button>
+
+        <div
+          style="flex: 1; display: flex; flex-direction: column; min-height: 0"
+        >
+          <label
+            class="section-title"
+            style="margin-bottom: 8px; flex-shrink: 0"
+            >AI 생성 초안</label
+          >
+          <textarea
+            id="tempDraft"
+            class="textarea"
+            style="background: #fdfbff; border-color: #c7d2fe; flex: 1"
+          ></textarea>
+          <button
+            class="btn success"
+            style="width: 100%; margin-top: 10px; flex-shrink: 0"
+            onclick="moveToFinal()"
+          >
+            우측 최종 결과로 반영 →
+          </button>
+        </div>
+      </section>
+
+      <section class="right">
+        <div class="section-header" style="margin-bottom: 15px">
+          <div class="section-title">NEIS 기재 최종 내용</div>
+          <div style="display: flex; gap: 8px">
+            <button class="btn danger" onclick="clearFinal()">
+              🗑️ 전체 삭제
+            </button>
+            <button
+              class="btn"
+              style="background: #8b5cf6; color: white; border-color: #7c3aed"
+              onclick="checkIntegrity()"
+            >
+              🪄 전체 문맥 다듬기 (주어 중복 제거)
+            </button>
+            <button class="btn success" onclick="finalApply()">
+              💾 적용하기
+            </button>
+          </div>
+        </div>
+
+        <div
+          style="
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            gap: 15px;
+            min-height: 0;
+          "
+        >
+          <div
+            id="finalPreview"
+            class="preview-box"
+            contenteditable="true"
+            oninput="updateByte()"
+          ></div>
+
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              flex-shrink: 0;
+            "
+          >
+            <div class="counter">
+              실시간 용량:
+              <span id="byteCount" style="color: #1f4ddc; font-weight: 700"
+                >0</span
+              >
+              / 1500 Byte
+            </div>
+          </div>
+
+          <div class="info-layer" id="infoLayer">
+            <span style="font-weight: 700; display: block; margin-bottom: 8px"
+              >📋 포함된 정보 요약 (다듬기 시 통합됨)</span
+            >
+            <div id="infoContentContainer" style="color: #999">
+              생성된 문단에 포함된 동아리 활동 내역이 누적됩니다.
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div id="logModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span style="font-size: 18px; font-weight: 700; color: #374151"
+            >학생별 동아리 누가기록 상세 관리</span
+          >
+          <button class="btn" onclick="closeModal()">닫기 (자동 저장됨)</button>
+        </div>
+        <div class="modal-body">
+          <div class="student-list" id="modalStudentList"></div>
+
+          <div class="log-entry">
+            <div class="tab-menu">
+              <div class="tab-btn active" onclick="switchTab('normal', this)">
+                👥 일반 활동
+              </div>
+              <div class="tab-btn" onclick="switchTab('project', this)">
+                🚀 프로젝트 / 심화 탐구
+              </div>
+            </div>
+
+            <div id="tab-normal" class="tab-content active">
+              <div class="form-box">
+                <div class="form-row">
+                  <div class="form-label">활동 일자</div>
+                  <div class="form-input-group">
+                    <input
+                      type="date"
+                      id="normDate"
+                      class="input"
+                      style="width: 200px"
+                    />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-label">활동 역할</div>
+                  <div class="form-input-group">
+                    <div style="display: flex; gap: 10px">
+                      <select
+                        id="normRole"
+                        class="select"
+                        onchange="toggleRoleInput('norm')"
+                        style="flex: 1"
+                      >
+                        <option value="member" selected>동아리원</option>
+                        <option value="leader">동아리 회장</option>
+                        <option value="sub_leader">동아리 부회장</option>
+                        <option value="exec">임원</option>
+                        <option value="custom">기타 (직접 입력)</option>
+                      </select>
+                      <input
+                        type="text"
+                        id="normRoleCustom"
+                        class="input"
+                        placeholder="예: 메인 PD, 카메라 감독"
+                        style="flex: 1; display: none"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-label">활동 영역/수준</div>
+                  <div
+                    class="form-input-group"
+                    style="display: flex; gap: 10px"
+                  >
+                    <select id="normCat" class="select" style="flex: 1">
+                      <option disabled selected>활동 영역</option>
+                      <option>참여태도</option>
+                      <option>협력소통</option>
+                      <option>창의성</option>
+                      <option>리더십</option>
+                      <option>과제수행</option>
+                      <option>진로역량</option>
+                      <option>기타</option>
+                    </select>
+                    <select id="normLevel" class="select" style="flex: 1">
+                      <option disabled selected>성취 수준</option>
+                      <option>매우우수</option>
+                      <option>우수</option>
+                      <option>보통</option>
+                      <option>노력</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-label">활동 내용</div>
+                  <div class="form-input-group">
+                    <textarea
+                      id="normContent"
+                      class="textarea"
+                      style="height: 80px"
+                      placeholder="상세 활동 내용 (예: 체육대회 라이브 중계 장비 세팅 및 촬영. 빈칸 시 영역명 자동 치환)"
+                    ></textarea>
+                  </div>
+                </div>
+                <div style="text-align: right">
+                  <button class="btn primary" onclick="saveActivity('normal')">
+                    + 목록에 추가/저장
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div id="tab-project" class="tab-content">
+              <div class="form-box">
+                <div class="form-row">
+                  <div class="form-label">활동 일자</div>
+                  <div class="form-input-group">
+                    <input
+                      type="date"
+                      id="projDate"
+                      class="input"
+                      style="width: 200px"
+                    />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-label">활동 역할</div>
+                  <div class="form-input-group">
+                    <div style="display: flex; gap: 10px">
+                      <select
+                        id="projRole"
+                        class="select"
+                        onchange="toggleRoleInput('proj')"
+                        style="flex: 1"
+                      >
+                        <option value="member" selected>동아리원</option>
+                        <option value="leader">동아리 회장</option>
+                        <option value="sub_leader">동아리 부회장</option>
+                        <option value="exec">임원</option>
+                        <option value="custom">기타 (직접 입력)</option>
+                      </select>
+                      <input
+                        type="text"
+                        id="projRoleCustom"
+                        class="input"
+                        placeholder="예: 편집장, 기획담당"
+                        style="flex: 1; display: none"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-label">영상/프로젝트명</div>
+                  <div class="form-input-group">
+                    <input
+                      type="text"
+                      id="projTopic"
+                      class="input"
+                      placeholder="예: 2026학년도 학교 홍보 영상 제작"
+                    />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-label">탐구 내용/결과</div>
+                  <div class="form-input-group">
+                    <textarea
+                      id="projContent"
+                      class="textarea"
+                      style="height: 80px"
+                      placeholder="예: 프리미어 프로를 활용해 컷 편집을 주도하고 완성도 높은 영상을 송출함."
+                    ></textarea>
+                  </div>
+                </div>
+                <div style="text-align: right">
+                  <button class="btn primary" onclick="saveActivity('project')">
+                    + 목록에 추가/저장
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div
+              style="
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                min-height: 0;
+              "
+            >
+              <div
+                style="
+                  margin-bottom: 10px;
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  flex-shrink: 0;
+                "
+              >
+                <span style="font-weight: 700; color: #374151"
+                  >🕒 입력된 기록 목록</span
+                >
+                <div>
+                  <button class="btn sm" onclick="checkAll(true)">
+                    전체 선택
+                  </button>
+                  <button class="btn sm" onclick="checkAll(false)">
+                    전체 해제
+                  </button>
+                </div>
+              </div>
+              <div
+                id="historyListContainer"
+                style="overflow-y: auto; flex: 1; padding-right: 5px"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      /* --- [동아리 핵심 데이터베이스] --- */
+      const ROLE_NAMES = {
+        leader: "동아리 회장",
+        sub_leader: "동아리 부회장",
+        exec: "임원",
+        member: "동아리원",
+      };
+
+      const CAT_ENDINGS = {
+        참여태도: {
+          3: "매사 열정적으로 방송 준비 및 장비 세팅에 참여하여 타의 모범이 됨",
+          2: "적극적인 태도로 영상 기획 및 촬영 활동에 임하여 뚜렷한 성장을 보임",
+          1: "성실한 자세로 정규 방송 및 교내 행사에 참여함",
+          0: "관심을 가지고 꾸준히 방송부 활동에 참여하려 노력함",
+        },
+        협력소통: {
+          3: "뛰어난 소통 능력으로 기획, 촬영, 편집 파트 간의 팀워크를 극대화함",
+          2: "부원들과 원활하게 소통하며 성공적인 방송 송출을 이끌어냄",
+          1: "조원들과 협력하여 원만하게 영상 제작을 수행함",
+          0: "다른 부원의 의견을 경청하며 협력적인 태도를 보임",
+        },
+        창의성: {
+          3: "독창적인 기획력과 참신한 앵글로 수준 높은 영상 콘텐츠를 제작함",
+          2: "창의적인 시각으로 접근하여 기존과 다른 새로운 방송 포맷을 시도함",
+          1: "다양한 아이디어를 제시하며 효과적인 영상 편집 기술을 탐구함",
+          0: "새로운 촬영 기법 및 장비 활용에 흥미를 가지고 접근함",
+        },
+        리더십: {
+          3: "탁월한 리더십으로 스태프들을 이끌고 돌발 상황에서도 완벽한 대처 능력을 보여줌",
+          2: "부원들을 격려하며 주도적으로 학교 행사 중계 및 영상 프로젝트를 이끎",
+          1: "맡은 바 역할을 다하며 원활한 큐시트 진행에 기여함",
+          0: "책임감을 가지고 방송부 운영을 돕기 위해 묵묵히 노력함",
+        },
+        과제수행: {
+          3: "마감 기한을 엄수하며 높은 완성도의 최종 편집본을 제출하는 강한 책임감을 보여줌",
+          2: "주어진 취재 및 촬영 과제를 훌륭히 해결하며 높은 기기 이해도를 보임",
+          1: "책임감을 가지고 대본 작성 및 장비 관리를 끝까지 수행함",
+          0: "주어진 방송 과제 해결을 위해 끈기 있게 노력함",
+        },
+        진로역량: {
+          3: "활동을 통해 미디어 분야 및 방송 연출에 대한 심도 있는 탐구 역량과 전문성을 입증함",
+          2: "방송 메커니즘을 이해하고 자신의 진로와 연계하여 활동을 확장해 나가는 모습이 돋보임",
+          1: "자신의 진로(언론/영상)에 대해 진지하게 고민하고 탐구함",
+          0: "방송 연출 및 영상 제작 분야에 대한 높은 관심을 보임",
+        },
+        기타: {
+          3: "탁월한 방송 기획 및 기술 역량을 발휘하여 동아리 발전에 크게 기여함",
+          2: "우수한 성과를 내며 방송부 활동에 활력을 불어넣음",
+          1: "성실하게 참여하여 방송에 관련된 의미 있는 경험을 쌓음",
+          0: "꾸준한 활동을 통해 미디어 소양을 발전시키는 모습을 보임",
+        },
+      };
+
+      let studentHistory = [];
+      let finalHistoryStack = [];
+      let historyIdCounter = 0;
+      let tempContext = null;
+
+      function resolveJosa(word, type) {
+        if (!word) return "";
+        const lastChar = word.charCodeAt(word.length - 1);
+        if (lastChar < 0xac00 || lastChar > 0xd7a3)
+          return type === "ul" ? "을(를)" : "이(가)";
+        const hasBatchim = (lastChar - 0xac00) % 28 > 0;
+        if (type === "ul") return hasBatchim ? "을" : "를";
+        if (type === "i") return hasBatchim ? "이" : "가";
+        return "";
+      }
+
+      window.onload = () => {
+        const list = document.getElementById("modalStudentList");
+        const div = document.createElement("div");
+        div.className = "student-item active";
+        div.textContent = "이현태";
+        list.appendChild(div);
+        renderHistory();
+      };
+
+      function openModal() {
+        document.getElementById("logModal").style.display = "block";
+      }
+      function closeModal() {
+        document.getElementById("logModal").style.display = "none";
+        updateMainSummary();
+      }
+
+      function switchTab(tabId, btn) {
+        document
+          .querySelectorAll(".tab-btn")
+          .forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        document
+          .querySelectorAll(".tab-content")
+          .forEach((c) => c.classList.remove("active"));
+        document.getElementById("tab-" + tabId).classList.add("active");
+      }
+
+      function toggleRoleInput(prefix) {
+        const val = document.getElementById(prefix + "Role").value;
+        document.getElementById(prefix + "RoleCustom").style.display =
+          val === "custom" ? "block" : "none";
+      }
+
+      function saveActivity(type) {
+        let data = { id: ++historyIdCounter, type, checked: true };
+        let prefix = type === "normal" ? "norm" : "proj";
+
+        data.date = document.getElementById(prefix + "Date").value;
+        let roleKey = document.getElementById(prefix + "Role").value;
+        let customRole = document
+          .getElementById(prefix + "RoleCustom")
+          .value.trim();
+
+        if (!data.date) return alert("날짜를 입력하세요.");
+
+        data.roleKey = roleKey;
+        data.roleName =
+          roleKey === "custom" && customRole
+            ? customRole
+            : roleKey === "custom"
+            ? "동아리원"
+            : ROLE_NAMES[roleKey];
+        data.customName = roleKey === "custom" ? data.roleName : null;
+
+        if (type === "normal") {
+          data.cat = document.getElementById("normCat").value;
+          data.level = document.getElementById("normLevel").value;
+          data.content = document.getElementById("normContent").value.trim();
+          if (data.cat === "활동 영역") data.cat = "기타";
+          if (!data.content && data.cat === "기타")
+            return alert("내용을 입력하거나 활동 영역을 선택하세요.");
+
+          data.hashKey = `NORM|${data.date}|${data.roleName}|${data.cat}|${data.content}`;
+        } else {
+          data.topic = document.getElementById("projTopic").value.trim();
+          data.content = document.getElementById("projContent").value.trim();
+          if (!data.topic && !data.content)
+            return alert("주제나 내용을 입력하세요.");
+
+          data.hashKey = `PROJ|${data.date}|${data.roleName}|${data.topic}`;
+        }
+
+        if (studentHistory.some((h) => h.hashKey === data.hashKey))
+          return alert("이미 등록된 동일한 활동이 있습니다.");
+
+        studentHistory.forEach((h) => (h.checked = false));
+        studentHistory.push(data);
+
+        document.getElementById(prefix + "Date").value = "";
+        if (type === "normal") {
+          document.getElementById("normContent").value = "";
+        } else {
+          document.getElementById("projTopic").value = "";
+          document.getElementById("projContent").value = "";
+        }
+
+        renderHistory();
+        showToast("목록에 저장되었습니다.");
+      }
+
+      function renderHistory() {
+        const container = document.getElementById("historyListContainer");
+        if (!studentHistory.length) {
+          container.innerHTML =
+            '<div style="text-align:center;color:#999;padding:20px; border:1px solid #e5e7eb; border-radius:8px;">기록이 없습니다.</div>';
+          return;
+        }
+
+        let html = "";
+        [...studentHistory]
+          .sort((a, b) => b.date.localeCompare(a.date))
+          .forEach((item) => {
+            let badgeColor = item.type === "normal" ? "#10b981" : "#3b82f6";
+            let badgeText = item.type === "normal" ? "일반" : "프로젝트";
+            let dTitle =
+              item.type === "normal"
+                ? item.content
+                  ? item.content.substring(0, 20) + "..."
+                  : `[${item.cat}] 활동`
+                : item.topic;
+            let dDesc = item.content || "(영역명으로 자동 치환됨)";
+
+            html += `
+            <div class="history-item" style="${
+              item.checked
+                ? "border-left:4px solid #1f4ddc;"
+                : "border-left:4px solid transparent;"
+            }">
+                <input type="checkbox" class="history-chk" ${
+                  item.checked ? "checked" : ""
+                } onchange="toggleCheck(${item.id})" style="margin-top:2px;">
+                <div style="flex:1;">
+                    <div style="font-size:12px; color:#666; margin-bottom:4px;">
+                        <span style="background:#e0f2fe; color:#0369a1; padding:2px 6px; border-radius:4px; font-weight:bold; margin-right:5px;">${
+                          item.roleName
+                        }</span>
+                        ${item.date}
+                    </div>
+                    <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+                        <span style="background:${badgeColor}; color:#fff; font-size:11px; padding:2px 6px; border-radius:4px; font-weight:bold;">${badgeText}</span>
+                        <strong style="font-size:14px; color:#333;">${dTitle}</strong>
+                    </div>
+                    <div style="font-size:13px; color:#555; line-height:1.4;">${dDesc}</div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:5px;">
+                    <button class="btn sm warning" onclick="editHistory(${
+                      item.id
+                    })">수정</button>
+                    <button class="btn sm" style="color:red; border:1px solid #ffcccc; background:#fff;" onclick="deleteHistory(${
+                      item.id
+                    })">삭제</button>
+                </div>
+            </div>`;
+          });
+        container.innerHTML = html;
+      }
+
+      function editHistory(id) {
+        const item = studentHistory.find((i) => i.id === id);
+        if (!item) return;
+
+        studentHistory = studentHistory.filter((i) => i.id !== id);
+        renderHistory();
+        updateMainSummary();
+
+        let btnIndex = item.type === "normal" ? 0 : 1;
+        document.querySelectorAll(".tab-btn")[btnIndex].click();
+        let prefix = item.type === "normal" ? "norm" : "proj";
+
+        document.getElementById(prefix + "Date").value = item.date;
+        document.getElementById(prefix + "Role").value = item.roleKey;
+        toggleRoleInput(prefix);
+        if (item.roleKey === "custom")
+          document.getElementById(prefix + "RoleCustom").value =
+            item.customName;
+
+        if (item.type === "normal") {
+          if (item.cat !== "기타")
+            document.getElementById("normCat").value = item.cat;
+          if (item.level !== "성취 수준")
+            document.getElementById("normLevel").value = item.level;
+          document.getElementById("normContent").value = item.content;
+        } else {
+          document.getElementById("projTopic").value = item.topic;
+          document.getElementById("projContent").value = item.content;
+        }
+      }
+
+      function toggleCheck(id) {
+        const item = studentHistory.find((i) => i.id === id);
+        if (item) item.checked = !item.checked;
+        renderHistory();
+        updateMainSummary();
+      }
+      function checkAll(state) {
+        studentHistory.forEach((h) => (h.checked = state));
+        renderHistory();
+        updateMainSummary();
+      }
+      function deleteHistory(id) {
+        if (!confirm("삭제하시겠습니까?")) return;
+        studentHistory = studentHistory.filter((i) => i.id !== id);
+        renderHistory();
+        updateMainSummary();
+      }
+
+      function updateMainSummary() {
+        const active = studentHistory.filter((h) => h.checked);
+        let text = "[생성 대기 목록]\n\n";
+        active
+          .sort((a, b) => a.date.localeCompare(b.date))
+          .forEach((h, i) => {
+            let dTitle =
+              h.type === "normal" ? h.content || `(${h.cat} 관련)` : h.topic;
+            text += `${i + 1}. [${h.roleName}] ${h.date}\n   : ${dTitle}\n\n`;
+          });
+        document.getElementById("rawDataDisplay").value = active.length
+          ? text
+          : "체크된 활동이 없습니다.";
+      }
+
+      /* --- 고정 동아리명 및 역할별 인트로 맵핑 --- */
+      const CLUB_NAME = "방송부";
+
+      const DYN_INTROS = {
+        leader: `${CLUB_NAME} 회장으로서 뛰어난 리더십과 책임감을 바탕으로 부원들을 이끌며 전반적인 활동을 주도함. `,
+        sub_leader: `${CLUB_NAME} 부회장으로서 회장을 보좌하고 부원 간의 의견을 조율하며 원활한 동아리 운영에 헌신함. `,
+        exec: `${CLUB_NAME} 임원으로서 맡은 바 직책을 성실히 수행하며 동아리 발전에 핵심적인 역할을 함. `,
+        member: `${CLUB_NAME} 동아리원으로서 동료들과 협력하고 모든 활동에 주도적으로 참여하여 역량의 성장을 보임. `,
+      };
+      const DYN_TRANS = {
+        leader: `이후 ${CLUB_NAME} 회장으로 선출되어 리더십을 발휘하며, `,
+        sub_leader: `또한 ${CLUB_NAME} 부회장을 맡아 헌신하며, `,
+        exec: `나아가 ${CLUB_NAME} 임원으로서 책임을 다하며, `,
+        member: `이어서 ${CLUB_NAME} 동아리 활동에 지속적으로 참여하여, `,
+      };
+      const OUTRO_TEXT = `이러한 ${CLUB_NAME} 활동을 통해 자신의 관심 분야에 대한 실무적 전문성을 기르고 훌륭한 인재로 성장하는 계기를 마련함.`;
+
+      function generateClubAI() {
+        let targets = studentHistory.filter((h) => h.checked);
+        if (targets.length === 0) return alert("생성할 활동을 선택하세요.");
+
+        targets.sort((a, b) => a.date.localeCompare(b.date));
+
+        let blocks = [];
+        let currentBlock = { roleKey: null, roleName: null, items: [] };
+
+        targets.forEach((item) => {
+          if (currentBlock.roleName !== item.roleName) {
+            if (currentBlock.roleName !== null) blocks.push(currentBlock);
+            currentBlock = {
+              roleKey: item.roleKey,
+              roleName: item.roleName,
+              customName: item.customName,
+              items: [item],
+            };
+          } else {
+            currentBlock.items.push(item);
+          }
+        });
+        if (currentBlock.roleName !== null) blocks.push(currentBlock);
+
+        let finalParagraphs = [];
+        let summaryData = {};
+        let actsMapping = [];
+
+        blocks.forEach((block, index) => {
+          let intro = "";
+          if (index === 0) {
+            intro =
+              block.roleKey === "custom"
+                ? `${block.customName}로서 ${CLUB_NAME} 활동에 주도적으로 참여하며, `
+                : DYN_INTROS[block.roleKey];
+          } else {
+            intro =
+              block.roleKey === "custom"
+                ? `또한, ${block.customName} 역할을 맡아 `
+                : DYN_TRANS[block.roleKey];
+          }
+
+          let contentMap = new Map();
+          block.items.forEach((item) => {
+            let coreContent = item.content.trim();
+            if (!coreContent && item.cat) coreContent = `${item.cat} 관련 활동`;
+
+            let cKey =
+              item.type === "normal"
+                ? `NORMAL|${coreContent}`
+                : `PROJ|${item.topic.trim()}`;
+            if (!contentMap.has(cKey)) contentMap.set(cKey, []);
+            contentMap.get(cKey).push(item);
+
+            actsMapping.push({
+              hashKey: item.hashKey,
+              name:
+                item.type === "normal"
+                  ? item.content.substring(0, 10) || item.cat
+                  : item.topic,
+            });
+          });
+
+          let body = "";
+          let blockSummary = [];
+
+          for (let [cKey, cItems] of contentMap) {
+            const count = cItems.length;
+            const first = cItems[0];
+            let freqAdverb =
+              count === 2
+                ? "지속적으로"
+                : count >= 3
+                ? "매회 빠짐없이 주도적으로"
+                : "";
+
+            if (first.type === "normal") {
+              let actName =
+                first.content.trim() || `[${first.cat} 역량] 관련 활동`;
+              const josa = resolveJosa(actName, "ul");
+
+              let bestLvlStr = "보통";
+              const lvlMap = { 매우우수: 3, 우수: 2, 보통: 1, 노력: 0 };
+              cItems.forEach((i) => {
+                if (lvlMap[i.level] > lvlMap[bestLvlStr]) bestLvlStr = i.level;
+              });
+              let lvlScore = lvlMap[bestLvlStr];
+
+              let ending = CAT_ENDINGS[first.cat]
+                ? CAT_ENDINGS[first.cat][lvlScore]
+                : CAT_ENDINGS["기타"][lvlScore];
+
+              body += `${actName}${josa} ${freqAdverb} ${ending}. `;
+              blockSummary.push(`${actName}(${count})`);
+            } else {
+              const tJosa = resolveJosa(first.topic, "ul");
+              let pContent = first.content.trim() || "유의미한 결과물";
+              if (count >= 2)
+                body += `${first.topic}${tJosa} 주제로 심화 프로젝트를 ${freqAdverb} 진행하여 ${pContent}를 도출함. `;
+              else
+                body += `${first.topic}${tJosa} 주제로 미디어 프로젝트를 수행하여 ${pContent}를 완성함. `;
+              blockSummary.push(`[P]${first.topic}(${count})`);
+            }
+          }
+          finalParagraphs.push(intro + body.trim());
+          if (!summaryData[block.roleName]) summaryData[block.roleName] = [];
+          summaryData[block.roleName].push(...blockSummary);
+        });
+
+        let resultText = finalParagraphs.join(" ") + " " + OUTRO_TEXT;
+        resultText = resultText
+          .replace(/['"\[\]]/g, "")
+          .replace(/\s+/g, " ")
+          .trim();
+
+        document.getElementById("tempDraft").value = resultText;
+        tempContext = {
+          summary: summaryData,
+          actsMap: actsMapping,
+          len: resultText.length,
+        };
+        showToast(`AI 문단이 생성되었습니다. (적용 동아리: ${CLUB_NAME})`);
+      }
+
+      function updateDuplicateStatus() {
+        let hashCounts = {};
+        finalHistoryStack.forEach((item) => {
+          if (item.status === "active" && item.actsMap) {
+            item.actsMap.forEach((act) => {
+              hashCounts[act.hashKey] = (hashCounts[act.hashKey] || 0) + 1;
+            });
+          }
+        });
+        finalHistoryStack.forEach((item) => {
+          if (item.status === "active" && item.actsMap) {
+            let dupActs = item.actsMap.filter(
+              (act) => hashCounts[act.hashKey] > 1
+            );
+            item.isDuplicate = dupActs.length > 0;
+            item.dupNames = dupActs.map((a) => a.name);
+          } else {
+            item.isDuplicate = false;
+            item.dupNames = [];
+          }
+        });
+      }
+
+      function moveToFinal() {
+        const text = document.getElementById("tempDraft").value;
+        const preview = document.getElementById("finalPreview");
+        if (!text || !tempContext) return alert("생성된 문단이 없습니다.");
+
+        let duplicateNames = [];
+        tempContext.actsMap.forEach((act) => {
+          if (
+            finalHistoryStack.some(
+              (fh) =>
+                fh.status === "active" &&
+                fh.actsMap &&
+                fh.actsMap.some((a) => a.hashKey === act.hashKey)
+            )
+          ) {
+            duplicateNames.push(act.name);
+          }
+        });
+        let isDuplicate = duplicateNames.length > 0;
+
+        if (preview.innerText.trim() === "") preview.innerText = "";
+        else preview.appendChild(document.createTextNode(" "));
+
+        const uniqueId = "block_" + Date.now();
+        const span = document.createElement("span");
+        span.className = "sentence-block";
+        span.id = uniqueId;
+        span.innerText = text;
+        preview.appendChild(span);
+
+        finalHistoryStack.push({
+          id: uniqueId,
+          summary: tempContext.summary,
+          actsMap: tempContext.actsMap,
+          len: text.length,
+          status: "active",
+          isDuplicate: isDuplicate,
+          dupNames: duplicateNames,
+        });
+
+        updateDuplicateStatus();
+        renderInfoLayer();
+        updateByte();
+      }
+
+      function renderInfoLayer() {
+        const con = document.getElementById("infoContentContainer");
+        con.innerHTML = "";
+        if (finalHistoryStack.length === 0) {
+          con.innerHTML = "생성 이력이 없습니다.";
+          return;
+        }
+
+        finalHistoryStack.forEach((item) => {
+          const div = document.createElement("div");
+          div.className = `info-card ${item.status} ${
+            item.isDuplicate ? "duplicate" : ""
+          }`;
+          div.onclick = () => highlightSentence(item.id);
+
+          let contentHtml = "";
+          for (const [role, acts] of Object.entries(item.summary)) {
+            let tags = acts
+              .map((a) => `<span class="tag">${a}</span>`)
+              .join("");
+            contentHtml += `<div class="info-role-group"><div class="info-role-title">👤 ${role}</div><div class="info-tags">${tags}</div></div>`;
+          }
+
+          // [수정 완료] 최적화된 상태(optimized)에서도 삭제 버튼이 항상 보이도록 변경
+          let delBtn = `<button class="delete-sentence-btn" onclick="deleteFinalSentence(event, '${item.id}')">🗑️ 삭제</button>`;
+          let dupAlert = item.isDuplicate
+            ? `<span class="dup-badge" style="margin-left:8px;" title="${item.dupNames.join(
+                ", "
+              )} 중복">⚠️ 중복 감지</span>`
+            : "";
+
+          let statBadge = "";
+          if (item.status === "deleted")
+            statBadge =
+              "<span class='status-badge' style='background:#ef4444;'>❌ 삭제됨</span>";
+          else if (item.status === "modified")
+            statBadge = "<span class='status-badge'>✅ 직접 수정함</span>";
+          else if (item.status === "optimized")
+            statBadge =
+              "<span class='status-badge' style='background:#8b5cf6;'>🪄 문맥 최적화됨</span>";
+
+          div.innerHTML = `
+            <div class="info-header">
+                <span style="display:flex; align-items:center;">📝 동아리 활동 문단 ${dupAlert}</span>
+                ${delBtn}
+            </div>
+            ${
+              item.status !== "active"
+                ? `<div style="margin-bottom:6px;">${statBadge}</div>`
+                : ""
+            }
+            ${contentHtml}`;
+          con.appendChild(div);
+        });
+      }
+
+      function highlightSentence(id) {
+        document
+          .querySelectorAll(".sentence-block")
+          .forEach((el) => el.classList.remove("highlight-active"));
+        const target = document.getElementById(id);
+        if (target) {
+          target.scrollIntoView({ behavior: "smooth", block: "center" });
+          target.classList.add("highlight-active");
+          setTimeout(() => {
+            target.classList.remove("highlight-active");
+          }, 2000);
+        }
+      }
+
+      function deleteFinalSentence(event, id) {
+        event.stopPropagation();
+        const target = document.getElementById(id);
+        if (target) {
+          if (target.previousSibling && target.previousSibling.nodeType === 3)
+            target.previousSibling.remove();
+          target.remove();
+        }
+        finalHistoryStack = finalHistoryStack.filter((item) => item.id !== id);
+        updateDuplicateStatus();
+        renderInfoLayer();
+        updateByte();
+        showToast("문단이 삭제되었습니다.");
+      }
+
+      /* --- [최적화 다듬기 엔진] --- */
+      function checkIntegrity() {
+        let text = document.getElementById("finalPreview").innerText;
+        if (!text.trim()) return showToast("다듬을 내용이 없습니다.");
+
+        // 1. 인트로(주어) 중복 제거
+        Object.values(DYN_INTROS).forEach((intro) => {
+          let parts = text.split(intro);
+          if (parts.length > 2) {
+            let newText = parts[0] + intro;
+            for (let i = 1; i < parts.length; i++) {
+              newText += " " + parts[i].trimStart();
+            }
+            text = newText;
+          }
+        });
+
+        // 2. 아웃트로 중복 제거
+        let outroParts = text.split(OUTRO_TEXT);
+        if (outroParts.length > 1) {
+          text = outroParts.join(" ").trim() + " " + OUTRO_TEXT;
+        }
+
+        // 3. 다중 공백 정제
+        text = text.replace(/\s+/g, " ").trim();
+
+        // 4. 프리뷰 블록 통합 교체
+        const preview = document.getElementById("finalPreview");
+        preview.innerHTML = "";
+
+        const uniqueId = "opt_" + Date.now();
+        const span = document.createElement("span");
+        span.className = "sentence-block";
+        span.id = uniqueId;
+        span.innerText = text;
+        preview.appendChild(span);
+
+        // 5. 백그라운드 스택 단일화 병합
+        let mergedActs = [];
+        let mergedSummary = {};
+
+        finalHistoryStack.forEach((item) => {
+          if (item.status !== "deleted") {
+            if (item.actsMap) mergedActs.push(...item.actsMap);
+            for (const [role, acts] of Object.entries(item.summary)) {
+              if (!mergedSummary[role]) mergedSummary[role] = [];
+              mergedSummary[role].push(...acts);
+            }
+          }
+        });
+
+        for (let role in mergedSummary) {
+          mergedSummary[role] = [...new Set(mergedSummary[role])];
+        }
+
+        finalHistoryStack = [
+          {
+            id: uniqueId,
+            summary: mergedSummary,
+            actsMap: mergedActs,
+            len: text.length,
+            status: "optimized",
+            isDuplicate: false,
+            dupNames: [],
+          },
+        ];
+
+        renderInfoLayer();
+        updateByte();
+        showToast("주어 중복 및 문맥이 완벽하게 최적화되었습니다.");
+      }
+
+      function clearFinal() {
+        if (confirm("전체 삭제하시겠습니까?")) {
+          document.getElementById("finalPreview").innerText = "";
+          finalHistoryStack = [];
+          renderInfoLayer();
+          updateByte();
+        }
+      }
+      function updateByte() {
+        const text = document.getElementById("finalPreview").innerText;
+        let bytes = 0;
+        for (let i = 0; i < text.length; i++)
+          bytes += text.charCodeAt(i) > 127 ? 3 : 1;
+        document.getElementById("byteCount").innerText = bytes;
+        document.getElementById("byteCount").style.color =
+          bytes > 1500 ? "red" : "#1f4ddc";
+      }
+      function finalApply() {
+        alert("NEIS 입력 완료");
+      }
+      function showToast(m) {
+        const t = document.getElementById("toast");
+        t.textContent = m;
+        t.style.opacity = 1;
+        setTimeout(() => (t.style.opacity = 0), 2000);
+      }
+    </script>
+  </body>
+</html>
