@@ -1,4 +1,119 @@
 <!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NEIS-AI</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, Apple SD Gothic Neo, Segoe UI, Roboto, sans-serif;
+      margin: 0;
+      background: #f6f7fb;
+      color: #111;
+    }
+
+    /* [1] 상단 안내 배너 */
+    .notice-banner {
+      background-color: #fff3cd;
+      color: #856404;
+      padding: 15px 20px;
+      text-align: center;
+      font-size: 15px;
+      border-bottom: 1px solid #ffeeba;
+      line-height: 1.5;
+      word-break: keep-all;
+    }
+    .notice-banner strong {
+      font-weight: 700;
+      color: #533f03;
+    }
+
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 48px 20px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 40px;
+      letter-spacing: -0.5px;
+    }
+    p {
+      margin: 0 0 28px;
+      color: #444;
+    }
+
+    /* [2] 유튜브 영상 컨테이너 */
+    .video-box {
+      position: relative;
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto 30px; /* 아래 간격 */
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      background: #000;
+    }
+    .video-box iframe {
+      display: block;
+      width: 100%;
+      height: 450px;
+    }
+
+    /* [3] 다운로드 섹션 스타일 (추가됨) */
+    .download-box {
+      max-width: 800px;
+      margin: 0 auto 40px;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+    }
+    .download-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 15px;
+      color: #374151;
+      display: block;
+    }
+    .btn-down {
+      display: inline-block;
+      text-decoration: none;
+      background: #4b5563; /* 회색 버튼 */
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      margin: 5px;
+      transition: 0.2s;
+    }
+    .btn-down:hover {
+      background: #374151;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .Delphi1.hwp { background: #3b82f6; } /* 한글은 파란색 */
+    .Delphi1.pdf { background: #ef4444; } /* PDF는 빨간색 */
+
+    /* 카드 그리드 */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+    }
+    a.card {
+      display: block;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 16px 16px;
+      text-decoration: none;
+      color: #111;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+      transition: 0.2s;
     }
     a.card:hover {
       border-color: #c7d2fe;
@@ -52,11 +167,45 @@
 
     <div class="download-box">
       <span class="download-title">📄 델파이 조사 설문지 다운로드</span>
-      <a href="./survey.hwp" download class="btn-down hwp">💾 한글파일(.hwp) 다운로드</a>
-      <a href="./survey.pdf" download class="btn-download pdf">💾 PDF파일(.pdf) 다운로드</a>
+      <a href="./Delhphi1.hwp" download class="Delhphi1 hwp">💾 한글파일(.hwp) 다운로드</a>
+      <a href="./Delhphi1.pdf" download class="Delhphi1 pdf">💾 PDF파일(.pdf) 다운로드</a>
     </div>
 
     <div class="grid">
       <a class="card" href="./action_2.html">
         <div class="title">행동특성및종합의견</div>
         <p class="desc">카테고리·성취수준·키워드 기반 입력 → 작성 내용 적용</p>
+      </a>
+
+      <a class="card" href="./subject_2.html">
+        <div class="title">과목별 세부능력 및 특이사항(과세특)</div>
+        <p class="desc">대단원/소단원/성취수준(A~E) 기반 입력 → 작성 내용 편집</p>
+      </a>
+
+      <a class="card" href="./career_2.html">
+        <div class="title">진로활동관리</div>
+        <p class="desc">희망분야 기반 검사/강연/기타 기록 → 작성 내용 편집</p>
+      </a>
+
+      <a class="card" href="./club_2.html">
+        <div class="title">동아리활동기록</div>
+        <p class="desc">정보 연계 동아리 활동 성취(A~E) 및 키워드 조합</p>
+      </a>
+
+      <a class="card" href="./book_2.html">
+        <div class="title">독서활동상황관리</div>
+        <p class="desc">책 제목 + 진로 연계 여부 + 느낀점 입력 → 문장 다듬기</p>
+      </a>
+
+      <a class="card" href="./free_2.html">
+        <div class="title">자율·자치활동관리</div>
+        <p class="desc">교육, 자치 활동, 교내 행사 입력 → 작성 내용 적용</p>
+      </a>
+    </div>
+
+    <div class="note">
+      ※ 본 페이지는 설치 없이 링크 접속만으로 화면 흐름을 확인하기 위한 시연용입니다.
+    </div>
+  </div>
+</body>
+</html>
