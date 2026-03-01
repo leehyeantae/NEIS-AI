@@ -453,7 +453,9 @@
   </head>
   <body>
     <div id="toast">알림</div>
-    <div class="topbar">행동특성 및 종합의견</div>
+    <div class="topbar">
+      행동특성 및 종합의견
+    </div>
 
     <div class="container">
       <section class="left">
@@ -529,7 +531,7 @@
           <label
             class="section-title"
             style="margin-bottom: 8px; flex-shrink: 0"
-            >AI 생성 초안 (검토 및 수정)</label
+            >AI 생성 초안 (검토 및 직접 추가)</label
           >
           <textarea
             id="tempDraft"
@@ -540,6 +542,7 @@
               flex: 1;
               line-height: 1.6;
             "
+            placeholder="AI 초안이 생성되면 여기에 표시됩니다. 선생님이 직접 덧붙이고 싶은 문장이 있다면 자유롭게 추가하세요."
           ></textarea>
           <button
             class="btn success"
@@ -563,7 +566,7 @@
               style="background: #8b5cf6; color: white; border-color: #7c3aed"
               onclick="checkAndUpgradeIntegrity()"
             >
-              🪄 전체 AI 다듬기 (빈도/수준 분석 강화)
+              🪄 전체 AI 다듬기 (빈도 강화 및 직접 작성 보존)
             </button>
             <button class="btn success" onclick="finalApply()">
               💾 적용하기
@@ -715,7 +718,7 @@
                 id="comprehensiveInput"
                 class="textarea"
                 style="height: 60px"
-                placeholder="누가기록 외에 학생의 전반적인 성향이나 변화를 자유롭게 작성하세요."
+                placeholder="학생의 성향을 자유롭게 작성하세요. ('마음에 든다', '노력했다' 등으로 써도 AI가 '~함', '~듦'으로 완벽히 정제해 줍니다.)"
                 oninput="saveComprehensive()"
               ></textarea>
             </div>
@@ -756,6 +759,260 @@
     </div>
 
     <script>
+      /* =========================================================================
+         [문장 추출 및 분해 도구] 
+      ========================================================================== */
+      function getSentences(text) {
+        if (!text) return [];
+        let matches = text.replace(/\n/g, " ").match(/[^.!?]+[.!?]*/g);
+        return matches ? matches.map((s) => s.trim()).filter((s) => s) : [];
+      }
+
+      /* =========================================================================
+         [독립 클래스 V8.0] 자연어 맞춤법/종결어미 변환 엔진 (Korean Grammar Engine)
+         - 업데이트: 어절 단위 스캔 도입! 마침표 없이 여러 문장을 이어 써도 완벽하게 잡아냅니다.
+      ========================================================================== */
+      class GrammarEngine {
+        constructor() {
+          this.irregularDict = {
+            든다: "듦",
+            들다: "듦",
+            들었다: "듦",
+            만든다: "만듦",
+            만들다: "만듦",
+            만들었다: "만듦",
+            이끈다: "이끎",
+            이끌다: "이끎",
+            이끌었다: "이끎",
+            베푼다: "베풂",
+            베풀다: "베풂",
+            베풀었다: "베풂",
+            돕는다: "도움",
+            돕다: "도움",
+            도왔다: "도움",
+            어렵다: "어려움",
+            어려웠다: "어려움",
+            쉽다: "쉬움",
+            쉬웠다: "쉬움",
+            즐겁다: "즐거움",
+            즐거웠다: "즐거움",
+            아름답다: "아름다움",
+            아름다웠다: "아름다움",
+            무겁다: "무거움",
+            무거웠다: "무거움",
+            가볍다: "가벼움",
+            가벼웠다: "가벼움",
+            새롭다: "새로움",
+            새로웠다: "새로움",
+            기쁘다: "기쁨",
+            기뻤다: "기쁨",
+            슬프다: "슬픔",
+            슬펐다: "슬픔",
+            그렇다: "그러함",
+            그랬다: "그러함",
+            듣다: "들음",
+            듣는다: "들음",
+            들었다: "들음",
+            묻다: "물음",
+            묻는다: "물음",
+            물었다: "물음",
+            걷다: "걸음",
+            걷는다: "걸음",
+            걸었다: "걸음",
+            깨닫다: "깨달음",
+            깨닫는다: "깨달음",
+            깨달았다: "깨달음",
+            짓다: "지음",
+            짓는다: "지음",
+            지었다: "지음",
+            낫다: "나음",
+            나았다: "나음",
+            잇다: "이음",
+            잇는다: "이음",
+            이었다: "이음",
+            긋다: "그음",
+            그었다: "그음",
+          };
+
+          this.patternDict = [
+            [/깝다$/, "까움"],
+            [/까웠다$/, "까웠음"],
+            [/겹다$/, "겨움"],
+            [/겨웠다$/, "겨웠음"],
+            [/랍다$/, "라움"],
+            [/라웠다$/, "라웠음"],
+            [/갑다$/, "가움"],
+            [/가웠다$/, "가웠음"],
+            [/맙다$/, "마움"],
+            [/마웠다$/, "마웠음"],
+            [/습다$/, "스움"],
+            [/스웠다$/, "스웠음"],
+            [/롭다$/, "로움"],
+            [/로웠다$/, "로웠음"],
+            [/럽다$/, "러움"],
+            [/러웠다$/, "러웠음"],
+            [/답다$/, "다움"],
+            [/다웠다$/, "다웠음"],
+            [/겁다$/, "거움"],
+            [/거웠다$/, "거웠음"],
+            [/어둡다$/, "어두움"],
+            [/어두웠다$/, "어두웠음"],
+            [/껍다$/, "꺼움"],
+            [/꺼웠다$/, "꺼웠음"],
+            [/납다$/, "나움"],
+            [/나웠다$/, "나웠음"],
+            [/엽다$/, "여움"],
+            [/여웠다$/, "여웠음"],
+            [/덥다$/, "더움"],
+            [/더웠다$/, "더웠음"],
+            [/렇다$/, "러함"],
+            [/랬다$/, "랬음"],
+            [/떻다$/, "떠함"],
+            [/땠다$/, "땠음"],
+            [/랗다$/, "라함"],
+            [/갛다$/, "가함"],
+            [/얗다$/, "야함"],
+            [/맣다$/, "마함"],
+            [/고다$/, "고임"],
+            [/수다$/, "수임"],
+            [/재다$/, "재임"],
+            [/표다$/, "표임"],
+            [/쑤다$/, "쑤임"],
+            [/기다$/, "기임"],
+            [/회다$/, "회임"],
+            [/두다$/, "두임"],
+            [/아니다$/, "아님"],
+            [/아니었다$/, "아녔음"],
+            [/하였다$/, "함"],
+            [/했다$/, "함"],
+            [/한다$/, "함"],
+            [/하다$/, "함"],
+            [/이다$/, "임"],
+            [/이었다$/, "임"],
+            [/였다$/, "임"],
+            [/보였다$/, "보임"],
+            [/보인다$/, "보임"],
+            [/보이다$/, "보임"],
+            [/되었다$/, "됨"],
+            [/된다$/, "됨"],
+            [/되다$/, "됨"],
+            [/주었다$/, "줌"],
+            [/준다$/, "줌"],
+            [/주다$/, "줌"],
+            [/받았다$/, "받음"],
+            [/받는다$/, "받음"],
+            [/받다$/, "받음"],
+            [/가졌다$/, "가짐"],
+            [/가진다$/, "가짐"],
+            [/가지다$/, "가짐"],
+            [/느꼈다$/, "느낌"],
+            [/느낀다$/, "느낌"],
+            [/느끼다$/, "느낌"],
+            [/많다$/, "많음"],
+            [/적다$/, "적음"],
+            [/크다$/, "큼"],
+            [/작다$/, "작음"],
+            [/있다$/, "있음"],
+            [/없다$/, "없음"],
+            [/같다$/, "같음"],
+            [/않다$/, "않음"],
+            [/는다$/, "음"],
+            [/은다$/, "음"],
+            [/었다$/, "었음"],
+            [/았다$/, "았음"],
+            [/겠다$/, "겠음"],
+          ];
+        }
+
+        convert(text) {
+          if (!text) return "";
+          let sentences = text.match(/[^.!?]+[.!?]*/g) || [text];
+
+          let converted = sentences.map((sentence) => {
+            let s = sentence.trim();
+            if (!s) return "";
+
+            let puncMatch = s.match(/[.!?]+$/);
+            let sentencePunc = puncMatch ? puncMatch[0] : "";
+            let body = s.replace(/[.!?]+$/, "");
+
+            // 문장의 모든 어절(단어)을 스캔합니다. (중간에 마침표 없이 이어 쓴 문장 방어)
+            let words = body.split(/\s+/);
+
+            for (let i = 0; i < words.length; i++) {
+              let word = words[i];
+              let wordPuncMatch = word.match(/[.,!?]+$/);
+              let wordPunc = wordPuncMatch ? wordPuncMatch[0] : "";
+              let cleanWord = word.replace(/[.,!?]+$/, "");
+
+              let isConverted = false;
+
+              if (this.irregularDict[cleanWord]) {
+                cleanWord = this.irregularDict[cleanWord];
+                isConverted = true;
+              } else {
+                for (let [pattern, rep] of this.patternDict) {
+                  if (pattern.test(cleanWord)) {
+                    cleanWord = cleanWord.replace(pattern, rep);
+                    isConverted = true;
+                    break;
+                  }
+                }
+              }
+
+              // 일반명사 파괴를 막기 위해 유니코드 연산은 맨 마지막 단어에만 적용
+              if (
+                !isConverted &&
+                i === words.length - 1 &&
+                cleanWord.endsWith("다")
+              ) {
+                const lastChar = cleanWord.charCodeAt(cleanWord.length - 2);
+                if (lastChar >= 0xac00 && lastChar <= 0xd7a3) {
+                  const jongseong = (lastChar - 0xac00) % 28;
+                  if (jongseong === 0) {
+                    cleanWord =
+                      cleanWord.slice(0, -2) +
+                      String.fromCharCode(lastChar + 16);
+                  } else if (jongseong === 8) {
+                    cleanWord =
+                      cleanWord.slice(0, -2) +
+                      String.fromCharCode(lastChar + 2);
+                  } else if (jongseong === 4) {
+                    cleanWord =
+                      cleanWord.slice(0, -2) +
+                      String.fromCharCode(lastChar + 12);
+                  } else {
+                    cleanWord = cleanWord.slice(0, -1) + "음";
+                  }
+                  isConverted = true;
+                }
+              }
+
+              // 중간에 변환된 동사가 있다면 마침표를 강제로 삽입해줍니다 (띄어쓰기 뭉개짐 방지)
+              if (isConverted && i < words.length - 1 && !wordPunc) {
+                wordPunc = ".";
+              }
+
+              words[i] = cleanWord + wordPunc;
+            }
+
+            let finalSentence = words.join(" ");
+            if (!sentencePunc) sentencePunc = ".";
+            let result = finalSentence + sentencePunc;
+            return result.replace(/\.{2,}/g, "."); // 중복 마침표 정리
+          });
+
+          return converted
+            .join(" ")
+            .replace(/\.{2,}/g, ".")
+            .replace(/\s+\./g, ".")
+            .trim();
+        }
+      }
+
+      const grammarEngine = new GrammarEngine();
+
+      /* --- 이하 DB 및 UI 로직 --- */
       const currentStudent = "이현태";
       const cats = [
         "성격",
@@ -1060,7 +1317,7 @@
               매우우수:
                 "자신의 일을 스스로 계획하고 완벽히 실천하는 자주적인 태도가 매우 돋보임.",
               우수: "스스로 할 수 있는 일은 주도적으로 해결하려는 의지가 강함.",
-              보통: "자신의 일을 남에게 미루지 않고 스스로 해결하려 함.",
+              보통: "자신의 일을 남에게 미루지 기 않고 스스로 해결하려 함.",
               노력: "어려운 일도 스스로 해결하려는 자주성을 기르며 독립심을 키워가고 있음.",
             },
           },
@@ -1113,7 +1370,7 @@
                 "방대한 자료를 체계적으로 분석하여 핵심 정보를 추출하는 정보처리 능력이 탁월함.",
               우수: "주어진 정보와 데이터를 논리적으로 분석하고 활용할 줄 앎.",
               보통: "필요한 정보를 검색하여 내용을 이해하고 정리함.",
-              노력: "정보의 핵심을 파악하는 분석력을 기르며 올바른 정보 활용 윤리를 익혀감.",
+              노력: "정보의 핵심 파악 분석력을 기르며 올바른 정보 활용 윤리를 익혀감.",
             },
           },
           {
@@ -1424,7 +1681,7 @@
             const level = levelSelect.value;
             if (!level) return alert("성취수준을 먼저 선택해주세요.");
             const sentence = kData.s[level] || "";
-            if (!sentence) return; // 부정키워드 "매우우수" 대응
+            if (!sentence) return;
 
             if (chip.classList.contains("active")) {
               input.value = input.value
@@ -1504,6 +1761,9 @@
           if (!cat) continue;
           if (!level) return alert(`'${cat}' 영역의 성취수준을 선택해주세요.`);
           if (!text) return alert("활동 내용을 입력해주세요.");
+
+          // [핵심 업데이트] 목록에 저장되는 그 즉시 맞춤법 검사기를 통과시켜 UI 상에서 교사가 변환 결과를 바로 확인할 수 있게 합니다!
+          text = grammarEngine.convert(text);
 
           const isDup = db[currentStudent].logs.some(
             (log) => log.date === date && log.cat === cat && log.text === text
@@ -1604,7 +1864,6 @@
           summary || "선택된 데이터가 없습니다.";
       }
 
-      /* --- [핵심] 수준 인식형 빈도 강화 및 비문 완벽 정제 엔진 --- */
       function assembleContext(targets, comprehensive) {
         let uniqueTexts = {
           "성격/생활": new Set(),
@@ -1622,13 +1881,8 @@
 
         targets.forEach((l) => {
           let text = l.text.trim();
-          // [패치] 비문 및 마침표 중복 완벽 제거
           text = text.replace(/\.{2,}/g, ".");
           if (!text.endsWith(".")) text += ".";
-
-          if (text.endsWith("하였다.") || text.endsWith("했다."))
-            text = text.slice(0, -3) + "함.";
-          if (text.endsWith("보였다.")) text = text.slice(0, -3) + "보임.";
 
           let targetCat = "";
           if (["성격", "생활태도"].includes(l.cat)) targetCat = "성격/생활";
@@ -1698,14 +1952,14 @@
 
         let resultText = paras.join(" ");
         if (comprehensive) {
-          let comp = comprehensive.trim();
-          // [패치] . ! ? 가 모두 올바르게 적용되도록 정규식 처리
-          if (!/[.!?]$/.test(comp)) comp += ".";
+          let comp = grammarEngine.convert(comprehensive.trim());
           resultText += (paras.length > 0 ? " 종합적으로 볼 때, " : "") + comp;
         }
 
         return {
-          text: resultText.replace(/\s{2,}/g, " ").trim(),
+          text: grammarEngine.convert(
+            resultText.replace(/\s{2,}/g, " ").trim()
+          ),
           freq: catFreq,
         };
       }
@@ -1724,17 +1978,16 @@
         );
         document.getElementById("tempDraft").value = resultText;
 
-        let hashKey =
-          "BHV|" +
-          targets.map((t) => t.id).join(",") +
-          "|" +
-          (data.comprehensive ? "COMP" : "");
         tempContext = {
-          hashKey: hashKey,
+          hashKey:
+            "BHV|" +
+            targets.map((t) => t.id).join(",") +
+            "|" +
+            (data.comprehensive ? "COMP" : ""),
           logIds: targets.map((t) => t.id),
           freq: catFreq,
           comp: data.comprehensive,
-          len: resultText.length,
+          aiGeneratedText: resultText,
         };
 
         showToast("행특 문단 초안이 생성되었습니다.");
@@ -1765,25 +2018,26 @@
       }
 
       function moveToFinal() {
-        const text = document.getElementById("tempDraft").value;
+        const draftText = document.getElementById("tempDraft").value;
         const preview = document.getElementById("finalPreview");
-        if (!text || !tempContext) return alert("생성된 초안이 없습니다.");
+        if (!draftText || !tempContext) return alert("생성된 초안이 없습니다.");
+
+        let aiSentences = getSentences(tempContext.aiGeneratedText);
+        let currentSentences = getSentences(draftText);
+        let manualCount = 0;
+        currentSentences.forEach((cs) => {
+          if (cs && !aiSentences.includes(cs)) manualCount++;
+        });
+
+        let correctedText = grammarEngine.convert(draftText);
 
         let b = 0;
-        let testText = preview.innerText + " " + text;
+        let testText = preview.innerText + " " + correctedText;
         for (let i = 0; i < testText.length; i++)
           b += testText.charCodeAt(i) > 127 ? 3 : 1;
         if (b > 1500)
           return alert(
             "⚠️ 생기부 최대 용량(1500 Byte)을 초과하여 전송할 수 없습니다."
-          );
-
-        let isExactDuplicate = finalHistoryStack.some(
-          (fh) => fh.status === "active" && fh.hashKey === tempContext.hashKey
-        );
-        if (isExactDuplicate)
-          return alert(
-            "⚠️ 완전히 동일한 조합의 기록이 이미 전송되어 있습니다. 중복 전송을 차단합니다."
           );
 
         if (preview.innerText.includes("학생을 선택하고"))
@@ -1795,7 +2049,7 @@
         const span = document.createElement("span");
         span.className = "sentence-block";
         span.id = uniqueId;
-        span.innerText = text;
+        span.innerText = correctedText;
         preview.appendChild(span);
 
         finalHistoryStack.push({
@@ -1804,9 +2058,11 @@
           logIds: tempContext.logIds,
           freq: tempContext.freq,
           comp: tempContext.comp,
-          len: text.length,
+          aiGeneratedText: tempContext.aiGeneratedText,
+          len: correctedText.length,
           status: "active",
           needsUpgrade: false,
+          manualCount: manualCount,
         });
 
         updateDuplicateStatus();
@@ -1839,6 +2095,10 @@
               tagsHtml += `<span class="tag">${cat} <b style="color:#1f4ddc;">${count}건</b></span>`;
           }
           if (item.comp) tagsHtml += `<span class="tag">종합의견 포함</span>`;
+
+          if (item.manualCount > 0) {
+            tagsHtml += `<span class="tag" style="background:#fef08a; border-color:#fde047; color:#854d0e;">✏️ 직접 작성 ${item.manualCount}건</span>`;
+          }
 
           let delBtn = `<button class="delete-sentence-btn" onclick="deleteFinalSentence(event, '${item.id}')">🗑️ 삭제</button>`;
           let dupAlert = item.needsUpgrade
@@ -1903,29 +2163,41 @@
         showToast("문단이 삭제되었습니다.");
       }
 
-      /* --- [패치] 수동 편집 보호 장치 추가 및 데이터 증발 방지 --- */
       function checkAndUpgradeIntegrity() {
         let activeItems = finalHistoryStack.filter(
           (i) => i.status !== "deleted"
         );
         if (activeItems.length === 0) return alert("다듬을 내용이 없습니다.");
 
-        // 수동 편집 보호 장치
         if (
           !confirm(
-            "⚠️ [주의]\nAI 다듬기 실행 시 선생님이 직접 수정한 텍스트가 초기화되고, 원본 데이터를 바탕으로 최적화된 문장이 새롭게 생성됩니다.\n진행하시겠습니까?"
+            "⚠️ [주의]\nAI 다듬기 실행 시 원본 데이터를 바탕으로 문맥이 재조립됩니다.\n선생님이 직접 추가하신 문장은 지워지지 않고 보존되어 뒤에 병합됩니다.\n진행하시겠습니까?"
           )
         )
           return;
 
+        let allAIGeneratedText = activeItems
+          .map((i) => i.aiGeneratedText)
+          .join(" ");
+        let aiSentences = getSentences(allAIGeneratedText);
+
+        let currentSentences = getSentences(
+          document.getElementById("finalPreview").innerText
+        );
+
+        let customSentences = [];
+        currentSentences.forEach((cs) => {
+          if (cs && !aiSentences.includes(cs)) {
+            customSentences.push(cs);
+          }
+        });
+
         let allActiveLogIds = [];
         let compToUse = "";
-
         activeItems.forEach((item) => {
           if (item.logIds) allActiveLogIds.push(...item.logIds);
           if (item.comp) compToUse = item.comp;
         });
-
         allActiveLogIds = [...new Set(allActiveLogIds)];
         let allTargets = db[currentStudent].logs.filter((l) =>
           allActiveLogIds.includes(l.id)
@@ -1936,10 +2208,16 @@
           compToUse
         );
 
-        // [패치] 다듬기 직후 용량 초과 검증 (경고)
+        let finalCombinedText = upgradedText;
+        if (customSentences.length > 0) {
+          finalCombinedText += " " + customSentences.join(" ");
+        }
+
+        let finalText = grammarEngine.convert(finalCombinedText);
+
         let b = 0;
-        for (let i = 0; i < upgradedText.length; i++)
-          b += upgradedText.charCodeAt(i) > 127 ? 3 : 1;
+        for (let i = 0; i < finalText.length; i++)
+          b += finalText.charCodeAt(i) > 127 ? 3 : 1;
         if (b > 1500)
           alert(
             "⚠️ [경고] 최적화된 문장의 용량이 1500 Byte를 초과했습니다. 기재 내용을 줄여주세요."
@@ -1951,7 +2229,7 @@
         const span = document.createElement("span");
         span.className = "sentence-block";
         span.id = uniqueId;
-        span.innerText = upgradedText;
+        span.innerText = finalText;
         preview.appendChild(span);
 
         finalHistoryStack = [
@@ -1961,15 +2239,17 @@
             logIds: allActiveLogIds,
             freq: mergedFreq,
             comp: compToUse,
-            len: upgradedText.length,
+            aiGeneratedText: upgradedText,
+            len: finalText.length,
             status: "optimized",
             needsUpgrade: false,
+            manualCount: customSentences.length,
           },
         ];
 
         renderInfoLayer();
         updateByte();
-        showToast("수준 및 빈도를 분석하여 문맥이 압도적으로 강화되었습니다!");
+        showToast("AI 다듬기 및 직접 작성 문장 병합이 완료되었습니다!");
       }
 
       function clearFinal() {
