@@ -145,7 +145,7 @@
         font-size: 12px;
       }
 
-      /* [신규] DB 목록 패널 */
+      /* DB 목록 패널 */
       .db-list-panel {
         display: none;
         background: #f8fafc;
@@ -476,7 +476,6 @@
     </div>
 
     <script>
-      /* --- 데이터 정의 (확장됨) --- */
       const STUDENT_LIST = [
         { id: "s1", name: "김태연" },
         { id: "s2", name: "박지성" },
@@ -486,9 +485,7 @@
         { id: "s6", name: "한지민" },
       ];
 
-      // [수정] '외'가 포함된 도서 10권 추가 및 데이터 확장
       const DUMMY_BOOKS = [
-        // --- [기본 스테디셀러 및 공동 저자('외') 도서] ---
         { title: "코스모스", author: "칼 세이건" },
         { title: "사피엔스", author: "유발 하라리" },
         { title: "데미안", author: "헤르만 헤세" },
@@ -501,388 +498,18 @@
         { title: "노인과 바다", author: "어니스트 헤밍웨이" },
         { title: "아몬드", author: "손원평" },
         { title: "트렌드 코리아 2025", author: "김난도 외" },
-        { title: "트렌드 코리아 2024", author: "김난도 외" },
-        { title: "2025 한국경제 대전망", author: "이근 외" },
-        { title: "모바일 미래보고서 2025", author: "커넥팅랩 외" },
-        { title: "세계미래보고서 2040", author: "박영숙 외" },
         { title: "질문하는 10대, 대답하는 인문학", author: "최재천 외" },
-        { title: "10대를 위한 진로 인문학", author: "정진호 외" },
         { title: "십 대를 위한 미래 과학 콘서트", author: "정재승 외" },
         { title: "청소년을 위한 사회학 에세이", author: "구정화 외" },
-        { title: "교실 밖 인문학 콘서트", author: "김경집 외" },
-        { title: "10대를 위한 심리학 수업", author: "김현경 외" },
-
-        // --- [국내 문학 : 고전 / 현대 / 청소년] ---
         { title: "홍길동전", author: "허균" },
         { title: "구운몽", author: "김만중" },
-        { title: "사씨남정기", author: "김만중" },
-        { title: "춘향전", author: "작자미상" },
-        { title: "심청전", author: "작자미상" },
-        { title: "흥부전", author: "작자미상" },
-        { title: "토끼전", author: "작자미상" },
-        { title: "장화홍련전", author: "작자미상" },
-        { title: "양반전", author: "박지원" },
-        { title: "허생전", author: "박지원" },
-        { title: "호질", author: "박지원" },
-        { title: "열하일기", author: "박지원" },
-        { title: "금오신화", author: "김시습" },
-        { title: "이생규장전", author: "김시습" },
-        { title: "만복사저포기", author: "김시습" },
-        { title: "최척전", author: "조위한" },
-        { title: "박씨전", author: "작자미상" },
-        { title: "운영전", author: "작자미상" },
-        { title: "혈의 누", author: "이인직" },
-        { title: "무정", author: "이광수" },
-        { title: "배따라기", author: "김동인" },
-        { title: "감자", author: "김동인" },
-        { title: "동백꽃", author: "김유정" },
-        { title: "봄봄", author: "김유정" },
-        { title: "운수 좋은 날", author: "현진건" },
-        { title: "빈처", author: "현진건" },
-        { title: "태평천하", author: "채만식" },
-        { title: "탁류", author: "채만식" },
-        { title: "날개", author: "이상" },
-        { title: "메밀꽃 필 무렵", author: "이효석" },
-        { title: "상록수", author: "심훈" },
-        { title: "무녀도", author: "김동리" },
-        { title: "수난이대", author: "하근찬" },
-        { title: "오발탄", author: "이범선" },
-        { title: "달밤", author: "이태준" },
-        { title: "돌다리", author: "이태준" },
-        { title: "카인의 후예", author: "황순원" },
-        { title: "소나기", author: "황순원" },
-        { title: "학", author: "황순원" },
-        { title: "광장", author: "최인훈" },
-        { title: "난장이가 쏘아올린 작은 공", author: "조세희" },
-        { title: "삼포 가는 길", author: "황석영" },
-        { title: "장마", author: "윤흥길" },
-        { title: "우리들의 일그러진 영웅", author: "이문열" },
-        { title: "엄마의 말뚝", author: "박완서" },
-        { title: "그 많던 싱아는 누가 다 먹었을까", author: "박완서" },
-        { title: "자전거 도둑", author: "김소진" },
-        { title: "당신들의 천국", author: "이청준" },
-        { title: "서편제", author: "이청준" },
-        { title: "토지", author: "박경리" },
-        { title: "태백산맥", author: "조정래" },
-        { title: "아리랑", author: "조정래" },
-        { title: "무소유", author: "법정" },
-        { title: "하늘과 바람과 별과 시", author: "윤동주" },
-        { title: "님의 침묵", author: "한용운" },
-        { title: "진달래꽃", author: "김소월" },
-        { title: "정지용 시집", author: "정지용" },
-        { title: "사슴", author: "백석" },
-        { title: "서른의 반격", author: "손원평" },
-        { title: "완득이", author: "김려령" },
-        { title: "우아한 거짓말", author: "김려령" },
-        { title: "페인트", author: "이희영" },
-        { title: "유원", author: "백온유" },
-        { title: "시간을 파는 상점", author: "김선영" },
-        { title: "위저드 베이커리", author: "구병모" },
-        { title: "파과", author: "구병모" },
-        { title: "소년이 온다", author: "한강" },
-        { title: "채식주의자", author: "한강" },
-        { title: "바깥은 여름", author: "김애란" },
-        { title: "쇼코의 미소", author: "최은영" },
-        { title: "피프티 피플", author: "정세랑" },
-        { title: "우리가 빛의 속도로 갈 수 없다면", author: "김초엽" },
-        { title: "지구 끝의 온실", author: "김초엽" },
-        { title: "달러구트 꿈 백화점", author: "이미예" },
-        { title: "불편한 편의점", author: "김호연" },
-        { title: "마당을 나온 암탉", author: "황선미" },
-        { title: "연어", author: "안도현" },
-        { title: "나의 문화유산답사기", author: "유홍준" },
-
-        // --- [세계 문학 : 고전 / 근현대] ---
-        { title: "수레바퀴 아래서", author: "헤르만 헤세" },
-        { title: "싯다르타", author: "헤르만 헤세" },
-        { title: "변신", author: "프란츠 카프카" },
-        { title: "무기여 잘 있거라", author: "어니스트 헤밍웨이" },
-        { title: "누구를 위하여 종은 울리나", author: "어니스트 헤밍웨이" },
-        { title: "이방인", author: "알베르 카뮈" },
-        { title: "페스트", author: "알베르 카뮈" },
-        { title: "1984", author: "조지 오웰" },
-        { title: "동물농장", author: "조지 오웰" },
-        { title: "파리대왕", author: "윌리엄 골딩" },
-        { title: "멋진 신세계", author: "올더스 헉슬리" },
-        { title: "호밀밭의 파수꾼", author: "J.D. 샐린저" },
         { title: "위대한 개츠비", author: "F. 스콧 피츠제럴드" },
-        { title: "죄와 벌", author: "표도르 도스토옙스키" },
-        { title: "카라마조프 가의 형제들", author: "표도르 도스토옙스키" },
-        { title: "부활", author: "레프 톨스토이" },
-        { title: "안나 카레니나", author: "레프 톨스토이" },
-        { title: "사람은 무엇으로 사는가", author: "레프 톨스토이" },
-        { title: "오만과 편견", author: "제인 오스틴" },
-        { title: "이성과 감성", author: "제인 오스틴" },
-        { title: "제인 에어", author: "샬럿 브론테" },
-        { title: "폭풍의 언덕", author: "에밀리 브론테" },
-        { title: "주홍 글씨", author: "너새니얼 호손" },
-        { title: "백경", author: "허먼 멜빌" },
-        { title: "허클베리 핀의 모험", author: "마크 트웨인" },
-        { title: "톰 소여의 모험", author: "마크 트웨인" },
-        { title: "레 미제라블", author: "빅토르 위고" },
-        { title: "적과 흑", author: "스탕달" },
-        { title: "파우스트", author: "요한 볼프강 폰 괴테" },
-        { title: "젊은 베르테르의 슬픔", author: "요한 볼프강 폰 괴테" },
-        { title: "데카메론", author: "조반니 보카치오" },
-        { title: "돈 키호테", author: "미겔 데 세르반테스" },
-        { title: "햄릿", author: "윌리엄 셰익스피어" },
-        { title: "맥베스", author: "윌리엄 셰익스피어" },
-        { title: "리어 왕", author: "윌리엄 셰익스피어" },
-        { title: "오셀로", author: "윌리엄 셰익스피어" },
-        { title: "로미오와 줄리엣", author: "윌리엄 셰익스피어" },
-        { title: "베니스의 상인", author: "윌리엄 셰익스피어" },
-        { title: "일리아스", author: "호메로스" },
-        { title: "오디세이아", author: "호메로스" },
-        { title: "그리스 로마 신화", author: "토머스 불핀치" },
-        { title: "자기 앞의 생", author: "에밀 아자르" },
-        { title: "참을 수 없는 존재의 가벼움", author: "밀란 쿤데라" },
-        { title: "백년의 고독", author: "가브리엘 가르시아 마르케스" },
-        { title: "눈먼 자들의 도시", author: "주제 사라마구" },
-        { title: "앵무새 죽이기", author: "하퍼 리" },
-        { title: "달과 6펜스", author: "서머싯 몸" },
-        { title: "인간 실격", author: "다자이 오사무" },
-        { title: "마음", author: "나쓰메 소세키" },
-        { title: "나는 고양이로소이다", author: "나쓰메 소세키" },
-        { title: "설국", author: "가와바타 야스나리" },
-        { title: "용의자 X의 헌신", author: "히가시노 게이고" },
-        { title: "나미야 잡화점의 기적", author: "히가시노 게이고" },
-        { title: "모모", author: "미하엘 엔데" },
-        { title: "끝없는 이야기", author: "미하엘 엔데" },
-        { title: "갈매기의 꿈", author: "리처드 바크" },
-        { title: "나의 라임오렌지나무", author: "J.M. 바스콘셀로스" },
-        { title: "연금술사", author: "파울로 코엘료" },
-        { title: "노르웨이의 숲", author: "무라카미 하루키" },
-        { title: "마션", author: "앤디 위어" },
-        { title: "파이 이야기", author: "얀 마텔" },
-        { title: "안네의 일기", author: "안네 프랑크" },
-        { title: "키다리 아저씨", author: "진 웹스터" },
-        { title: "빨강 머리 앤", author: "루시 모드 몽고메리" },
-        { title: "작은 아씨들", author: "루이자 메이 올컷" },
-        { title: "걸리버 여행기", author: "조너선 스위프트" },
-
-        // --- [인문 / 철학 / 심리 / 윤리] ---
-        { title: "소크라테스의 변명", author: "플라톤" },
-        { title: "국가", author: "플라톤" },
-        { title: "니코마코스 윤리학", author: "아리스토텔레스" },
-        { title: "정치학", author: "아리스토텔레스" },
-        { title: "논어", author: "공자" },
-        { title: "맹자", author: "맹자" },
-        { title: "노자 (도덕경)", author: "노자" },
-        { title: "장자", author: "장자" },
-        { title: "사기", author: "사마천" },
-        { title: "명심보감", author: "작자미상" },
-        { title: "목민심서", author: "정약용" },
-        { title: "격몽요결", author: "이이" },
-        { title: "군주론", author: "니콜로 마키아벨리" },
-        { title: "방법서설", author: "르네 데카르트" },
-        { title: "리바이어던", author: "토마스 홉스" },
-        { title: "통치론", author: "존 로크" },
-        { title: "사회계약론", author: "장 자크 루소" },
-        { title: "에밀", author: "장 자크 루소" },
-        { title: "순수이성비판", author: "임마누엘 칸트" },
-        { title: "실천이성비판", author: "임마누엘 칸트" },
-        { title: "짜라투스트라는 이렇게 말했다", author: "프리드리히 니체" },
-        { title: "자본론", author: "카를 마르크스" },
-        { title: "공산당 선언", author: "카를 마르크스" },
-        { title: "자유론", author: "존 스튜어트 밀" },
-        { title: "꿈의 해석", author: "지그문트 프로이트" },
-        { title: "정신분석 입문", author: "지그문트 프로이트" },
-        { title: "프로테스탄티즘의 윤리와 자본주의 정신", author: "막스 베버" },
-        { title: "감시와 처벌", author: "미셸 푸코" },
-        { title: "오리엔탈리즘", author: "에드워드 사이드" },
-        { title: "정의론", author: "존 롤스" },
-        { title: "소유냐 존재냐", author: "에리히 프롬" },
-        { title: "사랑의 기술", author: "에리히 프롬" },
-        { title: "자유로부터의 도피", author: "에리히 프롬" },
-        { title: "피로사회", author: "한병철" },
-        { title: "호모 데우스", author: "유발 하라리" },
-        { title: "21세기를 위한 21가지 제언", author: "유발 하라리" },
-        { title: "아픔이 길이 하려면", author: "김승섭" },
-        { title: "선량한 차별주의자", author: "김지혜" },
-        { title: "프레임", author: "최인철" },
-        { title: "굿 라이프", author: "최인철" },
-        { title: "자존감 수업", author: "윤홍균" },
-        { title: "돈으로 살 수 없는 것들", author: "마이클 샌델" },
-        { title: "공정하다는 착각", author: "마이클 샌델" },
-        { title: "철학의 위안", author: "알랭 드 보통" },
-        { title: "불안", author: "알랭 드 보통" },
-        { title: "언어의 온도", author: "이기주" },
-        { title: "지적 대화를 위한 넓고 얕은 지식 1", author: "채사장" },
-        { title: "지적 대화를 위한 넓고 얕은 지식 2", author: "채사장" },
-        { title: "백범일지", author: "김구" },
-        { title: "징비록", author: "류성룡" },
-        { title: "니체의 말", author: "시라토리 하루히코" },
-        { title: "철학이 필요한 시간", author: "강신주" },
-        { title: "감정수업", author: "강신주" },
-        { title: "어떻게 살 것인가", author: "유시민" },
-        { title: "생각의 탄생", author: "로버트 루트번스타인" },
-
-        // --- [사회 / 경제 / 역사 / 지리] ---
-        { title: "문명의 붕괴", author: "재레드 다이아몬드" },
-        { title: "어제까지의 세계", author: "재레드 다이아몬드" },
-        { title: "국부론", author: "애덤 스미스" },
-        { title: "도덕감정론", author: "애덤 스미스" },
-        { title: "넛지", author: "리처드 탈러" },
-        { title: "경제학 콘서트", author: "팀 하포드" },
-        { title: "죽은 경제학자의 살아있는 아이디어", author: "토드 부크홀츠" },
-        { title: "자본주의", author: "EBS 자본주의 제작팀" },
-        { title: "나쁜 사마리아인들", author: "장하준" },
-        { title: "그들이 말하지 않는 23가지", author: "장하준" },
-        { title: "장하준의 경제학 강의", author: "장하준" },
-        { title: "사다리 걷어차기", author: "장하준" },
-        { title: "불평등의 대가", author: "조지프 스티글리츠" },
-        { title: "지리의 힘", author: "팀 마샬" },
-        { title: "제3의 물결", author: "앨빈 토플러" },
-        { title: "부의 미래", author: "앨빈 토플러" },
-        { title: "생각에 관한 생각", author: "대니얼 카너먼" },
-        { title: "역사란 무엇인가", author: "E.H. 카" },
-        { title: "거의 모든 것의 역사", author: "빌 브라이슨" },
-        { title: "역사의 쓸모", author: "최태성" },
-        { title: "설민석의 조선왕조실록", author: "설민석" },
-        { title: "로마인 이야기", author: "시오노 나나미" },
-        { title: "유토피아", author: "토마스 모어" },
-        { title: "시민의 불복종", author: "헨리 데이비드 소로" },
-        { title: "월든", author: "헨리 데이비드 소로" },
-        { title: "전태일 평전", author: "조영래" },
-        { title: "왜 세계의 절반은 굶주리는가?", author: "장 지글러" },
-        { title: "세계사 편력", author: "자와할랄 네루" },
-        { title: "평균의 종말", author: "토드 로즈" },
-        { title: "국가는 왜 실패하는가", author: "대런 애쓰모글루 외" },
-        { title: "21세기 자본", author: "토마 피케티" },
-        { title: "빈곤의 경제학", author: "아비지트 배너지 외" },
-        { title: "노동의 종말", author: "제레미 리프킨" },
-        { title: "소유의 종말", author: "제레미 리프킨" },
-        { title: "거꾸로 읽는 세계사", author: "에두아르도 갈레아노" },
-        { title: "클래식 경제학", author: "김수행" },
-        { title: "세계 지리", author: "이희연" },
-        { title: "청소년을 위한 경제의 역사", author: "니콜라우스 피퍼" },
-        { title: "자본주의의 역사", author: "미셸 보" },
-
-        // --- [과학 / 기술 / IT / 환경] ---
-        { title: "창백한 푸른 점", author: "칼 세이건" },
+        { title: "동물농장", author: "조지 오웰" },
+        { title: "1984", author: "조지 오웰" },
         { title: "이기적 유전자", author: "리처드 도킨스" },
-        { title: "만들어진 신", author: "리처드 도킨스" },
-        { title: "눈먼 시계공", author: "리처드 도킨스" },
-        { title: "엔트로피", author: "제레미 리프킨" },
-        { title: "부분과 전체", author: "베르너 하이젠베르크" },
-        { title: "과학혁명의 구조", author: "토마스 쿤" },
-        { title: "종의 기원", author: "찰스 다윈" },
-        { title: "시간의 역사", author: "스티븐 호킹" },
-        { title: "위대한 설계", author: "스티븐 호킹" },
-        { title: "떨림과 울림", author: "김상욱" },
-        { title: "김상욱의 양자 공부", author: "김상욱" },
-        { title: "다윈의 식탁", author: "장대익" },
-        { title: "물질의 물리학", author: "한정훈" },
-        { title: "세상을 바꾼 화학", author: "원정아" },
-        { title: "뇌과학의 모든 것", author: "박문호" },
-        { title: "생명과학 교과서는 살아있다", author: "유영제" },
         { title: "정재승의 과학 콘서트", author: "정재승" },
-        { title: "열두 발자국", author: "정재승" },
-        { title: "클라우스 슈밥의 제4차 산업혁명", author: "클라우스 슈밥" },
-        { title: "미래의 물리학", author: "미치오 카쿠" },
-        { title: "평행우주", author: "미치오 카쿠" },
-        { title: "엘러건트 유니버스", author: "브라이언 그린" },
-        { title: "블랙홀과 시간여행", author: "킵 손" },
-        { title: "인공지능과 딥러닝", author: "마쓰오 유타카" },
-        { title: "알고리즘, 인생을 계산하다", author: "브라이언 크리스천" },
-        { title: "생명이란 무엇인가", author: "에르빈 슈뢰딩거" },
-        { title: "이중나선", author: "제임스 왓슨" },
-        { title: "아내를 모자로 착각한 남자", author: "올리버 색스" },
-        { title: "파인만의 여섯 가지 물리 이야기", author: "리처드 파인만" },
-        { title: "과학자의 서재", author: "최재천" },
-        { title: "생명이 있는 것은 다 아름답다", author: "최재천" },
-        { title: "통섭", author: "에드워드 윌슨" },
-        { title: "지구의 짧은 역사", author: "앤드루 H. 놀" },
-        { title: "화학에서 인생을 배우다", author: "황영애" },
-        { title: "랩 걸", author: "호프 자런" },
-        { title: "6도의 멸종", author: "마크 라이너스" },
-        { title: "사라져 가는 것들의 안부를 묻다", author: "윤신영" },
-        { title: "원소의 왕국", author: "피터 앳킨스" },
-        { title: "바이러스 쇼크", author: "최강석" },
-        { title: "세계를 바꾼 17가지 방정식", author: "이언 스튜어트" },
-        { title: "화학의 프로메테우스", author: "오가타 가즈아키" },
-        { title: "물리학자는 영화에서 과학을 본다", author: "정재승" },
-
-        // --- [수학] ---
         { title: "수학의 정석", author: "홍성대" },
         { title: "페르마의 마지막 정리", author: "사이먼 싱" },
-        { title: "암호의 과학", author: "사이먼 싱" },
-        { title: "수학이 필요한 순간", author: "김민형" },
-        { title: "다시, 수학이 필요한 순간", author: "김민형" },
-        { title: "수학 귀신", author: "한스 마그누스 엔첸스베르거" },
-        { title: "세상을 움직이는 수학", author: "이언 스튜어트" },
-        { title: "수학의 쓸모", author: "조던 엘렌버그" },
-        { title: "틀리지 않는 법", author: "조던 엘렌버그" },
-        { title: "수학 비타민 플러스", author: "박경미" },
-        { title: "수학자들의 낭만적인 이야기", author: "박지향" },
-        { title: "미적분으로 바라본 하루", author: "오스카 E. 페르난데스" },
-        { title: "문명과 수학", author: "리처드 만키비치" },
-        { title: "수학, 인문으로 수를 읽다", author: "이광연" },
-        { title: "소수 이야기", author: "마르쿠스 뒤 사토이" },
-        { title: "미적분의 힘", author: "스티븐 스트로가츠" },
-        { title: "어느 수학자의 변명", author: "G.H. 하디" },
-        { title: "유클리드의 창", author: "레오나르드 멀로디노" },
-        { title: "넘버스", author: "다비드 루엘" },
-        { title: "이상한 수학책", author: "벤 올린" },
-        { title: "X의 즐거움", author: "스티븐 스트로가츠" },
-        { title: "이야기로 아주 쉽게 배우는 대수학", author: "마크 제거스" },
-        { title: "수학의 언어", author: "케이스 데블린" },
-        { title: "수학을 읽어드립니다", author: "남호영" },
-        { title: "수학사 클래식", author: "칼 보이어" },
-        { title: "천재들의 수학 노트", author: "박부성" },
-        { title: "피타고라스의 정리", author: "엘리 마오" },
-        { title: "수학이 좋아지는 수학", author: "조윤동" },
-        { title: "수학 콘서트", author: "박경미" },
-
-        // --- [예술 / 체육 / 문화 / 기타] ---
-        { title: "서양미술사", author: "E.H. 곰브리치" },
-        { title: "방구석 미술관", author: "조원재" },
-        { title: "진중권의 서양미술사", author: "진중권" },
-        { title: "미학 오디세이", author: "진중권" },
-        { title: "미술관에 간 화학자", author: "전창림" },
-        { title: "디자인의 디자인", author: "하라 켄야" },
-        { title: "건축, 음악처럼 듣고 미술처럼 보다", author: "서현" },
-        { title: "사진의 역사", author: "데이비드 호크니" },
-        { title: "클래식 튠", author: "김정환" },
-        { title: "음악의 기쁨", author: "롤랑 마뉘엘" },
-        { title: "베토벤의 생애", author: "로맹 롤랑" },
-        { title: "나는 왜 체육을 공부하는가", author: "최의창" },
-        { title: "스포츠 사회학", author: "이학준" },
-        { title: "스포츠 심리학", author: "김병준" },
-        { title: "마이클 조던의 성공학", author: "마이클 조던" },
-        { title: "축구의 세계사", author: "에두아르도 갈레아노" },
-        { title: "영화의 이해", author: "루이스 자네티" },
-        { title: "영화, 철학을 만나다", author: "이승종" },
-        { title: "그림 아는 만큼 보인다", author: "손철주" },
-        { title: "서양 음악사", author: "도널드 그라우트" },
-
-        // --- [진로 / 자기계발 / 멘토링 / 교육] ---
-        { title: "원씽", author: "게리 켈러" },
-        { title: "아토믹 해빗", author: "제임스 클리어" },
-        { title: "타이탄의 도구들", author: "팀 페리스" },
-        { title: "그릿", author: "앤절라 더크워스" },
-        { title: "아웃라이어", author: "말콤 글래드웰" },
-        { title: "티핑 포인트", author: "말콤 글래드웰" },
-        { title: "블링크", author: "말콤 글래드웰" },
-        { title: "다윗과 골리앗", author: "말콤 글래드웰" },
-        { title: "1만 시간의 법칙", author: "말콤 글래드웰" },
-        { title: "성공하는 사람들의 7가지 습관", author: "스티븐 코비" },
-        { title: "데일 카네기 인간관계론", author: "데일 카네기" },
-        { title: "딥 워크", author: "칼 뉴포트" },
-        { title: "몰입", author: "미하이 칙센트미하이" },
-        { title: "공부머리 독서법", author: "최승필" },
-        { title: "하버드 상위 1퍼센트의 비밀", author: "정주영" },
-        { title: "습관의 힘", author: "찰스 두히그" },
-        { title: "마인드셋", author: "캐럴 드웩" },
-        { title: "스티브 잡스", author: "월터 아이작슨" },
-        { title: "레오나르도 다빈치", author: "월터 아이작슨" },
-        { title: "아인슈타인 전기", author: "월터 아이작슨" },
-        { title: "미라클 모닝", author: "할 엘로드" },
-        { title: "왜 공부하는가", author: "조국" },
-        { title: "공부란 무엇인가", author: "김영민" },
-        { title: "어떻게 읽을 것인가", author: "고영성" },
-        { title: "일취월장", author: "고영성" },
-        { title: "생각하는 인문학", author: "이지성" },
       ];
 
       const MAX_BYTE = 1500;
@@ -895,13 +522,11 @@
       window.onload = () => {
         renderStudentButtons();
         renderRecords();
-        initDBList(); // DB 리스트 초기화
+        initDBList();
       };
 
-      /* --- 좌측: DB 리스트 보기 (신규 기능) --- */
       function initDBList() {
         const panel = document.getElementById("dbListPanel");
-        // 가나다순 정렬
         const sortedBooks = [...DUMMY_BOOKS].sort((a, b) =>
           a.title.localeCompare(b.title)
         );
@@ -922,7 +547,6 @@
         }
       }
 
-      /* --- 검색 및 자동완성 --- */
       const searchInput = document.getElementById("bookSearch");
       const resultsDiv = document.getElementById("searchResults");
 
@@ -989,10 +613,9 @@
         document.getElementById("finalAuthor").value = author;
         searchInput.value = title;
         resultsDiv.style.display = "none";
-        document.getElementById("dbListPanel").style.display = "none"; // 선택 시 DB 목록도 닫기
+        document.getElementById("dbListPanel").style.display = "none";
       }
 
-      /* --- 학생 선택 및 적용 --- */
       function renderStudentButtons() {
         const container = document.getElementById("studentBtnContainer");
         container.innerHTML = "";
@@ -1032,6 +655,7 @@
         showToast("입력 폼이 초기화되었습니다.");
       }
 
+      /* --- [핵심 수정] 부분 적용 및 중복 알림 팝업 --- */
       function applyToStudents() {
         const title = document.getElementById("finalTitle").value.trim();
         const author = document.getElementById("finalAuthor").value.trim();
@@ -1044,30 +668,44 @@
 
         const cleanTitle = title.replace(/[『』]/g, "");
         const entry = `『${cleanTitle}』(${author})`;
-        let appliedCount = 0;
-        let names = [];
+
+        let appliedNames = [];
+        let duplicateNames = [];
 
         targets.forEach((btn) => {
           const sid = btn.dataset.id;
+          const sName = btn.textContent;
           let current = studentRecords.get(sid);
 
+          // 중복 검사
           if (!current.includes(entry)) {
             if (current) current += `, ${entry}`;
             else current = entry;
             studentRecords.set(sid, current);
-            appliedCount++;
-            names.push(btn.textContent);
+            appliedNames.push(sName); // 정상 적용된 학생
+          } else {
+            duplicateNames.push(sName); // 중복된 학생
           }
         });
 
         renderRecords();
 
-        if (appliedCount > 0) {
-          addLog(cleanTitle, names);
-          showToast(`${appliedCount}명에게 적용 완료!`);
-          selectAllStudents(false);
+        // 1. 중복된 학생이 1명이라도 있을 경우 명시적인 알림 팝업 제공
+        if (duplicateNames.length > 0) {
+          alert(
+            `⚠️ [기재 중복 알림]\n\n선택하신 『${cleanTitle}』 도서가 이미 아래 학생들의 기록에 존재하여 중복 기재를 방지했습니다.\n\n▶ 중복 대상 학생: ${duplicateNames.join(
+              ", "
+            )}\n\n※ 위 학생들을 제외한 나머지 인원에게만 정상 반영되었습니다.`
+          );
+        }
+
+        // 2. 정상 적용된 학생 처리
+        if (appliedNames.length > 0) {
+          addLog(cleanTitle, appliedNames);
+          showToast(`${appliedNames.length}명에게 성공적으로 적용되었습니다.`);
+          selectAllStudents(false); // 성공 시에만 체크 해제
         } else {
-          showToast("선택된 학생들에게 이미 해당 도서가 있습니다.");
+          showToast("새로 추가된 기록이 없습니다.");
         }
       }
 
