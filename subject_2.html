@@ -613,9 +613,9 @@
          [문장 추출 및 분해 도구] 
       ========================================================================== */
       function getSentences(text) {
-          if (!text) return [];
-          let matches = text.replace(/\n/g, " ").match(/[^.!?]+[.!?]*/g);
-          return matches ? matches.map(s => s.trim()).filter(s => s) : [];
+        if (!text) return [];
+        let matches = text.replace(/\n/g, " ").match(/[^.!?]+[.!?]*/g);
+        return matches ? matches.map((s) => s.trim()).filter((s) => s) : [];
       }
 
       /* =========================================================================
@@ -624,133 +624,235 @@
       class GrammarEngine {
         constructor() {
           this.irregularDict = {
-            "든다": "듦", "들다": "듦", "들었다": "듦",
-            "만든다": "만듦", "만들다": "만듦", "만들었다": "만듦",
-            "이끈다": "이끎", "이끌다": "이끎", "이끌었다": "이끎",
-            "베푼다": "베풂", "베풀다": "베풂", "베풀었다": "베풂",
-            "돕는다": "도움", "돕다": "도움", "도왔다": "도움",
-            "어렵다": "어려움", "어려웠다": "어려움",
-            "쉽다": "쉬움", "쉬웠다": "쉬움",
-            "즐겁다": "즐거움", "즐거웠다": "즐거움",
-            "아름답다": "아름다움", "아름다웠다": "아름다움",
-            "무겁다": "무거움", "무거웠다": "무거움",
-            "가볍다": "가벼움", "가벼웠다": "가벼움",
-            "새롭다": "새로움", "새로웠다": "새로움",
-            "기쁘다": "기쁨", "기뻤다": "기쁨",
-            "슬프다": "슬픔", "슬펐다": "슬픔",
-            "그렇다": "그러함", "그랬다": "그러함",
-            "듣다": "들음", "듣는다": "들음", "들었다": "들음",
-            "묻다": "물음", "묻는다": "물음", "물었다": "물음",
-            "걷다": "걸음", "걷는다": "걸음", "걸었다": "걸음",
-            "깨닫다": "깨달음", "깨닫는다": "깨달음", "깨달았다": "깨달음",
-            "짓다": "지음", "짓는다": "지음", "지었다": "지음",
-            "낫다": "나음", "나았다": "나음",
-            "잇다": "이음", "잇는다": "이음", "이었다": "이음",
-            "긋다": "그음", "그었다": "그음"
+            든다: "듦",
+            들다: "듦",
+            들었다: "듦",
+            만든다: "만듦",
+            만들다: "만듦",
+            만들었다: "만듦",
+            이끈다: "이끎",
+            이끌다: "이끎",
+            이끌었다: "이끎",
+            베푼다: "베풂",
+            베풀다: "베풂",
+            베풀었다: "베풂",
+            돕는다: "도움",
+            돕다: "도움",
+            도왔다: "도움",
+            어렵다: "어려움",
+            어려웠다: "어려움",
+            쉽다: "쉬움",
+            쉬웠다: "쉬움",
+            즐겁다: "즐거움",
+            즐거웠다: "즐거움",
+            아름답다: "아름다움",
+            아름다웠다: "아름다움",
+            무겁다: "무거움",
+            무거웠다: "무거움",
+            가볍다: "가벼움",
+            가벼웠다: "가벼움",
+            새롭다: "새로움",
+            새로웠다: "새로움",
+            기쁘다: "기쁨",
+            기뻤다: "기쁨",
+            슬프다: "슬픔",
+            슬펐다: "슬픔",
+            그렇다: "그러함",
+            그랬다: "그러함",
+            듣다: "들음",
+            듣는다: "들음",
+            들었다: "들음",
+            묻다: "물음",
+            묻는다: "물음",
+            물었다: "물음",
+            걷다: "걸음",
+            걷는다: "걸음",
+            걸었다: "걸음",
+            깨닫다: "깨달음",
+            깨닫는다: "깨달음",
+            깨달았다: "깨달음",
+            짓다: "지음",
+            짓는다: "지음",
+            지었다: "지음",
+            낫다: "나음",
+            나았다: "나음",
+            잇다: "이음",
+            잇는다: "이음",
+            이었다: "이음",
+            긋다: "그음",
+            그었다: "그음",
           };
 
           this.patternDict = [
-            [/깝다$/, "까움"], [/까웠다$/, "까웠음"], 
-            [/겹다$/, "겨움"], [/겨웠다$/, "겨웠음"], 
-            [/랍다$/, "라움"], [/라웠다$/, "라웠음"],
-            [/갑다$/, "가움"], [/가웠다$/, "가웠음"], 
-            [/맙다$/, "마움"], [/마웠다$/, "마웠음"], 
-            [/습다$/, "스움"], [/스웠다$/, "스웠음"], 
-            [/롭다$/, "로움"], [/로웠다$/, "로웠음"], 
-            [/럽다$/, "러움"], [/러웠다$/, "러웠음"], 
-            [/답다$/, "다움"], [/다웠다$/, "다웠음"], 
-            [/겁다$/, "거움"], [/거웠다$/, "거웠음"], 
-            [/어둡다$/, "어두움"], [/어두웠다$/, "어두웠음"], 
-            [/껍다$/, "꺼움"], [/꺼웠다$/, "꺼웠음"], 
-            [/납다$/, "나움"], [/나웠다$/, "나웠음"], 
-            [/엽다$/, "여움"], [/여웠다$/, "여웠음"], 
-            [/덥다$/, "더움"], [/더웠다$/, "더웠음"], 
-            [/렇다$/, "러함"], [/랬다$/, "랬음"], [/떻다$/, "떠함"], [/땠다$/, "땠음"],
-            [/랗다$/, "라함"], [/갛다$/, "가함"], [/얗다$/, "야함"], [/맣다$/, "마함"],
-            [/고다$/, "고임"], [/수다$/, "수임"], [/재다$/, "재임"], [/표다$/, "표임"],
-            [/쑤다$/, "쑤임"], [/기다$/, "기임"], [/회다$/, "회임"], [/두다$/, "두임"],
-            [/아니다$/, "아님"], [/아니었다$/, "아녔음"],
-            [/하였다$/, "함"], [/했다$/, "함"], [/한다$/, "함"], [/하다$/, "함"],
-            [/이다$/, "임"], [/이었다$/, "임"], [/였다$/, "임"],
-            [/보였다$/, "보임"], [/보인다$/, "보임"], [/보이다$/, "보임"],
-            [/되었다$/, "됨"], [/된다$/, "됨"], [/되다$/, "됨"],
-            [/주었다$/, "줌"], [/준다$/, "줌"], [/주다$/, "줌"],
-            [/받았다$/, "받음"], [/받는다$/, "받음"], [/받다$/, "받음"],
-            [/가졌다$/, "가짐"], [/가진다$/, "가짐"], [/가지다$/, "가짐"],
-            [/느꼈다$/, "느낌"], [/느낀다$/, "느낌"], [/느끼다$/, "느낌"],
-            [/많다$/, "많음"], [/적다$/, "적음"], [/크다$/, "큼"], [/작다$/, "작음"],
-            [/있다$/, "있음"], [/없다$/, "없음"], [/같다$/, "같음"], [/않다$/, "않음"],
-            [/는다$/, "음"], [/은다$/, "음"],
-            [/었다$/, "었음"], [/았다$/, "았음"], [/겠다$/, "겠음"]
+            [/깝다$/, "까움"],
+            [/까웠다$/, "까웠음"],
+            [/겹다$/, "겨움"],
+            [/겨웠다$/, "겨웠음"],
+            [/랍다$/, "라움"],
+            [/라웠다$/, "라웠음"],
+            [/갑다$/, "가움"],
+            [/가웠다$/, "가웠음"],
+            [/맙다$/, "마움"],
+            [/마웠다$/, "마웠음"],
+            [/습다$/, "스움"],
+            [/스웠다$/, "스웠음"],
+            [/롭다$/, "로움"],
+            [/로웠다$/, "로웠음"],
+            [/럽다$/, "러움"],
+            [/러웠다$/, "러웠음"],
+            [/답다$/, "다움"],
+            [/다웠다$/, "다웠음"],
+            [/겁다$/, "거움"],
+            [/거웠다$/, "거웠음"],
+            [/어둡다$/, "어두움"],
+            [/어두웠다$/, "어두웠음"],
+            [/껍다$/, "꺼움"],
+            [/꺼웠다$/, "꺼웠음"],
+            [/납다$/, "나움"],
+            [/나웠다$/, "나웠음"],
+            [/엽다$/, "여움"],
+            [/여웠다$/, "여웠음"],
+            [/덥다$/, "더움"],
+            [/더웠다$/, "더웠음"],
+            [/렇다$/, "러함"],
+            [/랬다$/, "랬음"],
+            [/떻다$/, "떠함"],
+            [/땠다$/, "땠음"],
+            [/랗다$/, "라함"],
+            [/갛다$/, "가함"],
+            [/얗다$/, "야함"],
+            [/맣다$/, "마함"],
+            [/고다$/, "고임"],
+            [/수다$/, "수임"],
+            [/재다$/, "재임"],
+            [/표다$/, "표임"],
+            [/쑤다$/, "쑤임"],
+            [/기다$/, "기임"],
+            [/회다$/, "회임"],
+            [/두다$/, "두임"],
+            [/아니다$/, "아님"],
+            [/아니었다$/, "아녔음"],
+            [/하였다$/, "함"],
+            [/했다$/, "함"],
+            [/한다$/, "함"],
+            [/하다$/, "함"],
+            [/이다$/, "임"],
+            [/이었다$/, "임"],
+            [/였다$/, "임"],
+            [/보였다$/, "보임"],
+            [/보인다$/, "보임"],
+            [/보이다$/, "보임"],
+            [/되었다$/, "됨"],
+            [/된다$/, "됨"],
+            [/되다$/, "됨"],
+            [/주었다$/, "줌"],
+            [/준다$/, "줌"],
+            [/주다$/, "줌"],
+            [/받았다$/, "받음"],
+            [/받는다$/, "받음"],
+            [/받다$/, "받음"],
+            [/가졌다$/, "가짐"],
+            [/가진다$/, "가짐"],
+            [/가지다$/, "가짐"],
+            [/느꼈다$/, "느낌"],
+            [/느낀다$/, "느낌"],
+            [/느끼다$/, "느낌"],
+            [/많다$/, "많음"],
+            [/적다$/, "적음"],
+            [/크다$/, "큼"],
+            [/작다$/, "작음"],
+            [/있다$/, "있음"],
+            [/없다$/, "없음"],
+            [/같다$/, "같음"],
+            [/않다$/, "않음"],
+            [/는다$/, "음"],
+            [/은다$/, "음"],
+            [/었다$/, "었음"],
+            [/았다$/, "았음"],
+            [/겠다$/, "겠음"],
           ];
         }
 
         convert(text) {
           if (!text) return "";
           let sentences = text.match(/[^.!?]+[.!?]*/g) || [text];
-          
+
           let converted = sentences.map((sentence) => {
             let s = sentence.trim();
             if (!s) return "";
-            
+
             let puncMatch = s.match(/[.!?]+$/);
             let sentencePunc = puncMatch ? puncMatch[0] : "";
             let body = s.replace(/[.!?]+$/, "");
 
             let words = body.split(/\s+/);
-            
+
             for (let i = 0; i < words.length; i++) {
-                let word = words[i];
-                let wordPuncMatch = word.match(/[.,!?]+$/);
-                let wordPunc = wordPuncMatch ? wordPuncMatch[0] : "";
-                let cleanWord = word.replace(/[.,!?]+$/, "");
+              let word = words[i];
+              let wordPuncMatch = word.match(/[.,!?]+$/);
+              let wordPunc = wordPuncMatch ? wordPuncMatch[0] : "";
+              let cleanWord = word.replace(/[.,!?]+$/, "");
 
-                let isConverted = false;
+              let isConverted = false;
 
-                if (this.irregularDict[cleanWord]) {
-                    cleanWord = this.irregularDict[cleanWord];
+              if (this.irregularDict[cleanWord]) {
+                cleanWord = this.irregularDict[cleanWord];
+                isConverted = true;
+              } else {
+                for (let [pattern, rep] of this.patternDict) {
+                  if (pattern.test(cleanWord)) {
+                    cleanWord = cleanWord.replace(pattern, rep);
                     isConverted = true;
-                } else {
-                    for (let [pattern, rep] of this.patternDict) {
-                        if (pattern.test(cleanWord)) {
-                            cleanWord = cleanWord.replace(pattern, rep);
-                            isConverted = true;
-                            break;
-                        }
-                    }
+                    break;
+                  }
                 }
+              }
 
-                if (!isConverted && i === words.length - 1 && cleanWord.endsWith("다")) {
-                    const lastChar = cleanWord.charCodeAt(cleanWord.length - 2);
-                    if (lastChar >= 0xac00 && lastChar <= 0xd7a3) {
-                        const jongseong = (lastChar - 0xac00) % 28;
-                        if (jongseong === 0) { 
-                            cleanWord = cleanWord.slice(0, -2) + String.fromCharCode(lastChar + 16);
-                        } else if (jongseong === 8) { 
-                            cleanWord = cleanWord.slice(0, -2) + String.fromCharCode(lastChar + 2);
-                        } else if (jongseong === 4) { 
-                            cleanWord = cleanWord.slice(0, -2) + String.fromCharCode(lastChar + 12);
-                        } else {
-                            cleanWord = cleanWord.slice(0, -1) + "음";
-                        }
-                        isConverted = true;
-                    }
+              if (
+                !isConverted &&
+                i === words.length - 1 &&
+                cleanWord.endsWith("다")
+              ) {
+                const lastChar = cleanWord.charCodeAt(cleanWord.length - 2);
+                if (lastChar >= 0xac00 && lastChar <= 0xd7a3) {
+                  const jongseong = (lastChar - 0xac00) % 28;
+                  if (jongseong === 0) {
+                    cleanWord =
+                      cleanWord.slice(0, -2) +
+                      String.fromCharCode(lastChar + 16);
+                  } else if (jongseong === 8) {
+                    cleanWord =
+                      cleanWord.slice(0, -2) +
+                      String.fromCharCode(lastChar + 2);
+                  } else if (jongseong === 4) {
+                    cleanWord =
+                      cleanWord.slice(0, -2) +
+                      String.fromCharCode(lastChar + 12);
+                  } else {
+                    cleanWord = cleanWord.slice(0, -1) + "음";
+                  }
+                  isConverted = true;
                 }
+              }
 
-                if (isConverted && i < words.length - 1 && !wordPunc) {
-                    wordPunc = ".";
-                }
+              if (isConverted && i < words.length - 1 && !wordPunc) {
+                wordPunc = ".";
+              }
 
-                words[i] = cleanWord + wordPunc;
+              words[i] = cleanWord + wordPunc;
             }
 
             let finalSentence = words.join(" ");
             if (!sentencePunc) sentencePunc = ".";
             let result = finalSentence + sentencePunc;
-            return result.replace(/\.{2,}/g, "."); 
+            return result.replace(/\.{2,}/g, ".");
           });
 
-          return converted.join(" ").replace(/\.{2,}/g, ".").replace(/\s+\./g, ".").trim();
+          return converted
+            .join(" ")
+            .replace(/\.{2,}/g, ".")
+            .replace(/\s+\./g, ".")
+            .trim();
         }
       }
 
@@ -761,9 +863,12 @@
         "컴퓨팅 시스템": {
           subunits: ["유무선 네트워크", "사물 인터넷", "사물 인터넷 설계하기"],
           standards: {
-            "유무선 네트워크": "성취기준 [12정01-01]: 유무선 네트워크의 특성을 이해하고, 네트워크 환경을 구성한다.",
-            "사물 인터넷": "성취기준 [12정01-02]: 사물인터넷의 구성과 동작 원리를 분석한다.",
-            "사물 인터넷 설계하기": "성취기준 [12정01-03]: 문제 해결에 적합한 사물인터넷 시스템을 설계한다.",
+            "유무선 네트워크":
+              "성취기준 [12정01-01]: 유무선 네트워크의 특성을 이해하고, 네트워크 환경을 구성한다.",
+            "사물 인터넷":
+              "성취기준 [12정01-02]: 사물인터넷의 구성과 동작 원리를 분석한다.",
+            "사물 인터넷 설계하기":
+              "성취기준 [12정01-03]: 문제 해결에 적합한 사물인터넷 시스템을 설계한다.",
           },
         },
         데이터: {
@@ -774,10 +879,14 @@
             "데이터 시각화와 해석",
           ],
           standards: {
-            "데이터 압축": "성취기준 [12정02-01]: 디지털 데이터 압축의 개념과 필요성을 이해한다.",
-            "데이터 암호화": "성취기준 [12정02-02]: 암호화의 개념을 이해하고 사례를 분석한다.",
-            "빅데이터와 데이터 수집": "성취기준 [12정02-03]: 빅데이터의 개념을 이해하고 데이터를 수집한다.",
-            "데이터 시각화와 해석": "성취기준 [12정02-04]: 데이터를 시각화하고 그 의미를 해석한다.",
+            "데이터 압축":
+              "성취기준 [12정02-01]: 디지털 데이터 압축의 개념과 필요성을 이해한다.",
+            "데이터 암호화":
+              "성취기준 [12정02-02]: 암호화의 개념을 이해하고 사례를 분석한다.",
+            "빅데이터와 데이터 수집":
+              "성취기준 [12정02-03]: 빅데이터의 개념을 이해하고 데이터를 수집한다.",
+            "데이터 시각화와 해석":
+              "성취기준 [12정02-04]: 데이터를 시각화하고 그 의미를 해석한다.",
           },
         },
         "알고리즘과 프로그래밍": {
@@ -793,15 +902,24 @@
             "문제 해결을 위한 협력적 프로젝트",
           ],
           standards: {
-            "문제 분해와 모델링": "성취기준 [12정03-01]: 문제를 분해하고 모델링한다.",
-            "정형 알고리즘": "성취기준 [12정03-02]: 정렬 알고리즘의 특징과 효율을 비교한다.",
-            "탐색 알고리즘": "성취기준 [12정03-03]: 탐색 알고리즘의 특징과 효율을 비교한다.",
-            자료형: "성취기준 [12정03-04]: 적합한 자료형을 선택하여 프로그램을 작성한다.",
-            "표준 입출력과 파일 입출력": "성취기준 [12정03-05]: 입출력을 활용한 프로그램을 작성한다.",
-            "다차원 데이터 구조": "성취기준 [12정03-06]: 다차원 데이터 구조를 활용한다.",
-            "다양한 제어 구조": "성취기준 [12정03-07]: 다양한 제어 구조를 활용한다.",
-            "객체를 구현하는 클래스": "성취기준 [12정03-08]: 클래스와 인스턴스를 활용한다.",
-            "문제 해결을 위한 협력적 프로젝트": "성취기준 [12정03-09]: 프로그램을 협력적으로 설계 및 구현한다.",
+            "문제 분해와 모델링":
+              "성취기준 [12정03-01]: 문제를 분해하고 모델링한다.",
+            "정형 알고리즘":
+              "성취기준 [12정03-02]: 정렬 알고리즘의 특징과 효율을 비교한다.",
+            "탐색 알고리즘":
+              "성취기준 [12정03-03]: 탐색 알고리즘의 특징과 효율을 비교한다.",
+            자료형:
+              "성취기준 [12정03-04]: 적합한 자료형을 선택하여 프로그램을 작성한다.",
+            "표준 입출력과 파일 입출력":
+              "성취기준 [12정03-05]: 입출력을 활용한 프로그램을 작성한다.",
+            "다차원 데이터 구조":
+              "성취기준 [12정03-06]: 다차원 데이터 구조를 활용한다.",
+            "다양한 제어 구조":
+              "성취기준 [12정03-07]: 다양한 제어 구조를 활용한다.",
+            "객체를 구현하는 클래스":
+              "성취기준 [12정03-08]: 클래스와 인스턴스를 활용한다.",
+            "문제 해결을 위한 협력적 프로젝트":
+              "성취기준 [12정03-09]: 프로그램을 협력적으로 설계 및 구현한다.",
           },
         },
         인공지능: {
@@ -811,9 +929,12 @@
             "기계학습과 문제 해결",
           ],
           standards: {
-            "지능 에이전트": "성취기준 [12정04-01]: 지능 에이전트의 개념과 특성을 이해한다.",
-            "기계학습의 개념과 유형": "성취기준 [12정04-02]: 지도학습과 비지도학습의 차이를 비교한다.",
-            "기계학습과 문제 해결": "성취기준 [12정04-03]: 사회문제 해결에 기계학습을 적용한다.",
+            "지능 에이전트":
+              "성취기준 [12정04-01]: 지능 에이전트의 개념과 특성을 이해한다.",
+            "기계학습의 개념과 유형":
+              "성취기준 [12정04-02]: 지도학습과 비지도학습의 차이를 비교한다.",
+            "기계학습과 문제 해결":
+              "성취기준 [12정04-03]: 사회문제 해결에 기계학습을 적용한다.",
           },
         },
         "디지털 문화": {
@@ -823,9 +944,12 @@
             "정보 보안",
           ],
           standards: {
-            "디지털 사회와 진로": "성취기준 [12정05-01]: 디지털 기술의 영향력을 분석하고 진로를 설계한다.",
-            "정보 보호와 정보 공유": "성취기준 [12정05-02]: 올바른 정보 보호 방법을 실천한다.",
-            "정보 보안": "성취기준 [12정05-03]: 보안 기술을 활용하여 디지털 윤리를 실천한다.",
+            "디지털 사회와 진로":
+              "성취기준 [12정05-01]: 디지털 기술의 영향력을 분석하고 진로를 설계한다.",
+            "정보 보호와 정보 공유":
+              "성취기준 [12정05-02]: 올바른 정보 보호 방법을 실천한다.",
+            "정보 보안":
+              "성취기준 [12정05-03]: 보안 기술을 활용하여 디지털 윤리를 실천한다.",
           },
         },
       };
@@ -905,14 +1029,22 @@
 
       /* --- [핵심 수정] 과세특 문장 생성 및 맞춤법 엔진 결합 --- */
       function generateSubjectAI() {
-        const level = document.querySelector('input[name="level"]:checked')?.value || "C";
-        const customObj = document.getElementById("customObjectiveInput").value.trim();
-        
+        const level =
+          document.querySelector('input[name="level"]:checked')?.value || "C";
+        const customObj = document
+          .getElementById("customObjectiveInput")
+          .value.trim();
+
         // 사용자가 입력한 구체적 활동 사례 (줄바꿈 제거)
-        let activity = document.getElementById("caseInput").value.trim().replace(/\n/g, " ");
+        let activity = document
+          .getElementById("caseInput")
+          .value.trim()
+          .replace(/\n/g, " ");
 
         const comps = [];
-        document.querySelectorAll("input[type=checkbox]:checked").forEach((cb) => comps.push(cb.value));
+        document
+          .querySelectorAll("input[type=checkbox]:checked")
+          .forEach((cb) => comps.push(cb.value));
 
         const topic = customObj ? customObj : state.subunit;
 
@@ -922,12 +1054,12 @@
           `${topic}에 대한 깊은 학구적 호기심을 바탕으로 `,
           `수업 중 다룬 ${topic} 개념을 심층적으로 탐구하고자 `,
           `${topic}의 핵심 원리를 이해하는 데 그치지 않고 이를 주도적으로 확장하여, `,
-          `평소 ${state.unit} 분야에 대한 관심이 높아 ${topic} 파트에서 탁월한 수업 참여도를 보이며 `
+          `평소 ${state.unit} 분야에 대한 관심이 높아 ${topic} 파트에서 탁월한 수업 참여도를 보이며 `,
         ];
         const neutralIntros = [
           `${state.unit} 단원의 ${topic} 학습 과정에서 `,
           `${topic} 개념을 학습하며 `,
-          `교과 수업 중 ${topic} 파트에 참여하여 `
+          `교과 수업 중 ${topic} 파트에 참여하여 `,
         ];
         let intro =
           level === "D" || level === "E"
@@ -940,35 +1072,36 @@
           actText = `구체적인 활동으로 ${activity}. `;
         }
 
-        // 3. 생기부 전용 고급 서술어 DB 
+        // 3. 생기부 전용 고급 서술어 DB
         const bodies = {
           A: [
             `이 과정에서 핵심 원리를 깊이 있게 통찰하고 다각적인 시각으로 문제를 분석하여 최적의 해결책을 도출하는 등 뛰어난 교과 역량을 발휘함.`,
             `복잡한 개념 간의 유기적 연결성을 파악하는 능력이 탁월하며, 창의적인 문제해결력을 바탕으로 완성도 높은 결과물을 산출하여 학업적 우수성을 증명함.`,
-            `단순한 지식 습득을 넘어 비판적 사고와 논리적 추론을 통해 스스로 결론을 도출하는 과정이 돋보이며, 탁월한 탐구 역량과 지적 성장을 보여줌.`
+            `단순한 지식 습득을 넘어 비판적 사고와 논리적 추론을 통해 스스로 결론을 도출하는 과정이 돋보이며, 탁월한 탐구 역량과 지적 성장을 보여줌.`,
           ],
           B: [
             `개념을 정확하게 이해하고 있으며, 이를 논리적으로 적용하는 응용력이 돋보임. 적극적인 자료 탐색과 분석을 통해 과제를 훌륭히 해결하며 분석적 사고 역량을 나타냄.`,
             `학습 내용에 대한 높은 이해도를 바탕으로 스스로 문제를 정의하고 해결해 나가는 자기주도적 학습 태도를 갖추고 있으며, 우수한 학업 성취도를 보임.`,
-            `수업 중 습득한 이론을 실제 상황에 적절히 대입하여 해석하는 능력이 우수하며, 주어진 과제를 체계적으로 분석하고 논리적으로 서술하는 역량을 발휘함.`
+            `수업 중 습득한 이론을 실제 상황에 적절히 대입하여 해석하는 능력이 우수하며, 주어진 과제를 체계적으로 분석하고 논리적으로 서술하는 역량을 발휘함.`,
           ],
           C: [
             `해당 단원의 기본 개념을 충실히 학습하고, 주어진 과제를 책임감 있게 완수하는 성실함을 보임. 배운 지식을 실제 사례와 연결하려는 노력을 통해 실무적 역량을 기름.`,
             `수업에 적극적으로 참여하며 교과 지식을 안정적으로 습득함. 특히 과제 수행 시 원활한 소통을 바탕으로 공동체 역량과 협력적 태도를 나타냄.`,
-            `자신에게 주어진 역할을 명확히 인지하고 성실한 태도로 탐구에 임하며, 교과에서 요구하는 기초 소양과 정보처리 능력을 안정적으로 함양함.`
+            `자신에게 주어진 역할을 명확히 인지하고 성실한 태도로 탐구에 임하며, 교과에서 요구하는 기초 소양과 정보처리 능력을 안정적으로 함양함.`,
           ],
           D: [
             `초기에는 새로운 개념 적용에 다소 어려움을 겪었으나, 포기하지 않고 적극적인 질문과 반복 학습을 통해 이해도를 높이는 끈기를 보임.`,
             `과제 수행 중 마주한 한계를 극복하기 위해 지속적으로 노력하며, 꾸준한 성실함을 바탕으로 끝까지 완수해 내는 긍정적인 발전 가능성을 나타냄.`,
-            `학습 과정에서 부족한 부분을 스스로 인지하고 이를 보완하기 위해 적극적으로 소통하며 점진적으로 학업 역량을 성장시켜 나감.`
+            `학습 과정에서 부족한 부분을 스스로 인지하고 이를 보완하기 위해 적극적으로 소통하며 점진적으로 학업 역량을 성장시켜 나감.`,
           ],
           E: [
             `기초적인 내용에 관심을 가지고 성실한 태도로 수업에 참여함. 자신만의 학습 속도에 맞춰 교과 내용을 이해하려 노력하며 정보화 소양을 기르고자 노력함.`,
-            `수업 활동에 적극적으로 참여하여 기본적인 개념을 습득하고, 교사의 피드백을 수용하며 과제를 수행해 나가는 등 꾸준한 참여도를 보임.`
-          ]
+            `수업 활동에 적극적으로 참여하여 기본적인 개념을 습득하고, 교사의 피드백을 수용하며 과제를 수행해 나가는 등 꾸준한 참여도를 보임.`,
+          ],
         };
 
-        let body = bodies[level][Math.floor(Math.random() * bodies[level].length)];
+        let body =
+          bodies[level][Math.floor(Math.random() * bodies[level].length)];
 
         let compText = "";
         if (comps.length > 0) {
@@ -976,19 +1109,22 @@
           const endings = [
             `정보 교과 소양을 한층 더 신장시킴.`,
             `교과 역량을 뚜렷하게 보여줌.`,
-            `실질적인 문제해결력을 입증함.`
+            `실질적인 문제해결력을 입증함.`,
           ];
-          let randomEnding = endings[Math.floor(Math.random() * endings.length)];
+          let randomEnding =
+            endings[Math.floor(Math.random() * endings.length)];
           compText = ` 특히, ${formattedComps} 역량을 바탕으로 ${randomEnding}`;
         }
 
         // [핵심] 조립된 문장을 맞춤법 엔진에 통과시켜 완벽한 형태소로 정제
-        let rawText = (intro + actText + body + compText).replace(/\s+/g, " ").trim();
+        let rawText = (intro + actText + body + compText)
+          .replace(/\s+/g, " ")
+          .trim();
         let resultText = grammarEngine.convert(rawText);
 
         document.getElementById("tempDraft").value = resultText;
 
-        let hashKey = `SUBJ|${topic}`; 
+        let hashKey = `SUBJ|${topic}`;
 
         tempContext = {
           topic: topic,
@@ -1011,7 +1147,9 @@
           (fh) => fh.topic === tempContext.topic && fh.status !== "deleted"
         );
         if (isDuplicateSubunit) {
-          alert(`⚠️ [${tempContext.topic}]에 대한 기록이 이미 우측에 존재합니다.\n\n한 소단원(주제)에 대한 중복 기재를 피하기 위해, 기존 문장을 삭제한 후 새로운 내용으로 다시 생성해주시기 바랍니다.`);
+          alert(
+            `⚠️ [${tempContext.topic}]에 대한 기록이 이미 우측에 존재합니다.\n\n한 소단원(주제)에 대한 중복 기재를 피하기 위해, 기존 문장을 삭제한 후 새로운 내용으로 다시 생성해주시기 바랍니다.`
+          );
           return;
         }
 
@@ -1019,8 +1157,8 @@
         let aiSentences = getSentences(tempContext.aiGeneratedText);
         let currentSentences = getSentences(draftText);
         let manualCount = 0;
-        currentSentences.forEach(cs => {
-            if (cs && !aiSentences.includes(cs)) manualCount++;
+        currentSentences.forEach((cs) => {
+          if (cs && !aiSentences.includes(cs)) manualCount++;
         });
 
         let correctedText = grammarEngine.convert(draftText);
@@ -1028,8 +1166,12 @@
         let currentText = preview.innerText;
         let b = 0;
         let testText = currentText + " " + correctedText;
-        for (let i = 0; i < testText.length; i++) b += testText.charCodeAt(i) > 127 ? 3 : 1;
-        if (b > 1500) return alert("⚠️ 생기부 최대 용량(1500 Byte)을 초과하여 더 이상 추가할 수 없습니다.");
+        for (let i = 0; i < testText.length; i++)
+          b += testText.charCodeAt(i) > 127 ? 3 : 1;
+        if (b > 1500)
+          return alert(
+            "⚠️ 생기부 최대 용량(1500 Byte)을 초과하여 더 이상 추가할 수 없습니다."
+          );
 
         if (preview.innerText.trim() === "") preview.innerText = "";
         else preview.appendChild(document.createTextNode(" "));
@@ -1050,7 +1192,7 @@
           aiGeneratedText: tempContext.aiGeneratedText,
           len: correctedText.length,
           status: "active",
-          manualCount: manualCount
+          manualCount: manualCount,
         });
 
         renderInfoLayer();
@@ -1075,16 +1217,23 @@
           };
 
           let levelColor =
-            item.level === "A" ? "#1f4ddc"
-              : item.level === "B" ? "#10b981"
-              : item.level === "C" ? "#6b7280"
-              : item.level === "통합" ? "#8b5cf6" : "#f59e0b";
-              
+            item.level === "A"
+              ? "#1f4ddc"
+              : item.level === "B"
+              ? "#10b981"
+              : item.level === "C"
+              ? "#6b7280"
+              : item.level === "통합"
+              ? "#8b5cf6"
+              : "#f59e0b";
+
           let tagsHtml = `<span class="tag" style="color: ${levelColor}; border-color: ${levelColor}; background: #fff;">성취수준: ${item.level}</span>`;
           if (item.comps && item.comps.length > 0) {
-            tagsHtml += item.comps.map((a) => `<span class="tag">${a}</span>`).join("");
+            tagsHtml += item.comps
+              .map((a) => `<span class="tag">${a}</span>`)
+              .join("");
           }
-          
+
           if (item.manualCount > 0) {
             tagsHtml += `<span class="tag" style="background:#fef08a; border-color:#fde047; color:#854d0e;">✏️ 직접 작성 ${item.manualCount}건</span>`;
           }
@@ -1092,8 +1241,12 @@
           let delBtn = `<button class="delete-sentence-btn" onclick="deleteFinalSentence(event, '${item.id}')">🗑️ 삭제</button>`;
 
           let statBadge = "";
-          if (item.status === "deleted") statBadge = "<span class='status-badge' style='background:#ef4444;'>❌ 삭제됨</span>";
-          else if (item.status === "optimized") statBadge = "<span class='status-badge' style='background:#8b5cf6;'>🪄 통합 및 맞춤법 교정됨</span>";
+          if (item.status === "deleted")
+            statBadge =
+              "<span class='status-badge' style='background:#ef4444;'>❌ 삭제됨</span>";
+          else if (item.status === "optimized")
+            statBadge =
+              "<span class='status-badge' style='background:#8b5cf6;'>🪄 통합 및 맞춤법 교정됨</span>";
 
           div.innerHTML = `
             <div class="accordion-header">
@@ -1146,17 +1299,28 @@
 
       /* --- [핵심] 전체 AI 다듬기 (수동 편집 텍스트 완벽 보존 엔진) --- */
       function checkAndUpgradeIntegrity() {
-        let activeItems = finalHistoryStack.filter((i) => i.status !== "deleted");
+        let activeItems = finalHistoryStack.filter(
+          (i) => i.status !== "deleted"
+        );
         if (activeItems.length === 0) return alert("다듬을 내용이 없습니다.");
 
-        if (!confirm("⚠️ [주의]\nAI 다듬기 실행 시 선생님이 직접 추가하신 문장은 보존되며, 전체 텍스트의 맞춤법 및 종결어미가 완벽하게 교정되어 하나의 문단으로 통합됩니다.\n진행하시겠습니까?")) return;
+        if (
+          !confirm(
+            "⚠️ [주의]\nAI 다듬기 실행 시 선생님이 직접 추가하신 문장은 보존되며, 전체 텍스트의 맞춤법 및 종결어미가 완벽하게 교정되어 하나의 문단으로 통합됩니다.\n진행하시겠습니까?"
+          )
+        )
+          return;
 
         // 1. AI 원본 문장 추출
-        let allAIGeneratedText = activeItems.map((i) => i.aiGeneratedText).join(" ");
+        let allAIGeneratedText = activeItems
+          .map((i) => i.aiGeneratedText)
+          .join(" ");
         let aiSentences = getSentences(allAIGeneratedText);
 
         // 2. 현재 우측 화면 문장 추출
-        let currentSentences = getSentences(document.getElementById("finalPreview").innerText);
+        let currentSentences = getSentences(
+          document.getElementById("finalPreview").innerText
+        );
 
         // 3. 선생님 수동 작성 문장 골라내기
         let customSentences = [];
@@ -1167,7 +1331,9 @@
         });
 
         // 4. 다시 조립
-        let finalCombinedText = activeItems.map((i) => i.aiGeneratedText).join(" ");
+        let finalCombinedText = activeItems
+          .map((i) => i.aiGeneratedText)
+          .join(" ");
         if (customSentences.length > 0) {
           finalCombinedText += " " + customSentences.join(" ");
         }
@@ -1176,8 +1342,12 @@
         let finalText = grammarEngine.convert(finalCombinedText);
 
         let b = 0;
-        for (let i = 0; i < finalText.length; i++) b += finalText.charCodeAt(i) > 127 ? 3 : 1;
-        if (b > 1500) alert("⚠️ [경고] 최적화된 문장의 용량이 1500 Byte를 초과했습니다. 기재 내용을 줄여주세요.");
+        for (let i = 0; i < finalText.length; i++)
+          b += finalText.charCodeAt(i) > 127 ? 3 : 1;
+        if (b > 1500)
+          alert(
+            "⚠️ [경고] 최적화된 문장의 용량이 1500 Byte를 초과했습니다. 기재 내용을 줄여주세요."
+          );
 
         // 6. 화면 업데이트 (통합 블록 생성)
         const preview = document.getElementById("finalPreview");
@@ -1190,24 +1360,29 @@
         preview.appendChild(span);
 
         // 7. 정보 카드 통합
-        let mergedTopics = activeItems.map(i => i.topic).join(", ");
+        let mergedTopics = activeItems.map((i) => i.topic).join(", ");
         let mergedComps = [];
-        activeItems.forEach(i => {
-            if(i.comps) mergedComps.push(...i.comps);
+        activeItems.forEach((i) => {
+          if (i.comps) mergedComps.push(...i.comps);
         });
         mergedComps = [...new Set(mergedComps)];
 
-        finalHistoryStack = [{
-          id: uniqueId,
-          topic: mergedTopics.length > 25 ? mergedTopics.substring(0, 25) + "..." : mergedTopics,
-          level: "통합",
-          comps: mergedComps,
-          hashKey: "MERGED_" + Date.now(),
-          aiGeneratedText: finalCombinedText, 
-          len: finalText.length,
-          status: "optimized",
-          manualCount: customSentences.length
-        }];
+        finalHistoryStack = [
+          {
+            id: uniqueId,
+            topic:
+              mergedTopics.length > 25
+                ? mergedTopics.substring(0, 25) + "..."
+                : mergedTopics,
+            level: "통합",
+            comps: mergedComps,
+            hashKey: "MERGED_" + Date.now(),
+            aiGeneratedText: finalCombinedText,
+            len: finalText.length,
+            status: "optimized",
+            manualCount: customSentences.length,
+          },
+        ];
 
         renderInfoLayer();
         updateByte();
