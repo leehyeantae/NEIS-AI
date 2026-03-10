@@ -320,8 +320,19 @@
         font-size: 15px;
         display: flex;
         align-items: center;
-        gap: 8px;
       }
+      /* 권수 표시 뱃지 스타일 */
+      .book-count-badge {
+        font-size: 12px;
+        color: #0369a1;
+        background: #e0f2fe;
+        border: 1px solid #bae6fd;
+        padding: 2px 8px;
+        border-radius: 12px;
+        margin-left: 8px;
+        font-weight: bold;
+      }
+
       .record-byte {
         font-size: 13px;
         font-weight: 600;
@@ -1419,7 +1430,7 @@
 
       const MAX_BYTE = 1500;
 
-      // [핵심 변경] 문자열(String)이 아닌 배열(Array)로 책을 관리하여 콤마 분리 오류 방지
+      // 문자열(String)이 아닌 배열(Array)로 책을 관리하여 권수 파악 및 부분 삭제 용이
       let studentRecords = new Map();
       STUDENT_LIST.forEach((s) => studentRecords.set(s.id, []));
 
@@ -1639,7 +1650,7 @@
         logArea.prepend(div);
       }
 
-      /* --- 배열 기반 부분 삭제 및 렌더링 로직 --- */
+      /* --- 배열 기반 렌더링 및 뱃지 표시 로직 --- */
       function renderRecords() {
         const container = document.getElementById("recordContainer");
         container.innerHTML = "";
@@ -1668,17 +1679,20 @@
             }
           }
 
+          // 권수 표시 뱃지
+          let bookCountBadge = `<span class="book-count-badge">총 ${booksArr.length}권</span>`;
+
           // 전체 삭제 버튼 (삭제 모드 & 책이 1권 이상일 때만 표시)
           let deleteAllBtn =
             isDeleteMode && booksArr.length > 0
-              ? `<button class="btn sm danger" style="padding: 3px 8px; font-size: 11px;" onclick="deleteAllBooks('${s.id}')">전체 초기화</button>`
+              ? `<button class="btn sm danger" style="padding: 3px 8px; font-size: 11px; margin-left: 8px;" onclick="deleteAllBooks('${s.id}')">전체 초기화</button>`
               : "";
 
           wrap.innerHTML = `
                   <div class="record-header">
                       <span class="record-student">${idx + 1}. ${
             s.name
-          } ${deleteAllBtn}</span>
+          } ${bookCountBadge} ${deleteAllBtn}</span>
                       <span class="record-byte" style="color:${
                         byte > MAX_BYTE ? "red" : "#6b7280"
                       }">${byte} / ${MAX_BYTE} Byte</span>
