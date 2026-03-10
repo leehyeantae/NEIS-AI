@@ -666,8 +666,8 @@
         if (targets.length === 0)
           return showToast("학생을 최소 1명 선택해주세요.");
 
-        const cleanTitle = title.replace(/[『』]/g, "");
-        const entry = `『${cleanTitle}』(${author})`;
+        const cleanTitle = title.replace(/[]/g, "");
+        const entry = `${cleanTitle}(${author})`;
 
         let appliedNames = [];
         let duplicateNames = [];
