@@ -928,13 +928,13 @@
       }
 
       /* --- [V9.2 버그 픽스] 중복 방지 조사 부착 함수 --- */
-      // 단어 자체를 결합해서 반환하면 외부 템플릿과 꼬이므로, '조사'만 반환하도록 재설계
       function attachJosa(word, josaType) {
         if (!word) return "";
         const lastChar = word.charCodeAt(word.length - 1);
-        // 한글이 아닌 경우 기본(괄호 표기) 조사 반환
         if (lastChar < 0xac00 || lastChar > 0xd7a3) {
-          return josaType.split("/")[0]; // 예: '을/를' -> '을' (가장 범용적)
+          return (
+            word + "(" + josaType.split("/")[0] + ")" + josaType.split("/")[1]
+          );
         }
         const jongseong = (lastChar - 0xac00) % 28;
         const hasJongseong = jongseong > 0;
@@ -951,7 +951,7 @@
           case "으로/로":
             return word + (hasJongseong && jongseong !== 8 ? "으로" : "로");
           default:
-            return word;
+            return word + josaType;
         }
       }
 
@@ -1267,21 +1267,17 @@
         if (type === "normal") {
           data.cat = document.getElementById("normCat").value;
           data.level = document.getElementById("normLevel").value;
-          data.content = grammarEngine.convert(
-            document.getElementById("normContent").value.trim()
-          );
+          // [버그 픽스] 원시 데이터에 맞춤법 엔진을 미리 돌리지 않음 (형태 보존)
+          data.content = document.getElementById("normContent").value.trim();
 
           if (data.cat === "활동 영역") data.cat = "기타";
           if (!data.content && data.cat === "기타")
             return alert("내용을 입력하거나 활동 영역을 선택하세요.");
           data.hashKey = `NORM|${data.date}|${data.roleName}|${data.cat}|${data.content}`;
         } else {
-          data.topic = grammarEngine.convert(
-            document.getElementById("projTopic").value.trim()
-          );
-          data.content = grammarEngine.convert(
-            document.getElementById("projContent").value.trim()
-          );
+          // [버그 픽스] 원시 데이터 형태 보존
+          data.topic = document.getElementById("projTopic").value.trim();
+          data.content = document.getElementById("projContent").value.trim();
 
           if (!data.topic && !data.content)
             return alert("주제나 내용을 입력하세요.");
@@ -1330,7 +1326,7 @@
               item.type === "normal"
                 ? item.content
                   ? item.content.substring(0, 20) + "..."
-                  : `[${item.cat}] 활동`
+                  : `${item.cat} 활동`
                 : item.topic;
             let dDesc = item.content || "(영역명으로 자동 치환됨)";
 
@@ -1571,6 +1567,7 @@
         outroB = `이러한 과정을 통해 동아리 발전에 크게 기여하고 리더로서의 잠재력을 보여줌.`;
         outroC = `이를 통해 관련 역량을 기름.`;
 
+        // 캡슐 반환
         return {
           versions: {
             A: {
