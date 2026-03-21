@@ -3,9 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>진로활동 관리 시스템</title>
+    <title>진로활동 관리</title>
     <style>
-      /* --- [스크롤 이탈 방지 및 공통 레이아웃] --- */
+      /* --- [공통 레이아웃 & GNB] --- */
       * {
         box-sizing: border-box;
       }
@@ -16,6 +16,30 @@
         color: #333;
         overflow: hidden;
       }
+      .gnb-menu {
+        background: #1f2937;
+        display: flex;
+        padding: 0 16px;
+        overflow-x: auto;
+      }
+      .gnb-menu a {
+        color: #9ca3af;
+        text-decoration: none;
+        padding: 12px 20px;
+        font-size: 14px;
+        font-weight: 700;
+        transition: 0.2s;
+        white-space: nowrap;
+      }
+      .gnb-menu a:hover {
+        color: #fff;
+        background: #374151;
+      }
+      .gnb-menu a.active {
+        color: #fff;
+        background: #1f4ddc;
+      }
+
       .topbar {
         height: 48px;
         background: #f5c6cf;
@@ -31,7 +55,7 @@
       .container {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        height: calc(100vh - 48px);
+        height: calc(100vh - 48px - 43px);
       }
       .left,
       .right {
@@ -89,6 +113,10 @@
         background: #fff;
         transition: 0.2s;
         flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
       }
       .btn.primary {
         background: #1f4ddc;
@@ -408,10 +436,50 @@
         transition: 0.3s;
         pointer-events: none;
         z-index: 3000;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      /* 3버전 톤앤매너 탭 UI */
+      .draft-tabs {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+      .draft-tab {
+        flex: 1;
+        padding: 10px 0;
+        text-align: center;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        border: 1px solid #d1d5db;
+        background: #f9fafb;
+        color: #4b5563;
+        transition: 0.2s;
+        user-select: none;
+      }
+      .draft-tab:hover {
+        background: #f3f4f6;
+      }
+      .draft-tab.active {
+        background: #1f4ddc;
+        color: #fff;
+        border-color: #1f4ddc;
+        box-shadow: 0 2px 4px rgba(31, 77, 220, 0.2);
       }
     </style>
   </head>
   <body>
+    <div class="gnb-menu">
+      <a href="action_2.html">행동특성</a>
+      <a href="subject_2.html">과세특</a>
+      <a href="free_2.html">자율·자치</a>
+      <a href="club_2.html">동아리</a>
+      <a href="carrer_2.html" class="active">진로활동</a>
+      <a href="book_2.html">독서활동</a>
+    </div>
+
     <div id="toast">알림</div>
     <div class="topbar">진로활동 관리 시스템</div>
 
@@ -452,7 +520,7 @@
             id="rawDataDisplay"
             class="textarea"
             readonly
-            placeholder="[누가기록 상세 관리]에서 체크된 진로 활동들이 표시됩니다."
+            placeholder="[누가기록 상세 관리]에서 체크된 진로 활동들이 시간순으로 표시됩니다."
             style="background: #f9fafb; color: #555; flex: 1; line-height: 1.8"
           ></textarea>
         </div>
@@ -462,7 +530,7 @@
           style="height: 50px; font-size: 16px; margin: 15px 0; flex-shrink: 0"
           onclick="generateCareerAI()"
         >
-          ✨ AI 진로 문장 생성
+          ✨ AI 멀티 톤앤매너 문단 생성
         </button>
 
         <div
@@ -471,8 +539,21 @@
           <label
             class="section-title"
             style="margin-bottom: 8px; flex-shrink: 0"
-            >AI 생성 초안 (직접 덧붙이기 가능)</label
+            >💡 톤앤매너 선택 및 초안 검토</label
           >
+
+          <div class="draft-tabs">
+            <div class="draft-tab active" onclick="switchDraftTab('A', this)">
+              🔍 전공 탐구형
+            </div>
+            <div class="draft-tab" onclick="switchDraftTab('B', this)">
+              🔥 열정 실천형
+            </div>
+            <div class="draft-tab" onclick="switchDraftTab('C', this)">
+              📄 핵심 요약형
+            </div>
+          </div>
+
           <textarea
             id="tempDraft"
             class="textarea"
@@ -482,13 +563,14 @@
               flex: 1;
               line-height: 1.8;
             "
+            placeholder="AI 초안이 생성되면 표시됩니다. 학생의 성향에 맞는 탭을 고른 후, 직접 내용을 덧붙여 우측으로 전송하세요."
           ></textarea>
           <button
             class="btn success"
             style="width: 100%; margin-top: 10px; flex-shrink: 0"
             onclick="moveToFinal()"
           >
-            우측 최종 결과로 반영 →
+            우측 최종 기재란으로 반영 ➔
           </button>
         </div>
       </section>
@@ -497,15 +579,21 @@
         <div class="section-header" style="margin-bottom: 15px">
           <div class="section-title">NEIS 기재 최종 내용</div>
           <div style="display: flex; gap: 8px">
-            <button class="btn danger" onclick="clearFinal()">
-              🗑️ 전체 삭제
+            <button class="btn danger" onclick="clearFinal()">🗑️ 삭제</button>
+            <button
+              class="btn warning"
+              onclick="undoFinal()"
+              id="undoBtn"
+              style="display: none"
+            >
+              ↩️ 되돌리기
             </button>
             <button
               class="btn"
               style="background: #8b5cf6; color: white; border-color: #7c3aed"
               onclick="checkIntegrity()"
             >
-              🪄 전체 문맥 다듬기 (흐름 최적화 및 수동 작성 보존)
+              🪄 AI 안전 다듬기 (압축/정렬)
             </button>
             <button class="btn success" onclick="finalApply()">
               💾 적용하기
@@ -538,7 +626,8 @@
             "
           >
             <div class="counter">
-              실시간 용량:
+              글자수: <span id="charNum" style="font-weight: 700">0</span>자
+              &nbsp;|&nbsp; 실시간 용량:
               <span id="byteCount" style="color: #1f4ddc; font-weight: 700"
                 >0</span
               >
@@ -548,10 +637,10 @@
 
           <div class="info-layer" id="infoLayer">
             <span style="font-weight: 700; display: block; margin-bottom: 8px"
-              >📋 포함된 정보 요약 (클릭 시 문장 위치 표시)</span
+              >📋 추가된 기록 정보 (클릭 시 문장 위치 표시)</span
             >
             <div id="infoContentContainer" style="color: #999">
-              생성된 문단에 포함된 진로 활동 내역이 누적됩니다.
+              우측에 전송된 활동 내역이 누적됩니다.
             </div>
           </div>
         </div>
@@ -571,10 +660,13 @@
 
           <div class="log-entry">
             <div class="tab-menu">
-              <div class="tab-btn active" onclick="switchTab('basic', this)">
+              <div
+                class="tab-btn active"
+                onclick="switchModalTab('basic', this)"
+              >
                 📝 진로 검사 및 상담
               </div>
-              <div class="tab-btn" onclick="switchTab('explore', this)">
+              <div class="tab-btn" onclick="switchModalTab('explore', this)">
                 🚀 전공 탐구 및 강연
               </div>
             </div>
@@ -669,7 +761,7 @@
                     </div>
                   </div>
                   <div class="form-row">
-                    <div class="form-label">검사 결과 (순위)</div>
+                    <div class="form-label">검사 결과 (강점)</div>
                     <div
                       class="form-input-group"
                       style="display: flex; gap: 10px"
@@ -728,7 +820,7 @@
                         id="counselContent"
                         class="textarea"
                         style="height: 80px"
-                        placeholder="상담한 내용과 결과, 느낀 점을 입력하세요."
+                        placeholder="상담한 내용과 결과, 느낀 점을 핵심 위주로 입력하세요."
                       ></textarea>
                     </div>
                   </div>
@@ -812,7 +904,7 @@
                         name="exploreType"
                         value="activity"
                       />
-                      전공 자율 탐구(연구)</label
+                      전공 심화 탐구(연구)</label
                     >
                   </div>
                 </div>
@@ -828,13 +920,13 @@
                   </div>
                 </div>
                 <div class="form-row">
-                  <div class="form-label">핵심 내용/성과</div>
+                  <div class="form-label">구체적 내용/팩트</div>
                   <div class="form-input-group">
                     <textarea
                       id="exploreContent"
                       class="textarea"
                       style="height: 80px"
-                      placeholder="새롭게 알게 된 지식, 전공 적합성 등 활동의 성과를 입력하세요."
+                      placeholder="새롭게 알게 된 지식이나 구체적인 활동 사례(팩트)를 입력하세요."
                     ></textarea>
                   </div>
                 </div>
@@ -869,7 +961,7 @@
                 "
               >
                 <span style="font-weight: 700; color: #374151"
-                  >🕒 입력된 기록 목록</span
+                  >🕒 입력된 기록 목록 (시계열 역순 정렬)</span
                 >
                 <div>
                   <button class="btn sm" onclick="checkAll(true)">
@@ -891,18 +983,45 @@
     </div>
 
     <script>
-      /* =========================================================================
-         [문장 추출 및 분해 도구] 
-      ========================================================================== */
       function getSentences(text) {
         if (!text) return [];
         let matches = text.replace(/\n/g, " ").match(/[^.!?]+[.!?]*/g);
         return matches ? matches.map((s) => s.trim()).filter((s) => s) : [];
       }
 
-      /* =========================================================================
-         [독립 클래스 V8.0] 자연어 맞춤법/종결어미 변환 엔진 (Korean Grammar Engine)
-      ========================================================================== */
+      function getByteCount(text) {
+        let b = 0;
+        for (let i = 0; i < text.length; i++)
+          b += text.charCodeAt(i) > 127 ? 3 : 1;
+        return b;
+      }
+
+      /* --- 한글 조사(받침) 자동 판별기 --- */
+      function attachJosa(word, josa) {
+        if (!word) return "";
+        const lastChar = word.charCodeAt(word.length - 1);
+        if (lastChar < 0xac00 || lastChar > 0xd7a3) {
+          return word + "(" + josa.split("/")[0] + ")" + josa.split("/")[1];
+        }
+        const jongseong = (lastChar - 0xac00) % 28;
+        const hasJongseong = jongseong > 0;
+        switch (josa) {
+          case "을/를":
+            return word + (hasJongseong ? "을" : "를");
+          case "이/가":
+            return word + (hasJongseong ? "이" : "가");
+          case "은/는":
+            return word + (hasJongseong ? "은" : "는");
+          case "과/와":
+            return word + (hasJongseong ? "과" : "와");
+          case "으로/로":
+            return word + (hasJongseong && jongseong !== 8 ? "으로" : "로");
+          default:
+            return word + josa;
+        }
+      }
+
+      /* --- 자연어 맞춤법/종결어미 변환 엔진 --- */
       class GrammarEngine {
         constructor() {
           this.irregularDict = {
@@ -1117,10 +1236,8 @@
                 }
               }
 
-              if (isConverted && i < words.length - 1 && !wordPunc) {
+              if (isConverted && i < words.length - 1 && !wordPunc)
                 wordPunc = ".";
-              }
-
               words[i] = cleanWord + wordPunc;
             }
 
@@ -1133,30 +1250,23 @@
           return converted
             .join(" ")
             .replace(/\.{2,}/g, ".")
-            .replace(/\s+\./g, ".")
+            .replace(/\s+\./g, " ")
             .trim();
         }
       }
 
       const grammarEngine = new GrammarEngine();
 
-      /* --- [기존 로직 시작] --- */
+      /* --- [State & Initialization] --- */
       let studentHistory = [];
       let finalHistoryStack = [];
       let historyIdCounter = 0;
+
+      let currentVersions = { A: null, B: null, C: null };
+      let selectedDraftType = "A";
       let tempContext = null;
       let currentEditId = null;
-
-      function resolveJosa(word, type) {
-        if (!word) return "";
-        const lastChar = word.charCodeAt(word.length - 1);
-        if (lastChar < 0xac00 || lastChar > 0xd7a3)
-          return type === "ul" ? "을(를)" : "이(가)";
-        const hasBatchim = (lastChar - 0xac00) % 28 > 0;
-        if (type === "ul") return hasBatchim ? "을" : "를";
-        if (type === "i") return hasBatchim ? "이" : "가";
-        return "";
-      }
+      let undoStack = [];
 
       window.onload = () => {
         const list = document.getElementById("modalStudentList");
@@ -1165,6 +1275,7 @@
         div.textContent = "이현태";
         list.appendChild(div);
         renderHistory();
+        updateByte();
       };
 
       function openModal() {
@@ -1177,7 +1288,7 @@
         resetButtons();
       }
 
-      function switchTab(tabId, btn) {
+      function switchModalTab(tabId, btn) {
         document
           .querySelectorAll(".tab-btn")
           .forEach((b) => b.classList.remove("active"));
@@ -1231,13 +1342,18 @@
           return alert("희망 진로(직업명)를 입력하세요.");
 
         data.jobCode = jobCode;
-        data.jobLabel =
-          jobCode === "custom"
-            ? customJob
-            : document
-                .querySelector(`#${tabId}Career option[value="${jobCode}"]`)
-                .text.split("(")[1]
-                .replace(")", "");
+        if (jobCode === "custom") {
+          data.jobLabel = customJob;
+        } else {
+          let optText = document.querySelector(
+            `#${tabId}Career option[value="${jobCode}"]`
+          ).text;
+          if (optText.includes("(")) {
+            data.jobLabel = optText.split("(")[1].replace(")", "").trim();
+          } else {
+            data.jobLabel = optText.substring(optText.indexOf(" ") + 1).trim();
+          }
+        }
 
         if (tabId === "basic") {
           data.subType = document.querySelector(
@@ -1257,17 +1373,17 @@
             )
               return alert("순위 결과는 중복될 수 없습니다.");
 
-            data.hashKey = `TEST|${data.date}|${data.topic}|${data.r1}`;
+            data.hashKey = `TEST|${data.date}|${data.topic}|${data.jobCode}|${data.r1}|${data.r2}|${data.r3}`;
           } else {
             data.content = document
               .getElementById("counselContent")
               .value.replace(/\n/g, " ")
               .trim();
             if (!data.content) return alert("상담 내용을 입력하세요.");
-            data.hashKey = `COUNSEL|${data.date}|${data.content.substring(
-              0,
-              10
-            )}`;
+            data.topic = "진로 심층 상담";
+            data.hashKey = `COUNSEL|${data.date}|${
+              data.jobCode
+            }|${data.content.substring(0, 10)}`;
           }
         } else {
           data.subType = document.querySelector(
@@ -1281,7 +1397,7 @@
           if (!data.topic || !data.content)
             return alert("주제와 내용을 모두 입력하세요.");
 
-          data.hashKey = `EXPLORE|${data.subType}|${data.date}|${data.topic}`;
+          data.hashKey = `EXPLORE|${data.subType}|${data.date}|${data.jobCode}|${data.topic}`;
         }
 
         if (currentEditId) {
@@ -1323,7 +1439,7 @@
 
         let html = "";
         [...studentHistory]
-          .sort((a, b) => b.date.localeCompare(a.date))
+          .sort((a, b) => new Date(b.date) - new Date(a.date))
           .forEach((item) => {
             let badgeColor =
               item.subType === "test"
@@ -1341,12 +1457,9 @@
                 : item.subType === "lecture"
                 ? "외부강연"
                 : "전공탐구";
-
-            let dTitle =
-              item.subType === "counsel" ? "[진로/개인 상담]" : item.topic;
             let dDesc =
               item.subType === "test"
-                ? `${item.r1}, ${item.r2}, ${item.r3} 영역 강점`
+                ? `${item.r1}, ${item.r2}, ${item.r3} 강점`
                 : item.content;
 
             html += `
@@ -1367,7 +1480,9 @@
                     </div>
                     <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
                         <span style="background:${badgeColor}; color:#fff; font-size:11px; padding:2px 6px; border-radius:4px; font-weight:bold;">${badgeText}</span>
-                        <strong style="font-size:14px; color:#333;">${dTitle}</strong>
+                        <strong style="font-size:14px; color:#333;">${
+                          item.topic
+                        }</strong>
                     </div>
                     <div style="font-size:13px; color:#555; line-height:1.4;">${dDesc}</div>
                 </div>
@@ -1387,7 +1502,6 @@
       function editHistory(id) {
         const item = studentHistory.find((i) => i.id === id);
         if (!item) return;
-
         currentEditId = id;
 
         let btnIndex = item.tabId === "basic" ? 0 : 1;
@@ -1444,92 +1558,162 @@
 
       function updateMainSummary() {
         const active = studentHistory.filter((h) => h.checked);
-        let text = "[생성 대기 중인 활동]\n\n";
+        let text = "";
         active
-          .sort((a, b) => a.date.localeCompare(b.date))
-          .forEach((h, i) => {
-            let dTitle = h.subType === "counsel" ? "진로 상담" : h.topic;
-            text += `${i + 1}. [${h.jobLabel}] ${dTitle} (${h.date})\n\n`;
+          .sort((a, b) => new Date(a.date) - new Date(b.date))
+          .forEach((h) => {
+            text += `[${h.date}] ${h.topic}\n`;
           });
         document.getElementById("rawDataDisplay").value = active.length
           ? text
           : "체크된 활동이 없습니다.";
       }
 
-      /* --- [핵심] 진로 문장 조립 및 맞춤법 통합 엔진 --- */
-      function assembleCareerContext(targets) {
-        targets.sort((a, b) => a.date.localeCompare(b.date));
+      /* --- 파트 분리형 다중 버전 및 직업 브릿지 생성 --- */
+      function assembleCareerVersions(targets) {
+        targets.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-        let jobs = [...new Set(targets.map((t) => t.jobLabel))];
-        let lastJob = jobs[jobs.length - 1];
-        let intro = "";
+        let jobs = [];
+        targets.forEach((t) => {
+          if (!jobs.includes(t.jobLabel)) jobs.push(t.jobLabel);
+        });
 
-        if (jobs.length === 1) {
-          intro = `평소 ${lastJob} 분야에 깊은 관심을 가지고 있으며, 관련 역량을 키우기 위해 주도적으로 진로 탐색에 임하는 학생임. `;
-        } else if (jobs.length === 2) {
-          intro = `초기에는 ${jobs[0]} 분야에 관심이 있었으나, 이후 다양한 탐색 과정을 거치며 ${lastJob} 분야로 진로를 구체화하고 역량을 개발함. `;
+        let lastJob = jobs[jobs.length - 1] || "미래 인재";
+        let isUndecided = ["미정", "탐색 중"].includes(lastJob);
+
+        let actsMap = [];
+
+        let introA = "",
+          introB = "",
+          introC = "";
+        let bodyA = "",
+          bodyB = "",
+          bodyC = "";
+        let outroA = "",
+          outroB = "",
+          outroC = "";
+
+        if (jobs.length === 1 && !isUndecided) {
+          introA = `평소 ${lastJob} 분야에 대한 심층적인 호기심을 바탕으로 관련 역량을 논리적으로 확장해 나가는 학생임. `;
+          introB = `평소 ${lastJob} 분야에 깊은 애정과 열정을 가지고 주도적으로 자신의 진로를 개척해 나가는 학생임. `;
+          introC = `${lastJob} 분야로 진로를 설정하고 탐구를 수행함. `;
+        } else if (jobs.length >= 2 && !isUndecided) {
+          introA = `초기 ${jobs[0]} 분야에 대한 관심에서 출발하여, 다각적인 탐구 과정을 거쳐 ${lastJob} 분야로 진로 방향을 논리적으로 구체화함. `;
+          introB = `초기 ${jobs[0]} 분야에 대한 흥미를 바탕으로 끊임없이 도전한 결과, ${lastJob} 분야로 자신의 꿈을 확고히 다짐. `;
+          introC = `${jobs[0]}에서 ${lastJob} 분야로 진로를 구체화함. `;
         } else {
-          intro = `다양한 분야에 대한 호기심을 바탕으로 진로를 탐색한 끝에, 최종적으로 ${lastJob} 분야로 진로 방향성을 뚜렷하게 확립함. `;
-        }
-        if (["미정", "탐색 중"].includes(lastJob)) {
-          intro = `자신의 적성을 찾기 위해 다양한 진로 체험 활동에 적극적으로 참여하며 폭넓은 시각을 기르고 있음. `;
+          introA = `자신의 적성을 다각도로 분석하고 객관적인 진로 탐색을 수행함. `;
+          introB = `자신의 적성을 찾기 위해 다양한 체험 활동에 열정적으로 참여함. `;
+          introC = `다양한 활동을 통해 진로를 탐색함. `;
         }
 
-        let body = "";
-        let actsMapping = [];
-        let summaryNames = [];
-
+        let currentJob = "";
         targets.forEach((item) => {
-          actsMapping.push({
+          actsMap.push({
             hashKey: item.hashKey,
-            name: item.topic || "진로 상담",
+            name: item.topic,
+            date: item.date,
+            jobLabel: item.jobLabel,
           });
-          summaryNames.push(item.topic || "진로 상담");
+
+          let topicEul = attachJosa(item.topic, "을/를");
+
+          if (
+            currentJob !== "" &&
+            currentJob !== item.jobLabel &&
+            !["미정", "탐색 중"].includes(item.jobLabel)
+          ) {
+            let nextJobRo = attachJosa(item.jobLabel, "으로/로");
+            bodyA += `이후 학습의 외연을 넓혀 ${nextJobRo} 관심사를 확장하였으며, `;
+            bodyB += `더 나아가 ${nextJobRo} 진로의 폭을 넓히는 열정을 보이며, `;
+            bodyC += `이후 ${nextJobRo} 관심을 넓혀, `;
+          }
+          currentJob = item.jobLabel;
 
           if (item.subType === "test") {
-            body += `${item.topic}에 참여하여 ${item.r1}, ${item.r2}, ${item.r3} 성향이 높게 나타남을 확인하고, 이를 바탕으로 자신의 강점을 객관적으로 파악함. `;
+            bodyA += `${item.topic} 결과 ${item.r1}, ${item.r2}, ${item.r3} 성향이 두드러짐을 확인하고 자신의 강점을 객관적으로 분석함. `;
+            bodyB += `${item.topic}에 적극적으로 참여하여 ${item.r1}, ${item.r2}, ${item.r3} 성향을 확인하고 자아 탐색의 밑거름으로 삼음. `;
+            bodyC += `${item.topic}에서 ${item.r1}, ${item.r2}, ${item.r3} 성향을 확인함. `;
           } else if (item.subType === "counsel") {
-            body += `진로 상담을 통해 ${item.content}에 대해 심도 있게 논의하고 구체적인 진로 로드맵을 수립함. `;
+            bodyA += `진로 상담을 통해 ${item.content}에 대해 심도 있게 분석하고 체계적인 진로 로드맵을 설계함. `;
+            bodyB += `진로 상담에 적극적으로 임하며 ${item.content}에 대한 조언을 수용하고 긍정적인 태도로 진로를 개척함. `;
+            bodyC += `진로 상담을 통해 ${item.content}에 대해 논의함. `;
           } else if (item.subType === "lecture") {
-            const josa = resolveJosa(item.topic, "ul");
-            body += `${item.topic}${josa} 주제로 한 특강을 경청하고 ${item.content}를 학습하며 관련 분야의 실무적 지식과 직업 가치관을 정립함. `;
+            bodyA += `${topicEul} 주제로 한 특강에서 ${item.content}를 비판적으로 수용하며 전공 분야의 지식 기반을 탄탄히 다짐. `;
+            bodyB += `${topicEul} 주제로 한 특강을 경청하고 ${item.content}를 학습하며 전공에 대한 확고한 의지와 열의를 보임. `;
+            bodyC += `${topicEul} 주제로 한 특강을 듣고 ${item.content}를 학습함. `;
           } else {
-            const josa = resolveJosa(item.topic, "ul");
-            body += `${item.topic}${josa} 주제로 탐구 활동을 주도적으로 수행하며 ${item.content} 등 전공에 대한 심도 있는 이해도와 자기주도적 탐구 역량을 보여줌. `;
+            bodyA += `${topicEul} 중심으로 탐구 활동을 수행하며 ${item.content} 등 전공과 관련된 심층적인 분석력과 논리력을 증명함. `;
+            bodyB += `${topicEul} 중심으로 자기주도적 탐구를 수행하여 ${item.content} 등 앎의 지평을 넓히는 뛰어난 실천력을 보임. `;
+            bodyC += `${topicEul} 탐구하며 ${item.content} 등 전공 적합성을 보임. `;
           }
         });
 
-        let outro = `이러한 일련의 진로 탐색 과정을 통해 미래의 ${
-          !["미정", "탐색 중"].includes(lastJob) ? lastJob : "핵심 인재"
-        }로서의 자질을 탄탄히 함양함.`;
-
-        let rawText = (intro + body + outro).replace(/\s+/g, " ").trim();
-
-        // 최종 조립된 문장을 V8.0 맞춤법 엔진에 통과시킵니다.
-        let resultText = grammarEngine.convert(rawText);
+        let lastJobText = isUndecided
+          ? "미래 인재"
+          : attachJosa(lastJob, "으로/로");
+        outroA = `이러한 과정을 통해 ${lastJobText}서의 학업적 자질과 전문성을 훌륭히 입증함.`;
+        outroB = `이러한 과정을 통해 ${lastJobText} 성장할 수 있는 풍부한 잠재력과 긍정적 에너지를 보여줌.`;
+        outroC = `이러한 과정을 통해 ${lastJobText}의 자질을 기름.`;
 
         return {
-          text: resultText,
-          actsMap: actsMapping,
-          summary: summaryNames,
+          versions: {
+            A: {
+              intro: grammarEngine.convert(introA),
+              body: grammarEngine.convert(bodyA),
+              outro: grammarEngine.convert(outroA),
+            },
+            B: {
+              intro: grammarEngine.convert(introB),
+              body: grammarEngine.convert(bodyB),
+              outro: grammarEngine.convert(outroB),
+            },
+            C: {
+              intro: grammarEngine.convert(introC),
+              body: grammarEngine.convert(bodyC),
+              outro: grammarEngine.convert(outroC),
+            },
+          },
+          actsMap,
         };
+      }
+
+      function switchDraftTab(type, btn) {
+        document
+          .querySelectorAll(".draft-tab")
+          .forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        selectedDraftType = type;
+
+        let parts = currentVersions[type];
+        let fullText = grammarEngine.convert(
+          [parts.intro, parts.body, parts.outro].join(" ")
+        );
+        document.getElementById("tempDraft").value = fullText;
+
+        if (tempContext) {
+          tempContext.parts = parts;
+          tempContext.aiGeneratedText = fullText;
+        }
       }
 
       function generateCareerAI() {
         let targets = studentHistory.filter((h) => h.checked);
         if (targets.length === 0) return alert("생성할 활동을 선택하세요.");
 
-        const { text, actsMap, summary } = assembleCareerContext(targets);
-        document.getElementById("tempDraft").value = text;
+        const result = assembleCareerVersions(targets);
+        currentVersions = result.versions;
 
-        // 향후 Diffing(보존)을 위해 순수 AI 생성 텍스트를 저장합니다.
         tempContext = {
-          actsMap: actsMap,
-          len: text.length,
-          summary: summary,
-          aiGeneratedText: text,
+          actsMap: result.actsMap,
+          parts: null,
+          aiGeneratedText: "",
         };
-        showToast("진로 AI 문단이 완벽하게 생성되었습니다.");
+
+        document.querySelectorAll(".draft-tab")[0].click();
+        showToast(
+          "시간 순서와 직업 변경 서사가 적용된 다중 버전 초안이 생성되었습니다."
+        );
       }
 
       function updateDuplicateStatus() {
@@ -1560,44 +1744,49 @@
         const preview = document.getElementById("finalPreview");
         if (!draftText || !tempContext) return alert("생성된 문단이 없습니다.");
 
-        // [핵심] 수동 편집 내용 감지
-        let aiSentences = getSentences(tempContext.aiGeneratedText);
-        let currentSentences = getSentences(draftText);
-        let manualCount = 0;
-        currentSentences.forEach((cs) => {
-          if (cs && !aiSentences.includes(cs)) manualCount++;
-        });
-
-        // 우측으로 넘어갈 때 선생님이 추가한 문장도 맞춤법 검사기 한 번 더 통과
-        let correctedText = grammarEngine.convert(draftText);
-
-        let currentText = preview.innerText;
-        let b = 0;
-        let testText = currentText + " " + correctedText;
-        for (let i = 0; i < testText.length; i++)
-          b += testText.charCodeAt(i) > 127 ? 3 : 1;
-        if (b > 1500)
-          return alert(
-            "⚠️ 생기부 최대 용량(1500 Byte)을 초과하여 더 이상 전송할 수 없습니다."
-          );
-
         let duplicateNames = [];
         tempContext.actsMap.forEach((act) => {
           if (
-            finalHistoryStack.some(
-              (fh) =>
-                fh.status === "active" &&
-                fh.actsMap &&
-                fh.actsMap.some((a) => a.hashKey === act.hashKey)
+            finalHistoryStack.some((fh) =>
+              fh.actsMap.some((a) => a.hashKey === act.hashKey)
             )
           ) {
             duplicateNames.push(act.name);
           }
         });
-        let isDuplicate = duplicateNames.length > 0;
+
+        if (duplicateNames.length > 0) {
+          alert(
+            `⚠️ 다음 활동은 이미 우측 기재란에 존재합니다:\n\n- ${duplicateNames.join(
+              "\n- "
+            )}\n\n중복 기재를 막기 위해 해당 활동의 체크를 해제한 후 다시 생성해 주세요.`
+          );
+          return;
+        }
+
+        let aiSentences = getSentences(tempContext.aiGeneratedText);
+        let currentSentences = getSentences(draftText);
+        let manualCount = 0;
+        let teacherSentences = [];
+        currentSentences.forEach((cs) => {
+          if (cs && !aiSentences.includes(cs)) {
+            manualCount++;
+            teacherSentences.push(cs);
+          }
+        });
+
+        let correctedText = grammarEngine.convert(draftText);
+        let currentText = preview.innerText;
+        let b = getByteCount(currentText + " " + correctedText);
+
+        if (b > 1500) {
+          alert(
+            "⚠️ 추가 후 총 용량이 1500 Byte를 초과합니다.\n우측의 [AI 안전 다듬기] 버튼을 눌러 내용을 최적화해 주세요."
+          );
+        }
 
         if (preview.innerText.trim() === "") preview.innerText = "";
-        else preview.appendChild(document.createTextNode(" "));
+        else preview.appendChild(document.createTextNode(" \n"));
 
         const uniqueId = "block_" + Date.now();
         const span = document.createElement("span");
@@ -1608,72 +1797,51 @@
 
         finalHistoryStack.push({
           id: uniqueId,
-          summary: tempContext.summary,
           actsMap: tempContext.actsMap,
-          aiGeneratedText: tempContext.aiGeneratedText, // 원본 기록 보존
+          parts: tempContext.parts,
+          originalAiText: tempContext.aiGeneratedText,
+          teacherText: teacherSentences.join(" "),
           len: correctedText.length,
           status: "active",
-          isDuplicate: isDuplicate,
-          dupNames: duplicateNames,
-          manualCount: manualCount, // 수동 작성 건수 저장
+          manualCount: manualCount,
         });
 
-        updateDuplicateStatus();
+        document.getElementById("tempDraft").value = "";
         renderInfoLayer();
         updateByte();
-        if (isDuplicate)
-          showToast(`⚠️ 중복 감지: 이미 작성된 활동이 포함되어 있습니다.`);
+        showToast("우측 최종 기재란으로 전송되었습니다.");
       }
 
+      /* --- [V8.4 픽스] 클릭 시 highlightSentence 발동 정상화 --- */
       function renderInfoLayer() {
         const con = document.getElementById("infoContentContainer");
         con.innerHTML = "";
         if (finalHistoryStack.length === 0) {
-          con.innerHTML = "생성 이력이 없습니다.";
+          con.innerHTML = "추가된 기록이 없습니다.";
           return;
         }
 
         finalHistoryStack.forEach((item) => {
           const div = document.createElement("div");
-          div.className = `info-card ${item.status} ${
-            item.isDuplicate ? "duplicate" : ""
-          }`;
+          div.className = `info-card`;
+
+          // ★ 여기서 클릭 이벤트를 연결합니다!
           div.onclick = () => highlightSentence(item.id);
 
-          let tagsHtml = item.summary
-            .map((a) => `<span class="tag">${a}</span>`)
+          let tagsHtml = item.actsMap
+            .map((a) => `<span class="tag">${a.name}</span>`)
             .join("");
-
-          // [UI] 직접 작성 문장 뱃지
           if (item.manualCount > 0) {
             tagsHtml += `<span class="tag" style="background:#fef08a; border-color:#fde047; color:#854d0e;">✏️ 직접 작성 ${item.manualCount}건</span>`;
           }
 
-          let delBtn = `<button class="delete-sentence-btn" onclick="deleteFinalSentence(event, '${item.id}')">🗑️ 삭제</button>`;
-          let dupAlert = item.isDuplicate
-            ? `<span class="dup-badge" style="margin-left:8px;" title="${item.dupNames.join(
-                ", "
-              )} 중복">⚠️ 중복 감지</span>`
-            : "";
-
-          let statBadge = "";
-          if (item.status === "deleted")
-            statBadge =
-              "<span class='status-badge' style='background:#ef4444;'>❌ 삭제됨</span>";
-          else if (item.status === "optimized")
-            statBadge =
-              "<span class='status-badge' style='background:#8b5cf6;'>🪄 흐름 최적화됨</span>";
+          let delBtn = `<button class="delete-sentence-btn" onclick="deleteFinalSentence(event, '${item.id}')">🗑️ 일괄 삭제</button>`;
 
           div.innerHTML = `
             <div class="info-header">
-                <span style="display:flex; align-items:center;">📝 진로 생성 기록 ${dupAlert}</span>
+                <span style="color:#374151;">📝 작성 완료된 문단 (클릭 시 하이라이트)</span>
                 ${delBtn}
             </div>
-            ${
-              item.status !== "active"
-                ? `<div style="margin-bottom:6px;">${statBadge}</div>`
-                : ""
-            }
             <div class="info-tags">${tagsHtml}</div>`;
           con.appendChild(div);
         });
@@ -1702,13 +1870,52 @@
           target.remove();
         }
         finalHistoryStack = finalHistoryStack.filter((item) => item.id !== id);
-        updateDuplicateStatus();
         renderInfoLayer();
         updateByte();
         showToast("기록이 삭제되었습니다.");
       }
 
-      /* --- [궁극의 마스터 업데이트] 수동 문장 보존 및 진로 흐름 재조립 엔진 --- */
+      function safeCompress(text) {
+        let c = text;
+        c = c.replace(/단순히 이해하는 데 그치지 않고 /g, "");
+        c = c.replace(
+          /실제 사례에 논리적으로 적용해 내는 /g,
+          "실제 사례에 적용하는 "
+        );
+        c = c.replace(/자신의 강점을 객관적으로 분석함/g, "강점을 파악함");
+        c = c.replace(/비판적으로 수용하며 /g, "");
+        c = c.replace(/앎의 지평을 넓히는 /g, "");
+        c = c.replace(/심층적인 호기심을 바탕으로 /g, "관심을 가져 ");
+        c = c.replace(/다각적인 탐구 과정을 거쳐 /g, "탐구하며 ");
+        return c;
+      }
+
+      function saveUndoState() {
+        undoStack.push({
+          history: JSON.parse(JSON.stringify(finalHistoryStack)),
+          html: document.getElementById("finalPreview").innerHTML,
+        });
+        document.getElementById("undoBtn").style.display = "inline-flex";
+      }
+
+      function undoFinal() {
+        if (undoStack.length === 0)
+          return alert("되돌릴 이전 상태가 없습니다.");
+        if (!confirm("압축 및 정렬 전(이전 상태)으로 되돌리시겠습니까?"))
+          return;
+
+        let prevState = undoStack.pop();
+        finalHistoryStack = prevState.history;
+        document.getElementById("finalPreview").innerHTML = prevState.html;
+
+        if (undoStack.length === 0)
+          document.getElementById("undoBtn").style.display = "none";
+
+        renderInfoLayer();
+        updateByte();
+        showToast("이전 상태로 복구되었습니다.");
+      }
+
       function checkIntegrity() {
         let activeItems = finalHistoryStack.filter(
           (i) => i.status !== "deleted"
@@ -1717,71 +1924,96 @@
 
         if (
           !confirm(
-            "⚠️ [주의]\n전체 문맥 다듬기 실행 시 원본 데이터를 바탕으로 진로 흐름(인트로/아웃트로)이 하나로 통합 재조립됩니다.\n선생님이 직접 추가하신 문장은 지워지지 않고 보존되어 뒤에 병합됩니다.\n진행하시겠습니까?"
+            "⚠️ [주의]\n다듬기 실행 시 선생님이 직접 쓰신 문장과 평가어는 절대 보존되며, 전체 데이터가 날짜순(과거➔현재)으로 완벽하게 재정렬 및 병합됩니다.\n진행하시겠습니까?"
           )
         )
           return;
 
-        // 1. AI 원본 문장 추출
-        let allAIGeneratedText = activeItems
-          .map((i) => i.aiGeneratedText)
-          .join(" ");
-        let aiSentences = getSentences(allAIGeneratedText);
+        saveUndoState();
 
-        // 2. 현재 우측 화면 문장 추출
-        let currentSentences = getSentences(
+        let displayedSentences = getSentences(
           document.getElementById("finalPreview").innerText
         );
-
-        // 3. 선생님 수동 작성 문장 골라내기 (Diffing)
-        let customSentences = [];
-        currentSentences.forEach((cs) => {
-          if (cs && !aiSentences.includes(cs)) {
-            customSentences.push(cs);
-          }
+        let knownSentences = [];
+        activeItems.forEach((i) => {
+          let baseText = i.optimizedAiText
+            ? i.optimizedAiText
+            : i.originalAiText;
+          knownSentences.push(...getSentences(grammarEngine.convert(baseText)));
+          if (i.teacherText)
+            knownSentences.push(
+              ...getSentences(grammarEngine.convert(i.teacherText))
+            );
         });
 
-        // 4. 우측에 생성되었던 '모든 활동 데이터'의 해시키를 모아 원본 목록 찾기
-        let allActiveHashKeys = [];
-        activeItems.forEach((item) => {
-          if (item.actsMap) {
-            item.actsMap.forEach((act) => allActiveHashKeys.push(act.hashKey));
-          }
+        let newPreviewSentences = [];
+        displayedSentences.forEach((s) => {
+          if (s && !knownSentences.includes(s)) newPreviewSentences.push(s);
         });
-        allActiveHashKeys = [...new Set(allActiveHashKeys)]; // 중복 제거
 
-        let allTargets = studentHistory.filter((h) =>
-          allActiveHashKeys.includes(h.hashKey)
+        let allTeacherTexts = activeItems
+          .map((i) => i.teacherText)
+          .filter((t) => t);
+        if (newPreviewSentences.length > 0)
+          allTeacherTexts.push(newPreviewSentences.join(" "));
+        let finalTeacherText = allTeacherTexts.join(" ");
+
+        activeItems.sort(
+          (a, b) =>
+            new Date(a.actsMap[0].date).getTime() -
+            new Date(b.actsMap[0].date).getTime()
         );
 
-        // 5. 다시 조립 (기존의 야매 치환 방식이 아닌, 근본적인 처음부터 다시 융합 생성 방식 적용)
-        const {
-          text: upgradedText,
-          actsMap: mergedActs,
-          summary: mergedSummary,
-        } = assembleCareerContext(allTargets);
+        let mergedBody = "";
+        let globalCurrentJob = "";
 
-        // 6. 다듬어진 AI 문장 뒤에, 빼두었던 '선생님 직접 작성 문장' 이어 붙이기
-        let finalCombinedText = upgradedText;
-        if (customSentences.length > 0) {
-          finalCombinedText += " " + customSentences.join(" ");
+        for (let i = 0; i < activeItems.length; i++) {
+          let item = activeItems[i];
+          let firstJobOfBlock = item.actsMap[0].jobLabel;
+
+          if (
+            globalCurrentJob &&
+            globalCurrentJob !== firstJobOfBlock &&
+            !["미정", "탐색 중"].includes(firstJobOfBlock)
+          ) {
+            mergedBody += `이후 ${attachJosa(
+              firstJobOfBlock,
+              "으로/로"
+            )} 관심사를 확장하였으며, `;
+          }
+
+          mergedBody += safeCompress(item.parts.body) + " ";
+          globalCurrentJob = item.actsMap[item.actsMap.length - 1].jobLabel;
         }
 
-        // 7. 병합된 전체 문장을 맞춤법 엔진에 통과시켜 완벽히 정제!
-        let finalText = grammarEngine.convert(finalCombinedText);
+        let newParts = {
+          intro: activeItems[0].parts.intro,
+          body: mergedBody.trim(),
+          outro: activeItems[activeItems.length - 1].parts.outro,
+        };
 
-        let b = 0;
-        for (let i = 0; i < finalText.length; i++)
-          b += finalText.charCodeAt(i) > 127 ? 3 : 1;
-        if (b > 1500)
+        let compressedAiText = grammarEngine.convert(
+          [newParts.intro, newParts.body, newParts.outro].join(" ")
+        );
+        let testText = grammarEngine.convert(
+          (compressedAiText + " " + finalTeacherText).replace(/\s{2,}/g, " ")
+        );
+
+        let finalText = testText;
+        let finalByte = getByteCount(testText);
+
+        if (finalByte > 1500) {
           alert(
-            "⚠️ [경고] 최적화된 문장의 용량이 1500 Byte를 초과했습니다. 기재 내용을 줄여주세요."
+            "⚠️ 압축을 진행했음에도 용량이 1500 Byte를 초과합니다.\n우측 상단의 [↩️ 되돌리기] 버튼을 눌러 원상 복구한 뒤, 덜 중요한 활동 1~2개를 과감히 삭제하시는 것을 권장합니다."
           );
+        } else {
+          showToast(
+            "완벽한 날짜 정렬 및 팩트 중심 압축이 성공적으로 완료되었습니다!"
+          );
+        }
 
-        // 8. 화면 업데이트 (단일 블록으로 융합)
         const preview = document.getElementById("finalPreview");
         preview.innerHTML = "";
-
         const uniqueId = "opt_" + Date.now();
         const span = document.createElement("span");
         span.className = "sentence-block";
@@ -1789,31 +2021,35 @@
         span.innerText = finalText;
         preview.appendChild(span);
 
+        let mergedActs = [];
+        activeItems.forEach((i) => {
+          if (i.actsMap) mergedActs.push(...i.actsMap);
+        });
+
         finalHistoryStack = [
           {
             id: uniqueId,
-            summary: mergedSummary,
             actsMap: mergedActs,
-            aiGeneratedText: upgradedText, // 다음 비교를 위해 순수 AI 텍스트만 기록
+            parts: newParts,
+            originalAiText: activeItems.map((i) => i.originalAiText).join(" "),
+            optimizedAiText: compressedAiText,
+            teacherText: finalTeacherText,
             len: finalText.length,
             status: "optimized",
-            isDuplicate: false,
-            dupNames: [],
-            manualCount: customSentences.length, // [직접 작성 뱃지]
+            manualCount: getSentences(finalTeacherText).length,
           },
         ];
 
         renderInfoLayer();
         updateByte();
-        showToast(
-          "진로 흐름 통합, 직접 작성 문장 보존 및 맞춤법 교정이 완료되었습니다!"
-        );
       }
 
       function clearFinal() {
         if (confirm("전체 삭제하시겠습니까?")) {
           document.getElementById("finalPreview").innerText = "";
           finalHistoryStack = [];
+          undoStack = [];
+          document.getElementById("undoBtn").style.display = "none";
           renderInfoLayer();
           updateByte();
         }
@@ -1821,12 +2057,10 @@
 
       function updateByte() {
         const text = document.getElementById("finalPreview").innerText;
-        let bytes = 0;
-        for (let i = 0; i < text.length; i++)
-          bytes += text.charCodeAt(i) > 127 ? 3 : 1;
-        document.getElementById("byteCount").innerText = bytes;
+        document.getElementById("charNum").innerText = text.length;
+        document.getElementById("byteCount").innerText = getByteCount(text);
         document.getElementById("byteCount").style.color =
-          bytes > 1500 ? "red" : "#1f4ddc";
+          getByteCount(text) > 1500 ? "red" : "#1f4ddc";
       }
       function finalApply() {
         alert("NEIS 입력 완료");
