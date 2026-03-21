@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>과목별 세부능력 및 특기사항</title>
     <style>
+      /* --- [공통 레이아웃 & GNB] --- */
       * {
         box-sizing: border-box;
       }
@@ -14,6 +15,29 @@
         background: #f5f6f8;
         color: #333;
         overflow: hidden;
+      }
+      .gnb-menu {
+        background: #1f2937;
+        display: flex;
+        padding: 0 16px;
+        overflow-x: auto;
+      }
+      .gnb-menu a {
+        color: #9ca3af;
+        text-decoration: none;
+        padding: 12px 20px;
+        font-size: 14px;
+        font-weight: 700;
+        transition: 0.2s;
+        white-space: nowrap;
+      }
+      .gnb-menu a:hover {
+        color: #fff;
+        background: #374151;
+      }
+      .gnb-menu a.active {
+        color: #fff;
+        background: #1f4ddc;
       }
       .topbar {
         height: 48px;
@@ -26,11 +50,10 @@
         color: #333;
         flex-shrink: 0;
       }
-
       .container {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        height: calc(100vh - 48px);
+        height: calc(100vh - 48px - 43px);
       }
       .left,
       .right {
@@ -45,7 +68,6 @@
         border-right: 1px solid #e5e7eb;
         gap: 15px;
       }
-
       .section-header {
         display: flex;
         justify-content: space-between;
@@ -58,7 +80,6 @@
         font-weight: 700;
         color: #1f2937;
       }
-
       .label {
         font-size: 13px;
         font-weight: 600;
@@ -80,7 +101,6 @@
         resize: none;
         line-height: 1.6;
       }
-
       .btn {
         padding: 10px 18px;
         border-radius: 8px;
@@ -111,11 +131,15 @@
         color: #e11d48;
         border-color: #ffcccc;
       }
+      .btn.warning {
+        background: #f59e0b;
+        color: #fff;
+        border-color: #d97706;
+      }
       .btn.sm {
         padding: 6px 12px;
         font-size: 12px;
       }
-
       .chip-row {
         display: flex;
         flex-wrap: wrap;
@@ -143,7 +167,6 @@
         font-weight: 600;
         box-shadow: 0 2px 4px rgba(31, 77, 220, 0.2);
       }
-
       .subunit-row {
         display: flex;
         flex-wrap: wrap;
@@ -168,7 +191,6 @@
         color: #1f4ddc;
         font-weight: 600;
       }
-
       .radio-group {
         display: flex;
         gap: 15px;
@@ -190,7 +212,6 @@
         accent-color: #1f4ddc;
         transform: scale(1.1);
       }
-
       .checkbox-group {
         display: flex;
         flex-wrap: wrap;
@@ -214,7 +235,6 @@
         accent-color: #15803d;
         transform: scale(1.1);
       }
-
       .card-info-box {
         padding: 12px;
         background: #f8fafc;
@@ -233,7 +253,6 @@
         color: #475569;
         line-height: 1.4;
       }
-
       .preview-box {
         flex: 6;
         min-height: 150px;
@@ -261,7 +280,6 @@
       .highlight-active {
         background-color: #fef08a !important;
       }
-
       .counter {
         text-align: right;
         margin-top: 10px;
@@ -279,7 +297,6 @@
         overflow-y: auto;
         margin-top: 15px;
       }
-
       .info-card {
         background: #fff;
         border: 1px solid #ddd;
@@ -308,7 +325,6 @@
         border-left-color: #8b5cf6;
         background: #f5f3ff;
       }
-
       .accordion-header {
         padding: 12px;
         display: flex;
@@ -325,7 +341,6 @@
       .info-card.expanded .accordion-chevron {
         transform: rotate(180deg);
       }
-
       .accordion-body-wrapper {
         display: grid;
         grid-template-rows: 0fr;
@@ -344,7 +359,6 @@
         flex-direction: column;
         gap: 8px;
       }
-
       .tag {
         padding: 3px 8px;
         border-radius: 4px;
@@ -378,7 +392,6 @@
         background: #ef4444;
         color: #fff;
       }
-
       #toast {
         position: fixed;
         bottom: 30px;
@@ -399,6 +412,15 @@
     </style>
   </head>
   <body>
+    <div class="gnb-menu">
+      <a href="action_2.html">행동특성</a>
+      <a href="subject_2.html" class="active">과세특</a>
+      <a href="free_2.html">자율·자치</a>
+      <a href="club_2.html">동아리</a>
+      <a href="carrer_2.html">진로활동</a>
+      <a href="book_2.html">독서활동</a>
+    </div>
+
     <div id="toast">알림</div>
     <div class="topbar">과목별 세부능력 및 특기사항</div>
 
@@ -413,6 +435,25 @@
           >
             🔄 폼 초기화
           </button>
+        </div>
+
+        <div
+          style="
+            background: #eef2ff;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #c7d2fe;
+            margin-bottom: 10px;
+            margin-top: 5px;
+            flex-shrink: 0;
+          "
+        >
+          <strong
+            style="color: #3730a3; display: flex; align-items: center; gap: 8px"
+          >
+            🧑‍🎓 학생명: 이현태
+            <span style="font-size: 12px; color: #555">(고정)</span>
+          </strong>
         </div>
 
         <div class="label" style="margin-top: 5px">1. 대단원 선택</div>
@@ -441,12 +482,20 @@
           type="text"
           id="customObjectiveInput"
           class="input"
-          placeholder="예) 인공지능 윤리, 다이익스트라 알고리즘 탐구 (미입력 시 소단원명 자동 반영)"
+          placeholder="예) 인공지능 윤리, 알고리즘 탐구 (미입력 시 소단원명 반영)"
           maxlength="30"
           style="margin-bottom: 10px"
         />
 
-        <div class="label">4. 2022 개정 교과 핵심 역량</div>
+        <div class="label">4. 구체적 활동 사례 (생기부의 핵심)</div>
+        <textarea
+          id="caseInput"
+          class="textarea"
+          style="height: 60px; min-height: 60px; margin-bottom: 10px"
+          placeholder="예) 공공데이터 API를 활용하여 미세먼지 시각화 프로젝트를 주도적으로 수행함."
+        ></textarea>
+
+        <div class="label">5. 2022 개정 교과 핵심 역량</div>
         <div class="checkbox-group" id="competencyGroup">
           <label
             ><input type="checkbox" value="지식정보처리" /> 지식정보처리</label
@@ -462,7 +511,7 @@
           >
         </div>
 
-        <div class="label">5. 성취수준 평가 (A~E)</div>
+        <div class="label">6. 성취수준 평가 (A~E)</div>
         <div style="font-size: 11px; color: #6b7280; margin-bottom: 6px">
           ※ 선택 수준에 따라 생기부 전용 고급 서술어와 역량이 서사 속에 자동
           융합됩니다.
@@ -480,16 +529,6 @@
           <label><input type="radio" name="level" value="E" /> E (참여)</label>
         </div>
 
-        <div class="label" style="margin-top: 10px">
-          6. 구체적 활동 사례 (생기부의 핵심)
-        </div>
-        <textarea
-          id="caseInput"
-          class="textarea"
-          style="height: 60px; min-height: 60px"
-          placeholder="예) 공공데이터 API를 활용하여 미세먼지 시각화 프로젝트를 수행함."
-        ></textarea>
-
         <button
           class="btn primary"
           style="
@@ -500,7 +539,7 @@
           "
           onclick="generateSubjectAI()"
         >
-          ✨ AI 과세특 문장 생성
+          ✨ AI 과세특 초개인화 서사 생성
         </button>
 
         <div
@@ -512,7 +551,7 @@
             margin-top: 15px;
           "
         >
-          <label class="label">AI 생성 초안 (검토 및 수정/직접 입력)</label>
+          <label class="label">AI 생성 초안 (검토 및 직접 수정 가능)</label>
           <textarea
             id="tempDraft"
             class="textarea"
@@ -523,6 +562,7 @@
               min-height: 120px;
               line-height: 1.8;
             "
+            placeholder="선생님이 입력하신 성취기준, 활동 사례, 핵심 역량을 바탕으로 합격 자소서 패턴의 초개인화된 서사가 자동 생성됩니다."
           ></textarea>
           <button
             class="btn success"
@@ -538,15 +578,21 @@
         <div class="section-header" style="margin-bottom: 15px">
           <div class="section-title">NEIS 기재 최종 내용</div>
           <div style="display: flex; gap: 8px">
-            <button class="btn danger" onclick="clearFinal()">
-              🗑️ 전체 삭제
+            <button class="btn danger" onclick="clearFinal()">🗑️ 삭제</button>
+            <button
+              class="btn warning"
+              onclick="undoFinal()"
+              id="undoBtn"
+              style="display: none"
+            >
+              ↩️ 되돌리기
             </button>
             <button
               class="btn"
               style="background: #8b5cf6; color: white; border-color: #7c3aed"
               onclick="checkAndUpgradeIntegrity()"
             >
-              🪄 전체 AI 다듬기 (수동 작성 보존 및 교정)
+              🪄 AI 팩트 중심 다듬기 (압축)
             </button>
             <button class="btn success" onclick="finalApply()">
               💾 적용하기
@@ -578,8 +624,9 @@
               flex-shrink: 0;
             "
           >
-            <div class="counter">
-              실시간 용량:
+            <div class="counter" style="margin-top: 0">
+              글자수: <span id="charNum" style="font-weight: 700">0</span>자
+              &nbsp;|&nbsp; 실시간 용량:
               <span id="byteCount" style="color: #1f4ddc; font-weight: 700"
                 >0</span
               >
@@ -595,8 +642,9 @@
                 margin-bottom: 8px;
                 color: #374151;
               "
-              >📋 작성된 소단원 요약 (클릭하여 상세 확인 및 삭제)</span
             >
+              📋 작성된 소단원 요약 (클릭하여 상세 확인 및 삭제)
+            </span>
             <div
               id="infoContentContainer"
               style="color: #9ca3af; font-size: 13px"
@@ -609,18 +657,44 @@
     </div>
 
     <script>
-      /* =========================================================================
-         [문장 추출 및 분해 도구] 
-      ========================================================================== */
       function getSentences(text) {
         if (!text) return [];
         let matches = text.replace(/\n/g, " ").match(/[^.!?]+[.!?]*/g);
         return matches ? matches.map((s) => s.trim()).filter((s) => s) : [];
       }
 
-      /* =========================================================================
-         [독립 클래스 V8.0] 자연어 맞춤법/종결어미 변환 엔진 (Korean Grammar Engine)
-      ========================================================================== */
+      function getByteCount(text) {
+        let b = 0;
+        for (let i = 0; i < text.length; i++)
+          b += text.charCodeAt(i) > 127 ? 3 : 1;
+        return b;
+      }
+
+      /* --- [V6.0] 한글 조사(받침) 자동 판별기 --- */
+      function attachJosa(word, josa) {
+        if (!word) return "";
+        const lastChar = word.charCodeAt(word.length - 1);
+        if (lastChar < 0xac00 || lastChar > 0xd7a3) {
+          return word + "(" + josa.split("/")[0] + ")" + josa.split("/")[1];
+        }
+        const jongseong = (lastChar - 0xac00) % 28;
+        const hasJongseong = jongseong > 0;
+        switch (josa) {
+          case "을/를":
+            return word + (hasJongseong ? "을" : "를");
+          case "이/가":
+            return word + (hasJongseong ? "이" : "가");
+          case "은/는":
+            return word + (hasJongseong ? "은" : "는");
+          case "과/와":
+            return word + (hasJongseong ? "과" : "와");
+          case "으로/로":
+            return word + (hasJongseong && jongseong !== 8 ? "으로" : "로");
+          default:
+            return word + josa;
+        }
+      }
+
       class GrammarEngine {
         constructor() {
           this.irregularDict = {
@@ -784,7 +858,6 @@
             let puncMatch = s.match(/[.!?]+$/);
             let sentencePunc = puncMatch ? puncMatch[0] : "";
             let body = s.replace(/[.!?]+$/, "");
-
             let words = body.split(/\s+/);
 
             for (let i = 0; i < words.length; i++) {
@@ -835,10 +908,8 @@
                 }
               }
 
-              if (isConverted && i < words.length - 1 && !wordPunc) {
+              if (isConverted && i < words.length - 1 && !wordPunc)
                 wordPunc = ".";
-              }
-
               words[i] = cleanWord + wordPunc;
             }
 
@@ -851,7 +922,7 @@
           return converted
             .join(" ")
             .replace(/\.{2,}/g, ".")
-            .replace(/\s+\./g, ".")
+            .replace(/\s+\./g, " ")
             .trim();
         }
       }
@@ -956,10 +1027,11 @@
 
       let state = { unit: "컴퓨팅 시스템", subunit: "유무선 네트워크" };
       let finalHistoryStack = [];
-      let tempContext = null;
+      let undoStack = []; // [V6.0] 되돌리기 백업 메모리
 
       window.onload = () => {
         renderSubunitButtons(state.unit);
+        updateByte();
       };
 
       document.getElementById("unitChips").addEventListener("click", (e) => {
@@ -1027,16 +1099,29 @@
         return `${comps.join(", ")} 및 ${last}`;
       }
 
-      /* --- [핵심 수정] 과세특 문장 생성 및 맞춤법 엔진 결합 --- */
+      function extractCoreStandard(rawText) {
+        let core = rawText.replace(/성취기준\s\[.*?\]:\s/g, "");
+        core = core.replace(/한다\.$/g, "하는 교과 원리");
+        core = core.replace(/비교한다\.$/g, "비교하는 핵심 개념");
+        core = core.replace(/설계한다\.$/g, "설계하는 교과 과정");
+        core = core.replace(/분석한다\.$/g, "분석하는 원리");
+        core = core.replace(/활용한다\.$/g, "활용하는 교과 역량");
+        core = core.replace(/수집한다\.$/g, "수집하는 교과 과정");
+        core = core.replace(/해석한다\.$/g, "해석하는 핵심 개념");
+        core = core.replace(/구현한다\.$/g, "구현하는 원리");
+        core = core.replace(/실천한다\.$/g, "실천하는 태도");
+        core = core.replace(/작성한다\.$/g, "작성하는 핵심 과정");
+        if (core.endsWith(".")) core = core.slice(0, -1);
+        return core;
+      }
+
       function generateSubjectAI() {
         const level =
           document.querySelector('input[name="level"]:checked')?.value || "C";
         const customObj = document
           .getElementById("customObjectiveInput")
           .value.trim();
-
-        // 사용자가 입력한 구체적 활동 사례 (줄바꿈 제거)
-        let activity = document
+        const activity = document
           .getElementById("caseInput")
           .value.trim()
           .replace(/\n/g, " ");
@@ -1047,94 +1132,81 @@
           .forEach((cb) => comps.push(cb.value));
 
         const topic = customObj ? customObj : state.subunit;
+        const rawStandard =
+          CURRICULUM_DATA[state.unit]?.standards?.[state.subunit] || "";
+        const coreStandard = extractCoreStandard(rawStandard);
 
-        // 1. 역동적인 도입부 (따옴표 제거)
-        const intros = [
-          `${state.unit} 단원의 ${topic} 영역을 학습하는 과정에서, `,
-          `${topic}에 대한 깊은 학구적 호기심을 바탕으로 `,
-          `수업 중 다룬 ${topic} 개념을 심층적으로 탐구하고자 `,
-          `${topic}의 핵심 원리를 이해하는 데 그치지 않고 이를 주도적으로 확장하여, `,
-          `평소 ${state.unit} 분야에 대한 관심이 높아 ${topic} 파트에서 탁월한 수업 참여도를 보이며 `,
-        ];
-        const neutralIntros = [
-          `${state.unit} 단원의 ${topic} 학습 과정에서 `,
-          `${topic} 개념을 학습하며 `,
-          `교과 수업 중 ${topic} 파트에 참여하여 `,
-        ];
-        let intro =
-          level === "D" || level === "E"
-            ? neutralIntros[Math.floor(Math.random() * neutralIntros.length)]
-            : intros[Math.floor(Math.random() * intros.length)];
+        // [V6.0] 조사 자동 변환기 적용
+        const topicEul = attachJosa(topic, "을/를");
+        const topicGwa = attachJosa(topic, "과/와");
+        const coreEul = attachJosa(coreStandard, "을/를");
 
-        // 2. 활동 연결부 (특수문자 괄호 제거 및 수식어 추가)
-        let actText = "";
-        if (activity) {
-          actText = `구체적인 활동으로 ${activity}. `;
+        let assembledText = "";
+
+        if (level === "A" || level === "B") {
+          const patterns = [
+            `수업 중 다룬 ${coreStandard}에 깊은 학구적 호기심을 느껴, ${topicEul} 주제로 ${
+              activity ? activity : "관련 탐구 활동을 주도적으로 수행함."
+            } 이 과정을 통해 해당 개념을 단순히 이해하는 데 그치지 않고 실제 사례에 논리적으로 적용해 내는 비판적 사고력이 돋보임.`,
+            `평소 ${
+              state.unit
+            } 분야에 높은 관심을 보이며, 학습한 ${coreEul} 바탕으로 ${topic}에 착안하여 ${
+              activity ? activity : "심도 있는 탐구를 기획함."
+            } 특히 복잡한 문제를 주도적으로 정의하고 해결해 나가는 자기주도적 학습 태도와 뛰어난 응용력을 입증함.`,
+            `${coreEul} 명확히 체화한 후, 이를 바탕으로 ${topicGwa} 관련된 ${
+              activity ? activity : "심화 과제를 훌륭히 해결함."
+            } 과제 수행 과정에서 분석적 사고와 창의성을 발휘하여 완성도 높은 결과물을 도출하며 학업적 우수성을 뚜렷하게 보여줌.`,
+          ];
+          assembledText = patterns[Math.floor(Math.random() * patterns.length)];
+        } else if (level === "C") {
+          const patterns = [
+            `${coreEul} 충실히 학습하고, 이를 바탕으로 ${topicGwa} 관련된 ${
+              activity ? activity : "과제에 성실하게 참여함."
+            } 주어진 역할을 책임감 있게 완수하며 배운 지식을 실제 사례와 연결하려는 긍정적인 학습 태도를 보여줌.`,
+            `수업 중 ${coreEul} 학습하는 과정에서 집중력 있는 태도를 보이며, ${topicEul} 주제로 ${
+              activity ? activity : "주어진 과제를 원만하게 해결함."
+            } 교과에서 요구하는 기초 소양을 안정적으로 함양하며 성실한 학업 역량을 기름.`,
+          ];
+          assembledText = patterns[Math.floor(Math.random() * patterns.length)];
+        } else {
+          // D, E
+          const patterns = [
+            `${coreEul} 학습하는 과정에서 마주한 지적 한계를 긍정적인 태도로 수용하고, 이를 극복하기 위해 ${topicEul} 중심으로 ${
+              activity ? activity : "관련 활동에 끈기 있게 참여함."
+            } 교사 및 동료들과 활발히 상호작용하며 학업 역량을 점진적으로 성장시키는 뜻깊은 변화를 보여줌.`,
+            `${coreEul} 온전히 이해하기 위해 지속적으로 질문하고 복습하는 등 학업에 대한 높은 열의를 보임. ${topicEul} 다룬 ${
+              activity ? activity : "수업 활동에 끝까지 참여하며,"
+            } 자신의 부족한 점을 채워나가는 유의미한 성장을 이룸.`,
+          ];
+          assembledText = patterns[Math.floor(Math.random() * patterns.length)];
         }
 
-        // 3. 생기부 전용 고급 서술어 DB
-        const bodies = {
-          A: [
-            `이 과정에서 핵심 원리를 깊이 있게 통찰하고 다각적인 시각으로 문제를 분석하여 최적의 해결책을 도출하는 등 뛰어난 교과 역량을 발휘함.`,
-            `복잡한 개념 간의 유기적 연결성을 파악하는 능력이 탁월하며, 창의적인 문제해결력을 바탕으로 완성도 높은 결과물을 산출하여 학업적 우수성을 증명함.`,
-            `단순한 지식 습득을 넘어 비판적 사고와 논리적 추론을 통해 스스로 결론을 도출하는 과정이 돋보이며, 탁월한 탐구 역량과 지적 성장을 보여줌.`,
-          ],
-          B: [
-            `개념을 정확하게 이해하고 있으며, 이를 논리적으로 적용하는 응용력이 돋보임. 적극적인 자료 탐색과 분석을 통해 과제를 훌륭히 해결하며 분석적 사고 역량을 나타냄.`,
-            `학습 내용에 대한 높은 이해도를 바탕으로 스스로 문제를 정의하고 해결해 나가는 자기주도적 학습 태도를 갖추고 있으며, 우수한 학업 성취도를 보임.`,
-            `수업 중 습득한 이론을 실제 상황에 적절히 대입하여 해석하는 능력이 우수하며, 주어진 과제를 체계적으로 분석하고 논리적으로 서술하는 역량을 발휘함.`,
-          ],
-          C: [
-            `해당 단원의 기본 개념을 충실히 학습하고, 주어진 과제를 책임감 있게 완수하는 성실함을 보임. 배운 지식을 실제 사례와 연결하려는 노력을 통해 실무적 역량을 기름.`,
-            `수업에 적극적으로 참여하며 교과 지식을 안정적으로 습득함. 특히 과제 수행 시 원활한 소통을 바탕으로 공동체 역량과 협력적 태도를 나타냄.`,
-            `자신에게 주어진 역할을 명확히 인지하고 성실한 태도로 탐구에 임하며, 교과에서 요구하는 기초 소양과 정보처리 능력을 안정적으로 함양함.`,
-          ],
-          D: [
-            `초기에는 새로운 개념 적용에 다소 어려움을 겪었으나, 포기하지 않고 적극적인 질문과 반복 학습을 통해 이해도를 높이는 끈기를 보임.`,
-            `과제 수행 중 마주한 한계를 극복하기 위해 지속적으로 노력하며, 꾸준한 성실함을 바탕으로 끝까지 완수해 내는 긍정적인 발전 가능성을 나타냄.`,
-            `학습 과정에서 부족한 부분을 스스로 인지하고 이를 보완하기 위해 적극적으로 소통하며 점진적으로 학업 역량을 성장시켜 나감.`,
-          ],
-          E: [
-            `기초적인 내용에 관심을 가지고 성실한 태도로 수업에 참여함. 자신만의 학습 속도에 맞춰 교과 내용을 이해하려 노력하며 정보화 소양을 기르고자 노력함.`,
-            `수업 활동에 적극적으로 참여하여 기본적인 개념을 습득하고, 교사의 피드백을 수용하며 과제를 수행해 나가는 등 꾸준한 참여도를 보임.`,
-          ],
-        };
-
-        let body =
-          bodies[level][Math.floor(Math.random() * bodies[level].length)];
-
-        let compText = "";
         if (comps.length > 0) {
           const formattedComps = formatCompetencies(comps);
           const endings = [
             `정보 교과 소양을 한층 더 신장시킴.`,
-            `교과 역량을 뚜렷하게 보여줌.`,
+            `자신의 교과 역량을 뚜렷하게 증명함.`,
             `실질적인 문제해결력을 입증함.`,
           ];
           let randomEnding =
             endings[Math.floor(Math.random() * endings.length)];
-          compText = ` 특히, ${formattedComps} 역량을 바탕으로 ${randomEnding}`;
+          assembledText += ` 아울러, ${formattedComps} 역량을 바탕으로 ${randomEnding}`;
         }
 
-        // [핵심] 조립된 문장을 맞춤법 엔진에 통과시켜 완벽한 형태소로 정제
-        let rawText = (intro + actText + body + compText)
-          .replace(/\s+/g, " ")
-          .trim();
-        let resultText = grammarEngine.convert(rawText);
-
+        let resultText = grammarEngine.convert(
+          assembledText.replace(/\s+/g, " ").trim()
+        );
         document.getElementById("tempDraft").value = resultText;
 
-        let hashKey = `SUBJ|${topic}`;
-
         tempContext = {
-          topic: topic,
+          topic: state.subunit,
+          customObj: topic,
           level: level,
           comps: comps,
-          hashKey: hashKey,
-          aiGeneratedText: resultText, // 추후 다듬기 로직을 위한 원본 저장
-          len: resultText.length,
+          hashKey: `SUBJ|${state.subunit}`,
+          aiGeneratedText: resultText, // 원본 AI 초안 영구 저장용
         };
-        showToast("다채로운 어휘가 적용된 초안이 생성되었습니다.");
+        showToast("초개인화된 합격 패턴의 과세특 초안이 생성되었습니다.");
       }
 
       function moveToFinal() {
@@ -1142,39 +1214,40 @@
         const preview = document.getElementById("finalPreview");
         if (!draftText || !tempContext) return alert("생성된 문장이 없습니다.");
 
-        // 완벽한 소단원 중복 차단 (Strict Block)
         let isDuplicateSubunit = finalHistoryStack.some(
           (fh) => fh.topic === tempContext.topic && fh.status !== "deleted"
         );
         if (isDuplicateSubunit) {
           alert(
-            `⚠️ [${tempContext.topic}]에 대한 기록이 이미 우측에 존재합니다.\n\n한 소단원(주제)에 대한 중복 기재를 피하기 위해, 기존 문장을 삭제한 후 새로운 내용으로 다시 생성해주시기 바랍니다.`
+            `⚠️ [${tempContext.topic}]에 대한 기록이 이미 존재합니다.\n중복 기재를 피하기 위해 기존 문장을 삭제 후 다시 생성해주시기 바랍니다.`
           );
           return;
         }
 
-        // 수동 편집 내용 감지 및 맞춤법 최종 검사
+        // AI 문장과 교사가 수정한 문장을 철저히 분리 저장
         let aiSentences = getSentences(tempContext.aiGeneratedText);
-        let currentSentences = getSentences(draftText);
-        let manualCount = 0;
-        currentSentences.forEach((cs) => {
-          if (cs && !aiSentences.includes(cs)) manualCount++;
+        let draftSentences = getSentences(draftText);
+        let teacherSentences = [];
+        draftSentences.forEach((cs) => {
+          if (cs && !aiSentences.includes(cs)) teacherSentences.push(cs);
         });
 
         let correctedText = grammarEngine.convert(draftText);
-
         let currentText = preview.innerText;
-        let b = 0;
-        let testText = currentText + " " + correctedText;
-        for (let i = 0; i < testText.length; i++)
-          b += testText.charCodeAt(i) > 127 ? 3 : 1;
-        if (b > 1500)
-          return alert(
-            "⚠️ 생기부 최대 용량(1500 Byte)을 초과하여 더 이상 추가할 수 없습니다."
-          );
+        if (currentText.includes("학생을 선택하고")) currentText = "";
 
-        if (preview.innerText.trim() === "") preview.innerText = "";
-        else preview.appendChild(document.createTextNode(" "));
+        let b = getByteCount(currentText + " " + correctedText);
+
+        if (b > 1500) {
+          alert(
+            "⚠️ 추가 후 총 용량이 1500 Byte를 초과합니다.\n우측의 [AI 팩트 중심 다듬기] 버튼을 눌러 최적화하거나, 일부 활동을 덜어내어 '선택과 집중'을 해주세요."
+          );
+        }
+
+        if (preview.innerText.includes("학생을 선택하고"))
+          preview.innerText = "";
+        if (preview.innerText.trim() !== "")
+          preview.appendChild(document.createTextNode(" "));
 
         const uniqueId = "block_" + Date.now();
         const span = document.createElement("span");
@@ -1189,12 +1262,12 @@
           level: tempContext.level,
           comps: tempContext.comps,
           hashKey: tempContext.hashKey,
-          aiGeneratedText: tempContext.aiGeneratedText,
-          len: correctedText.length,
+          originalAiText: tempContext.aiGeneratedText,
+          teacherText: teacherSentences.join(" "),
           status: "active",
-          manualCount: manualCount,
         });
 
+        document.getElementById("tempDraft").value = "";
         renderInfoLayer();
         updateByte();
       }
@@ -1226,27 +1299,23 @@
               : item.level === "통합"
               ? "#8b5cf6"
               : "#f59e0b";
-
           let tagsHtml = `<span class="tag" style="color: ${levelColor}; border-color: ${levelColor}; background: #fff;">성취수준: ${item.level}</span>`;
-          if (item.comps && item.comps.length > 0) {
+          if (item.comps && item.comps.length > 0)
             tagsHtml += item.comps
               .map((a) => `<span class="tag">${a}</span>`)
               .join("");
-          }
 
-          if (item.manualCount > 0) {
-            tagsHtml += `<span class="tag" style="background:#fef08a; border-color:#fde047; color:#854d0e;">✏️ 직접 작성 ${item.manualCount}건</span>`;
-          }
+          let tCount = getSentences(item.teacherText).length;
+          if (tCount > 0)
+            tagsHtml += `<span class="tag" style="background:#fef08a; border-color:#fde047; color:#854d0e;">✏️ 교사 덧붙임 ${tCount}건</span>`;
 
           let delBtn = `<button class="delete-sentence-btn" onclick="deleteFinalSentence(event, '${item.id}')">🗑️ 삭제</button>`;
-
-          let statBadge = "";
-          if (item.status === "deleted")
-            statBadge =
-              "<span class='status-badge' style='background:#ef4444;'>❌ 삭제됨</span>";
-          else if (item.status === "optimized")
-            statBadge =
-              "<span class='status-badge' style='background:#8b5cf6;'>🪄 통합 및 맞춤법 교정됨</span>";
+          let statBadge =
+            item.status === "deleted"
+              ? "<span class='status-badge' style='background:#ef4444;'>❌ 삭제됨</span>"
+              : item.status === "optimized"
+              ? "<span class='status-badge' style='background:#8b5cf6;'>🪄 통합 및 압축됨</span>"
+              : "";
 
           div.innerHTML = `
             <div class="accordion-header">
@@ -1294,10 +1363,79 @@
         finalHistoryStack = finalHistoryStack.filter((item) => item.id !== id);
         renderInfoLayer();
         updateByte();
-        showToast("문장이 삭제되었습니다.");
+        showToast("기록이 삭제되었습니다.");
       }
 
-      /* --- [핵심] 전체 AI 다듬기 (수동 편집 텍스트 완벽 보존 엔진) --- */
+      /* --- [V6.0 팩트 중심 스마트 압축 엔진] --- */
+      function compressText(text) {
+        let c = text;
+        // 공통: 역량 관련 서술어 일괄 분리 (Phase 통폐합 위함)
+        c = c.replace(/아울러,.*?(신장시킴|증명함|입증함|보여줌)\./g, "");
+
+        // [핵심] 교사 평가어(탁월하게, 훌륭하게, 주도적으로 등)는 철저히 보존!
+        // 구조적 껍데기만 깎아냅니다.
+        c = c.replace(/수업 중 다룬 /g, "");
+        c = c.replace(/깊은 학구적 호기심을 느껴, /g, "관심을 가져, ");
+        c = c.replace(/단순히 이해하는 데 그치지 않고 /g, "");
+        c = c.replace(
+          /실제 사례에 논리적으로 적용해 내는 /g,
+          "실제 사례에 적용하는 "
+        );
+        c = c.replace(/평소 .*? 분야에 높은 관심을 보이며, /g, "");
+        c = c.replace(/명확히 체화한 후, 이를 바탕으로 /g, "바탕으로 ");
+        c = c.replace(/충실히 학습하고, 이를 바탕으로 /g, "바탕으로 ");
+        c = c.replace(
+          /학습하는 과정에서 집중력 있는 태도를 보이며, /g,
+          "학습 중 "
+        );
+
+        // 성장 서사(D,E) 보호: 극복의 과정은 남기되 앞쪽 배경만 축약
+        c = c.replace(
+          /학습하는 과정에서 마주한 지적 한계를 긍정적인 태도로 수용하고, 이를 극복하기 위해 /g,
+          "학습 중 마주한 한계를 극복하고자 "
+        );
+        c = c.replace(
+          /온전히 이해하기 위해 지속적으로 질문하고 복습하는 등 학업에 대한 높은 열의를 보임\. /g,
+          "열의를 보이며, "
+        );
+
+        // 평가어는 최대한 보존하되 중복되는 너무 긴 표현 단축
+        c = c.replace(
+          /결과물을 도출하며 학업적 우수성을 뚜렷하게 보여줌/g,
+          "결과물을 도출하여 우수성을 보임"
+        );
+        c = c.replace(/학업적 우수성을 뚜렷하게 보여줌/g, "우수성을 보임");
+
+        return c;
+      }
+
+      /* --- [V6.0 되돌리기 시스템] 백업 저장 및 복구 --- */
+      function saveUndoState() {
+        // 현재 상태를 깊은 복사(Deep Copy)하여 백업
+        undoStack.push({
+          history: JSON.parse(JSON.stringify(finalHistoryStack)),
+          html: document.getElementById("finalPreview").innerHTML,
+        });
+        document.getElementById("undoBtn").style.display = "inline-flex";
+      }
+
+      function undoFinal() {
+        if (undoStack.length === 0)
+          return alert("되돌릴 이전 상태가 없습니다.");
+        if (!confirm("압축 전(이전 상태)으로 되돌리시겠습니까?")) return;
+
+        let prevState = undoStack.pop();
+        finalHistoryStack = prevState.history;
+        document.getElementById("finalPreview").innerHTML = prevState.html;
+
+        if (undoStack.length === 0)
+          document.getElementById("undoBtn").style.display = "none";
+
+        renderInfoLayer();
+        updateByte();
+        showToast("이전 상태로 완벽하게 복구되었습니다.");
+      }
+
       function checkAndUpgradeIntegrity() {
         let activeItems = finalHistoryStack.filter(
           (i) => i.status !== "deleted"
@@ -1306,50 +1444,81 @@
 
         if (
           !confirm(
-            "⚠️ [주의]\nAI 다듬기 실행 시 선생님이 직접 추가하신 문장은 보존되며, 전체 텍스트의 맞춤법 및 종결어미가 완벽하게 교정되어 하나의 문단으로 통합됩니다.\n진행하시겠습니까?"
+            "⚠️ [주의]\nAI 다듬기 실행 시 선생님이 추가하신 평가 내용('주도적인', '탁월한' 등)은 절대 보존되며, 전체 텍스트의 불필요한 껍데기 수식어만 깎아내어 용량을 최적화하고 역량을 하나로 통합합니다.\n진행하시겠습니까?"
           )
         )
           return;
 
-        // 1. AI 원본 문장 추출
-        let allAIGeneratedText = activeItems
-          .map((i) => i.aiGeneratedText)
-          .join(" ");
-        let aiSentences = getSentences(allAIGeneratedText);
+        // 상태 백업 (되돌리기용)
+        saveUndoState();
 
-        // 2. 현재 우측 화면 문장 추출
-        let currentSentences = getSentences(
+        // 1. 우측 프리뷰에서 교사가 방금 직타(수동)로 추가한 문장들 발라내기
+        let displayedSentences = getSentences(
           document.getElementById("finalPreview").innerText
         );
-
-        // 3. 선생님 수동 작성 문장 골라내기
-        let customSentences = [];
-        currentSentences.forEach((cs) => {
-          if (cs && !aiSentences.includes(cs)) {
-            customSentences.push(cs);
-          }
+        let knownSentences = [];
+        activeItems.forEach((i) => {
+          let baseText = i.optimizedAiText
+            ? i.optimizedAiText
+            : i.originalAiText;
+          knownSentences.push(...getSentences(grammarEngine.convert(baseText)));
+          if (i.teacherText)
+            knownSentences.push(
+              ...getSentences(grammarEngine.convert(i.teacherText))
+            );
         });
 
-        // 4. 다시 조립
-        let finalCombinedText = activeItems
-          .map((i) => i.aiGeneratedText)
+        let newPreviewSentences = [];
+        displayedSentences.forEach((s) => {
+          if (s && !knownSentences.includes(s)) newPreviewSentences.push(s);
+        });
+
+        // 2. 모든 교사 텍스트 병합 (절대 보존 영역)
+        let allTeacherTexts = activeItems
+          .map((i) => i.teacherText)
+          .filter((t) => t);
+        if (newPreviewSentences.length > 0)
+          allTeacherTexts.push(newPreviewSentences.join(" "));
+        let finalTeacherText = allTeacherTexts.join(" ");
+
+        // 3. 역량 통폐합 문자열 생성
+        let mergedComps = [];
+        activeItems.forEach((i) => {
+          if (i.comps) mergedComps.push(...i.comps);
+        });
+        mergedComps = [...new Set(mergedComps)];
+        let compStr =
+          mergedComps.length > 0
+            ? ` 일련의 과정을 통해 ${formatCompetencies(
+                mergedComps
+              )} 역량을 뚜렷하게 증명함.`
+            : "";
+
+        // --- [스마트 다이어트 적용] ---
+        let compressedAiText = activeItems
+          .map((i) => compressText(i.originalAiText))
           .join(" ");
-        if (customSentences.length > 0) {
-          finalCombinedText += " " + customSentences.join(" ");
+        let testText = grammarEngine.convert(
+          (compressedAiText + compStr + " " + finalTeacherText).replace(
+            /\s{2,}/g,
+            " "
+          )
+        );
+
+        let finalText = testText;
+        let finalByte = getByteCount(testText);
+
+        if (finalByte > 1500) {
+          alert(
+            "⚠️ 팩트 압축을 진행했음에도 용량이 1500 Byte를 초과합니다.\n우측 상단의 [↩️ 되돌리기] 버튼을 눌러 원상 복구한 뒤, '선택과 집중'을 위해 덜 중요한 활동 1~2개를 과감히 삭제하시는 것을 권장합니다."
+          );
+        } else {
+          showToast(
+            "전체 문장 통합 및 팩트 중심 압축이 성공적으로 완료되었습니다!"
+          );
         }
 
-        // 5. 맞춤법 및 명사형 엔진 최종 통과
-        let finalText = grammarEngine.convert(finalCombinedText);
-
-        let b = 0;
-        for (let i = 0; i < finalText.length; i++)
-          b += finalText.charCodeAt(i) > 127 ? 3 : 1;
-        if (b > 1500)
-          alert(
-            "⚠️ [경고] 최적화된 문장의 용량이 1500 Byte를 초과했습니다. 기재 내용을 줄여주세요."
-          );
-
-        // 6. 화면 업데이트 (통합 블록 생성)
+        // 화면 갱신
         const preview = document.getElementById("finalPreview");
         preview.innerHTML = "";
         const uniqueId = "opt_" + Date.now();
@@ -1359,14 +1528,8 @@
         span.innerText = finalText;
         preview.appendChild(span);
 
-        // 7. 정보 카드 통합
+        // 스택 단일 통합
         let mergedTopics = activeItems.map((i) => i.topic).join(", ");
-        let mergedComps = [];
-        activeItems.forEach((i) => {
-          if (i.comps) mergedComps.push(...i.comps);
-        });
-        mergedComps = [...new Set(mergedComps)];
-
         finalHistoryStack = [
           {
             id: uniqueId,
@@ -1377,37 +1540,43 @@
             level: "통합",
             comps: mergedComps,
             hashKey: "MERGED_" + Date.now(),
-            aiGeneratedText: finalCombinedText,
-            len: finalText.length,
+            originalAiText: activeItems.map((i) => i.originalAiText).join(" "), // 원본 보존
+            optimizedAiText: compressedAiText, // 압축본
+            teacherText: finalTeacherText,
             status: "optimized",
-            manualCount: customSentences.length,
+            manualCount: getSentences(finalTeacherText).length,
           },
         ];
 
         renderInfoLayer();
         updateByte();
-        showToast("전체 문장 통합 및 맞춤법 완벽 교정이 완료되었습니다!");
       }
 
       function clearFinal() {
         if (confirm("전체 삭제하시겠습니까?")) {
           document.getElementById("finalPreview").innerText = "";
           finalHistoryStack = [];
+          undoStack = [];
+          document.getElementById("undoBtn").style.display = "none";
           renderInfoLayer();
           updateByte();
         }
       }
       function updateByte() {
         const text = document.getElementById("finalPreview").innerText;
-        let bytes = 0;
-        for (let i = 0; i < text.length; i++)
-          bytes += text.charCodeAt(i) > 127 ? 3 : 1;
-        document.getElementById("byteCount").innerText = bytes;
+        document.getElementById("charNum").innerText = text.length;
+        document.getElementById("byteCount").innerText = getByteCount(text);
         document.getElementById("byteCount").style.color =
-          bytes > 1500 ? "red" : "#1f4ddc";
+          getByteCount(text) > 1500 ? "red" : "#1f4ddc";
       }
       function finalApply() {
         alert("NEIS 입력 완료");
+      }
+      function showToast(m) {
+        const t = document.getElementById("toast");
+        t.textContent = m;
+        t.style.opacity = 1;
+        setTimeout(() => (t.style.opacity = 0), 2000);
       }
     </script>
   </body>
