@@ -3,9 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>동아리활동 관리</title>
+    <title>동아리활동 관리 시스템 (V9.3.1 Master)</title>
     <style>
-      /* --- [공통 레이아웃 & GNB] --- */
+      /* --- [스크롤 및 레이아웃 최적화] --- */
       * {
         box-sizing: border-box;
       }
@@ -113,10 +113,6 @@
         background: #fff;
         transition: 0.2s;
         flex-shrink: 0;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
       }
       .btn.primary {
         background: #1f4ddc;
@@ -143,7 +139,6 @@
         font-size: 12px;
       }
 
-      /* --- [우측 마스터 패널] --- */
       .preview-box {
         flex: 6;
         min-height: 150px;
@@ -158,16 +153,12 @@
         white-space: pre-wrap;
         word-break: break-all;
         scroll-behavior: smooth;
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
       }
       .sentence-block {
         cursor: text;
         transition: background 0.4s ease-out;
         border-radius: 4px;
         padding: 2px 0;
-        display: inline;
       }
       .sentence-block:hover {
         background-color: #eff6ff;
@@ -209,7 +200,6 @@
       .info-card:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        border-color: #cbd5e1;
       }
       .info-card.deleted {
         border-left-color: #ef4444;
@@ -244,7 +234,6 @@
         margin-right: 4px;
         display: inline-block;
         margin-top: 4px;
-        font-weight: bold;
       }
       .dup-badge {
         background: #f59e0b;
@@ -325,7 +314,6 @@
         box-shadow: 0 2px 4px rgba(31, 77, 220, 0.2);
       }
 
-      /* --- [모달 및 키워드 패널] --- */
       .modal {
         display: none;
         position: fixed;
@@ -477,7 +465,6 @@
         cursor: pointer;
         accent-color: #1f4ddc;
       }
-
       #toast {
         position: fixed;
         bottom: 30px;
@@ -485,15 +472,13 @@
         transform: translateX(-50%);
         background: #333;
         color: #fff;
-        padding: 12px 25px;
+        padding: 10px 25px;
         border-radius: 30px;
         font-size: 13px;
-        font-weight: 600;
         opacity: 0;
         transition: 0.3s;
         pointer-events: none;
         z-index: 3000;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       }
     </style>
   </head>
@@ -501,14 +486,14 @@
     <div class="gnb-menu">
       <a href="action_2.html">행동특성</a>
       <a href="subject_2.html">과세특</a>
-      <a href="free_2.html">자율·자치</a>
       <a href="club_2.html" class="active">동아리</a>
       <a href="carrer_2.html">진로활동</a>
       <a href="book_2.html">독서활동</a>
+      <a href="free_2.html">자율·자치</a>
     </div>
 
     <div id="toast">알림</div>
-    <div class="topbar">동아리활동 관리 시스템</div>
+    <div class="topbar">동아리활동 관리 시스템 (V9.3.1 Master)</div>
 
     <div class="container">
       <section class="left">
@@ -927,7 +912,16 @@
         return matches ? matches.map((s) => s.trim()).filter((s) => s) : [];
       }
 
-      /* --- [V9.2 버그 픽스] 중복 방지 조사 부착 함수 --- */
+      /* --- [V9.3.1 핵심 복구] 용량 계산 함수 --- */
+      function getByteCount(text) {
+        let b = 0;
+        for (let i = 0; i < text.length; i++) {
+          b += text.charCodeAt(i) > 127 ? 3 : 1;
+        }
+        return b;
+      }
+
+      /* --- [V9.3 에러방지] 무결점 조사 부착 엔진 --- */
       function attachJosa(word, josaType) {
         if (!word) return "";
         const lastChar = word.charCodeAt(word.length - 1);
@@ -1212,6 +1206,7 @@
         div.textContent = "이현태";
         list.appendChild(div);
         renderHistory();
+        updateByte();
       };
 
       function openModal() {
@@ -1267,7 +1262,7 @@
         if (type === "normal") {
           data.cat = document.getElementById("normCat").value;
           data.level = document.getElementById("normLevel").value;
-          // [버그 픽스] 원시 데이터에 맞춤법 엔진을 미리 돌리지 않음 (형태 보존)
+          // 원본 보존
           data.content = document.getElementById("normContent").value.trim();
 
           if (data.cat === "활동 영역") data.cat = "기타";
@@ -1275,7 +1270,6 @@
             return alert("내용을 입력하거나 활동 영역을 선택하세요.");
           data.hashKey = `NORM|${data.date}|${data.roleName}|${data.cat}|${data.content}`;
         } else {
-          // [버그 픽스] 원시 데이터 형태 보존
           data.topic = document.getElementById("projTopic").value.trim();
           data.content = document.getElementById("projContent").value.trim();
 
@@ -1326,7 +1320,7 @@
               item.type === "normal"
                 ? item.content
                   ? item.content.substring(0, 20) + "..."
-                  : `${item.cat} 활동`
+                  : `${item.cat} 관련 활동`
                 : item.topic;
             let dDesc = item.content || "(영역명으로 자동 치환됨)";
 
@@ -1426,7 +1420,7 @@
           : "체크된 활동이 없습니다.";
       }
 
-      /* --- [V9.2 버그 픽스] 다중 톤앤매너 서사 엔진 --- */
+      /* --- [V9.3 에러방지] 다중 톤앤매너 서사 엔진 --- */
       function assembleClubVersions(targets) {
         targets.sort((a, b) => new Date(a.date) - new Date(b.date));
 
@@ -1466,7 +1460,6 @@
             bIntroB = "",
             bIntroC = "";
 
-          // 역할 기반 서사(도입 및 브릿지)
           if (index === 0) {
             if (block.roleKey === "custom") {
               bIntroA = `${block.customName}로서 ${CLUB_NAME} 활동에 탐구심을 가지고 참여하며, `;
@@ -1488,9 +1481,9 @@
               bIntroC = `또한, ${block.customName} 역할을 맡아, `;
             } else {
               let rNameRo = attachJosa(ROLE_NAMES[block.roleKey], "으로/로");
-              bIntroA = `이후 ${rNameRo} 선출되어 기획력을 발휘하며, `;
-              bIntroB = `이후 ${rNameRo} 선출되어 리더십을 발휘하며, `;
-              bIntroC = `이후 ${rNameRo} 선출되어, `;
+              bIntroA = `이후 ${rNameRo} 역할을 변경하여, 기획력을 발휘하며, `;
+              bIntroB = `이후 ${rNameRo} 역할을 변경하여, 리더십을 발휘하며, `;
+              bIntroC = `이후 ${rNameRo} 역할을 변경하여, `;
             }
           }
 
@@ -1501,7 +1494,6 @@
           let contentMap = new Map();
           block.items.forEach((item) => {
             let coreContent = item.content.trim();
-            // [버그 픽스] 특수기호 대괄호 제거
             if (!coreContent && item.cat) coreContent = `${item.cat} 관련 활동`;
 
             let cKey =
@@ -1539,14 +1531,14 @@
 
             if (first.type === "normal") {
               let actName = first.content.trim() || `${first.cat} 관련 활동`;
-              let actNameEul = attachJosa(actName, "을/를"); // [버그 픽스] 단어 중복 해결
+              let actNameEul = attachJosa(actName, "을/를");
 
               bBodyA += `${actNameEul} ${freqAdverb}심도 있게 탐구함. `;
               bBodyB += `${actNameEul} ${freqAdverb}열정적으로 수행함. `;
               bBodyC += `${actNameEul} ${freqAdverb}수행함. `;
               blockSummary.push(`${actName}(${count})`);
             } else {
-              const topicEul = attachJosa(first.topic, "을/를"); // [버그 픽스] 단어 중복 해결
+              const topicEul = attachJosa(first.topic, "을/를");
               let pContent = first.content.trim() || "유의미한 결과물";
 
               bBodyA += `${topicEul} 주제로 심화 프로젝트를 ${freqAdverb}진행하여 ${pContent}를 논리적으로 도출함. `;
@@ -1567,7 +1559,6 @@
         outroB = `이러한 과정을 통해 동아리 발전에 크게 기여하고 리더로서의 잠재력을 보여줌.`;
         outroC = `이를 통해 관련 역량을 기름.`;
 
-        // 캡슐 반환
         return {
           versions: {
             A: {
@@ -1630,99 +1621,115 @@
         );
       }
 
-      /* --- [V9.2 Live Time-Sync] 우측 전송 시 즉각적인 DOM 정렬 --- */
+      /* --- [V9.3 무결점] 3중 방어막 적용된 우측 전송 기능 --- */
       function moveToFinal() {
-        const draftText = document.getElementById("tempDraft").value;
-        const preview = document.getElementById("finalPreview");
-        if (!draftText || !tempContext) return alert("생성된 문단이 없습니다.");
+        try {
+          const draftText = document.getElementById("tempDraft").value;
+          const preview = document.getElementById("finalPreview");
 
-        // [버그 픽스] 중복 시 먹통 차단 풀기 (Confirm 창으로 우회)
-        let duplicateNames = [];
-        tempContext.actsMap.forEach((act) => {
-          if (
-            finalHistoryStack.some((fh) =>
-              fh.actsMap.some((a) => a.hashKey === act.hashKey)
-            )
-          ) {
-            duplicateNames.push(act.name);
-          }
-        });
-
-        if (duplicateNames.length > 0) {
-          if (
-            !confirm(
-              `⚠️ 다음 활동은 이미 우측 기재란에 존재합니다:\n\n- ${duplicateNames.join(
-                "\n- "
-              )}\n\n계속해서 중복 전송하시겠습니까?`
-            )
-          ) {
+          if (!draftText || !tempContext || !tempContext.actsMap) {
+            alert(
+              "생성된 문단이 없거나 데이터가 만료되었습니다. 다시 생성해주세요."
+            );
             return;
           }
-        }
 
-        let aiSentences = getSentences(tempContext.aiGeneratedText);
-        let currentSentences = getSentences(draftText);
-        let manualCount = 0;
-        let teacherSentences = [];
-        currentSentences.forEach((cs) => {
-          if (cs && !aiSentences.includes(cs)) {
-            manualCount++;
-            teacherSentences.push(cs);
+          let duplicateNames = [];
+          tempContext.actsMap.forEach((act) => {
+            if (
+              finalHistoryStack.some(
+                (fh) =>
+                  fh.actsMap &&
+                  fh.actsMap.some((a) => a.hashKey === act.hashKey)
+              )
+            ) {
+              duplicateNames.push(act.name);
+            }
+          });
+
+          if (duplicateNames.length > 0) {
+            if (
+              !confirm(
+                `⚠️ 다음 활동은 이미 우측 기재란에 존재합니다:\n\n- ${duplicateNames.join(
+                  "\n- "
+                )}\n\n계속해서 중복 전송하시겠습니까?`
+              )
+            ) {
+              return;
+            }
           }
-        });
 
-        let correctedText = grammarEngine.convert(draftText);
-        let currentText = preview.innerText;
-        let b = getByteCount(currentText + " " + correctedText);
+          let aiSentences = getSentences(tempContext.aiGeneratedText);
+          let currentSentences = getSentences(draftText);
+          let manualCount = 0;
+          let teacherSentences = [];
+          currentSentences.forEach((cs) => {
+            if (cs && !aiSentences.includes(cs)) {
+              manualCount++;
+              teacherSentences.push(cs);
+            }
+          });
 
-        if (b > 1500) {
-          alert(
-            "⚠️ 추가 후 총 용량이 1500 Byte를 초과합니다.\n우측의 [AI 안전 다듬기] 버튼을 눌러 내용을 최적화해 주세요."
+          let correctedText = grammarEngine.convert(draftText);
+          let currentText = preview.innerText;
+          let b = getByteCount(currentText + " " + correctedText);
+
+          if (b > 1500) {
+            alert(
+              "⚠️ 추가 후 총 용량이 1500 Byte를 초과합니다.\n우측의 [AI 안전 다듬기] 버튼을 눌러 내용을 최적화해 주세요."
+            );
+          }
+
+          const uniqueId = "block_" + Date.now();
+          const span = document.createElement("span");
+          span.className = "sentence-block";
+          span.id = uniqueId;
+          span.innerText = correctedText + " ";
+
+          preview.appendChild(span);
+
+          finalHistoryStack.push({
+            id: uniqueId,
+            summary: tempContext.summary,
+            actsMap: tempContext.actsMap,
+            parts: tempContext.parts,
+            originalAiText: tempContext.aiGeneratedText,
+            teacherText: teacherSentences.join(" "),
+            len: correctedText.length,
+            status: "active",
+            manualCount: manualCount,
+          });
+
+          // Date 기준으로 스택 무결성 정렬
+          finalHistoryStack.sort((a, b) => {
+            let dateA =
+              a.actsMap && a.actsMap.length > 0
+                ? new Date(a.actsMap[0].date).getTime()
+                : 0;
+            let dateB =
+              b.actsMap && b.actsMap.length > 0
+                ? new Date(b.actsMap[0].date).getTime()
+                : 0;
+            return dateA - dateB;
+          });
+
+          finalHistoryStack.forEach((item) => {
+            const node = document.getElementById(item.id);
+            if (node) preview.appendChild(node);
+          });
+
+          document.getElementById("tempDraft").value = "";
+          tempContext = null;
+
+          renderInfoLayer();
+          updateByte();
+          showToast(
+            "우측 기재란으로 전송되며 날짜에 맞게 자동 정렬되었습니다."
           );
+        } catch (e) {
+          console.error(e);
+          alert("전송 중 시스템 오류가 발생했습니다: " + e.message);
         }
-
-        const uniqueId = "block_" + Date.now();
-        const span = document.createElement("span");
-        span.className = "sentence-block";
-        span.id = uniqueId;
-        // 스페이스 하나 붙여서 다른 블록과 띄어쓰기 유지
-        span.innerText = correctedText + " ";
-
-        // 1. 일단 Append (생성)
-        preview.appendChild(span);
-
-        // 2. 스택에 저장
-        finalHistoryStack.push({
-          id: uniqueId,
-          summary: tempContext.summary,
-          actsMap: tempContext.actsMap,
-          parts: tempContext.parts,
-          originalAiText: tempContext.aiGeneratedText,
-          teacherText: teacherSentences.join(" "),
-          len: correctedText.length,
-          status: "active",
-          manualCount: manualCount,
-        });
-
-        // 3. [핵심] Date 기준으로 스택 정렬
-        finalHistoryStack.sort(
-          (a, b) =>
-            new Date(a.actsMap[0].date).getTime() -
-            new Date(b.actsMap[0].date).getTime()
-        );
-
-        // 4. [핵심] DOM 노드를 정렬된 순서대로 재배치 (내부 수동편집 텍스트 보존 효과)
-        finalHistoryStack.forEach((item) => {
-          const node = document.getElementById(item.id);
-          if (node) {
-            preview.appendChild(node);
-          }
-        });
-
-        document.getElementById("tempDraft").value = "";
-        renderInfoLayer();
-        updateByte();
-        showToast("우측 기재란으로 전송되며 날짜에 맞게 자동 정렬되었습니다.");
       }
 
       function renderInfoLayer() {
@@ -1739,11 +1746,13 @@
           div.onclick = () => highlightSentence(item.id);
 
           let contentHtml = "";
-          for (const [role, acts] of Object.entries(item.summary)) {
-            let tags = acts
-              .map((a) => `<span class="tag">${a}</span>`)
-              .join("");
-            contentHtml += `<div class="info-role-group"><div class="info-role-title">👤 ${role}</div><div class="info-tags">${tags}</div></div>`;
+          if (item.summary) {
+            for (const [role, acts] of Object.entries(item.summary)) {
+              let tags = acts
+                .map((a) => `<span class="tag">${a}</span>`)
+                .join("");
+              contentHtml += `<div class="info-role-group"><div class="info-role-title">👤 ${role}</div><div class="info-tags">${tags}</div></div>`;
+            }
           }
 
           let manualBadge =
@@ -1791,8 +1800,8 @@
         showToast("기록이 삭제되었습니다.");
       }
 
-      /* --- [V9.2 Safe Trim] 교사 평가어 보존 압축 --- */
       function safeCompress(text) {
+        if (!text) return "";
         let c = text;
         c = c.replace(/단순히 이해하는 데 그치지 않고 /g, "");
         c = c.replace(
@@ -1828,7 +1837,6 @@
         showToast("이전 상태로 복구되었습니다.");
       }
 
-      /* --- [궁극 마스터] 메타데이터 기반 전체 병합 및 다듬기 --- */
       function checkIntegrity() {
         let activeItems = finalHistoryStack.filter(
           (i) => i.status !== "deleted"
@@ -1852,7 +1860,10 @@
           let baseText = i.optimizedAiText
             ? i.optimizedAiText
             : i.originalAiText;
-          knownSentences.push(...getSentences(grammarEngine.convert(baseText)));
+          if (baseText)
+            knownSentences.push(
+              ...getSentences(grammarEngine.convert(baseText))
+            );
           if (i.teacherText)
             knownSentences.push(
               ...getSentences(grammarEngine.convert(i.teacherText))
@@ -1871,33 +1882,43 @@
           allTeacherTexts.push(newPreviewSentences.join(" "));
         let finalTeacherText = allTeacherTexts.join(" ");
 
-        activeItems.sort(
-          (a, b) =>
-            new Date(a.actsMap[0].date).getTime() -
-            new Date(b.actsMap[0].date).getTime()
-        );
+        activeItems.sort((a, b) => {
+          let dateA =
+            a.actsMap && a.actsMap.length > 0
+              ? new Date(a.actsMap[0].date).getTime()
+              : 0;
+          let dateB =
+            b.actsMap && b.actsMap.length > 0
+              ? new Date(b.actsMap[0].date).getTime()
+              : 0;
+          return dateA - dateB;
+        });
 
         let mergedBody = "";
         let globalCurrentRole = "";
 
         for (let i = 0; i < activeItems.length; i++) {
           let item = activeItems[i];
-          let firstRoleOfBlock = item.actsMap[0].jobLabel; // roleName
+          if (!item.actsMap || item.actsMap.length === 0) continue;
+          let firstRoleOfBlock = item.actsMap[0].jobLabel;
 
-          // 병합 시 직책 변경 브릿지 동적 생성
           if (globalCurrentRole && globalCurrentRole !== firstRoleOfBlock) {
             let ro = attachJosa(firstRoleOfBlock, "으로/로");
             mergedBody += `이후 ${ro} 역할을 변경하여, `;
           }
 
-          mergedBody += safeCompress(item.parts.body) + " ";
+          if (item.parts && item.parts.body) {
+            mergedBody += safeCompress(item.parts.body) + " ";
+          }
           globalCurrentRole = item.actsMap[item.actsMap.length - 1].jobLabel;
         }
 
         let newParts = {
-          intro: activeItems[0].parts.intro,
+          intro: activeItems[0].parts ? activeItems[0].parts.intro : "",
           body: mergedBody.trim(),
-          outro: activeItems[activeItems.length - 1].parts.outro,
+          outro: activeItems[activeItems.length - 1].parts
+            ? activeItems[activeItems.length - 1].parts.outro
+            : "",
         };
 
         let compressedAiText = grammarEngine.convert(
@@ -1933,9 +1954,11 @@
         let mergedSummary = {};
         activeItems.forEach((i) => {
           if (i.actsMap) mergedActs.push(...i.actsMap);
-          for (let [r, s] of Object.entries(i.summary)) {
-            if (!mergedSummary[r]) mergedSummary[r] = [];
-            mergedSummary[r].push(...s);
+          if (i.summary) {
+            for (let [r, s] of Object.entries(i.summary)) {
+              if (!mergedSummary[r]) mergedSummary[r] = [];
+              mergedSummary[r].push(...s);
+            }
           }
         });
 
