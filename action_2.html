@@ -14,7 +14,7 @@
         font-family: "Segoe UI", -apple-system, sans-serif;
         background: #f5f6f8;
         color: #333;
-        overflow: hidden;
+        overflow: hidden; /* 바디 전체 스크롤 방지, 내부 영역에서만 스크롤 */
       }
       .gnb-menu {
         background: #1f2937;
@@ -304,7 +304,6 @@
         color: #fff;
       }
 
-      /* 3버전 톤앤매너 탭 UI */
       .draft-tabs {
         display: flex;
         gap: 8px;
@@ -334,7 +333,6 @@
         box-shadow: 0 2px 4px rgba(31, 77, 220, 0.2);
       }
 
-      /* --- [모달 및 키워드 패널] --- */
       .modal {
         display: none;
         position: fixed;
@@ -523,7 +521,7 @@
     </div>
 
     <div id="toast">알림</div>
-    <div class="topbar">행동특성 및 종합의견 시스템</div>
+    <div class="topbar">행동특성 및 종합의견 관리 시스템</div>
 
     <div class="container">
       <section class="left">
@@ -1098,7 +1096,339 @@
         }
       }
 
+      /* =========================================================================
+         [Bridge Engine] - 행특 전용 문맥 추론 및 스마트 융합 엔진 (Master NLP 탑재본)
+         ========================================================================= */
+      class HeuristicBridgeEngine {
+        constructor() {
+          // 1. [Phase 1] 행특 맞춤형 어휘 격상 사전 (20여 종의 어미 완벽 포획망 탑재)
+          this.ELEVATION_DICT = {
+            CHARACTER: [
+              {
+                pattern:
+                  /(착하|마음이 따뜻하|마음씨가 고우)(고|며|면서|지만|으나|고자|려고|려|면|으면|더라도|므로|으므로|니|으니|니까|으니까|기 때문에|기 위해|기 위해서)/g,
+                replace: [
+                  "이타심과 배려심이 돋보이$2",
+                  "따뜻한 성품을 바탕으로 배려하$2",
+                ],
+              },
+              {
+                pattern:
+                  /(인사를 잘하|인사성이 밝)(고|며|면서|지만|으나|고자|려고|려|면|으면|더라도|므로|으므로|니|으니|니까|으니까|기 때문에|기 위해|기 위해서)/g,
+                replace: [
+                  "예의 바른 태도로 타의 모범이 되$2",
+                  "항상 웃어른을 공경하$2",
+                ],
+              },
+              {
+                pattern:
+                  /(도와주|돕)(고|며|면서|지만|으나|고자|려고|려|면|으면|더라도|므로|으므로|니|으니|니까|으니까|기 때문에|기 위해|기 위해서)/g,
+                replace: [
+                  "동료의 어려움을 기꺼이 지원하$2",
+                  "솔선수범하여 급우들을 조력하$2",
+                ],
+              },
+              {
+                pattern:
+                  /(친하게 지내|사이좋게 지내|잘 어울리|싸우지 않)(고|며|면서|지만|으나|고자|려고|려|면|으면|더라도|므로|으므로|니|으니|니까|으니까|기 때문에|기 위해|기 위해서)/g,
+                replace: [
+                  "학급 구성원들과 원만한 라포(Rapport)를 형성하$2",
+                  "갈등 없이 안정적인 교우관계를 유지하$2",
+                ],
+              },
+            ],
+            ATTITUDE: [
+              {
+                pattern:
+                  /(성실하|열심히 하)(고|며|면서|지만|으나|고자|려고|려|면|으면|더라도|므로|으므로|니|으니|니까|으니까|기 때문에|기 위해|기 위해서)/g,
+                replace: [
+                  "매사 근면 성실한 태도를 보이$2",
+                  "주어진 일과를 책임감 있게 수행하$2",
+                ],
+              },
+              {
+                pattern:
+                  /(규칙을 잘 지키|지각을 안하)(고|며|면서|지만|으나|고자|려고|려|면|으면|더라도|므로|으므로|니|으니|니까|으니까|기 때문에|기 위해|기 위해서)/g,
+                replace: [
+                  "준법정신이 투철하고 기본 생활 습관이 바르며",
+                  "학교 규범을 자발적으로 준수하는 모범적인 태도를 보이$2",
+                ],
+              },
+              {
+                pattern:
+                  /(청소를 잘하|정리를 잘하)(고|며|면서|지만|으나|고자|려고|려|면|으면|더라도|므로|으므로|니|으니|니까|으니까|기 때문에|기 위해|기 위해서)/g,
+                replace: [
+                  "학급 환경 미화에 솔선수범하$2",
+                  "자신의 역할을 묵묵히 수행하는 책임감을 보이$2",
+                ],
+              },
+            ],
+            LEADERSHIP: [
+              {
+                pattern:
+                  /(이끌|지휘하|통솔하)(고|며|면서|지만|으나|고자|려고|려|면|으면|더라도|므로|으므로|니|으니|니까|으니까|기 때문에|기 위해|기 위해서)/g,
+                replace: [
+                  "학급을 올바른 방향으로 견인하$2",
+                  "조직을 탁월하게 이끄는 리더십을 발휘하$2",
+                ],
+              },
+              // '나서/앞장서'는 구어체에서 '서'가 붙는 경우가 많아 특별히 '서'를 추가함
+              {
+                pattern:
+                  /(나서|앞장서)(고|며|서|면서|지만|으나|고자|려고|려|면|으면|더라도|므로|으므로|니|으니|니까|으니까|기 때문에|기 위해|기 위해서)/g,
+                replace: [
+                  "누구보다 먼저 솔선수범하$2",
+                  "궂은일도 자발적으로 자원하$2",
+                ],
+              },
+              {
+                pattern:
+                  /(말리|해결하|화해시키)(고|며|면서|지만|으나|고자|려고|려|면|으면|더라도|므로|으므로|니|으니|니까|으니까|기 때문에|기 위해|기 위해서)/g,
+                replace: [
+                  "이견을 합리적으로 조율하$2",
+                  "대화와 타협으로 갈등을 원만히 중재하$2",
+                ],
+              },
+            ],
+            ACADEMIC: [
+              {
+                pattern:
+                  /(공부를 열심히 하|성적이 오르)(고|며|면서|지만|으나|고자|려고|려|면|으면|더라도|므로|으므로|니|으니|니까|으니까|기 때문에|기 위해|기 위해서)/g,
+                replace: [
+                  "학업에 대한 뚜렷한 목표 의식으로 학업 성취도를 향상시키$2",
+                  "자기주도적 학습 태도를 바탕으로 괄목할 만한 성장을 이루$2",
+                ],
+              },
+              {
+                pattern:
+                  /(노력하)(고|며|면서|지만|으나|고자|려고|려|면|으면|더라도|므로|으므로|니|으니|니까|으니까|기 때문에|기 위해|기 위해서)/g,
+                replace: [
+                  "끊임없이 발전하고자 하는 열의를 보이$2",
+                  "자신의 한계를 극복하기 위해 끈기 있게 매진하$2",
+                ],
+              },
+            ],
+            ADVERB: [
+              {
+                pattern: /(스스로|혼자서)/g,
+                replace: [
+                  "자기주도적으로",
+                  "자발적으로",
+                  "뛰어난 독립성을 바탕으로",
+                ],
+              },
+            ],
+          };
+
+          this.INTENT_KEYWORDS = {
+            인성_배려: [
+              "착하",
+              "배려",
+              "양보",
+              "도와",
+              "봉사",
+              "이타",
+              "따뜻",
+              "마음",
+              "친절",
+              "희생",
+              "예의",
+              "인사",
+              "공경",
+              "효도",
+            ],
+            교우관계_소통: [
+              "친구",
+              "사이좋",
+              "원만",
+              "소통",
+              "대화",
+              "공감",
+              "갈등",
+              "화해",
+              "분위기",
+              "어울",
+              "경청",
+              "관계",
+              "교우",
+              "협력",
+              "협업",
+            ],
+            규칙_성실: [
+              "규칙",
+              "준법",
+              "지각",
+              "결석",
+              "성실",
+              "꾸준",
+              "청소",
+              "정리",
+              "책임",
+              "맡은",
+              "근면",
+              "모범",
+              "약속",
+              "정직",
+            ],
+            리더십_주도성: [
+              "이끌",
+              "앞장",
+              "조장",
+              "반장",
+              "회장",
+              "솔선수범",
+              "리더십",
+              "주도",
+              "기획",
+              "총괄",
+              "리더",
+              "중재",
+              "카리스마",
+              "통솔",
+            ],
+            학업_발전: [
+              "공부",
+              "학업",
+              "성적",
+              "질문",
+              "노력",
+              "발전",
+              "성장",
+              "향상",
+              "극복",
+              "목표",
+              "진로",
+              "적성",
+              "학습",
+              "수업",
+              "집중",
+            ],
+          };
+
+          this.NEGATION_DEFENSE_PATTERNS = [
+            /(부족|미흡|아쉽|못하|않|없|어렵|힘들|포기|좌절|실패|실수|오류|한계|단점|결점|문제|서툴|서투르)/g,
+            /(소극|조용|말이 없|내성|낯가림|위축|긴장|불안|주저|회피|숨|자신감 없|수동적|의존적|끌려다니|소심)/g,
+            /(산만|떠들|장난|시끄럽|집중 못|주의력|딴짓|불참|지각|결석|태만|게으름|미루|불성실|귀찮|나태)/g,
+            /(충돌|다툼|갈등|싸움|이기적|고집|독단|폐쇄적|배려 없|공감 못|어울리지 못|혼자서만|마찰|불화)/g,
+            /(~하지만|~했으나|~임에도 불구하고|가끔|때로는|종종|간혹|아직은|초기에는|처음에는|~편이나)/g,
+          ];
+
+          this.SMART_BRIDGES = {
+            인성_배려: [
+              "타인을 먼저 생각하는 이타심과 따뜻한 성품을 바탕으로, ",
+              "항상 웃어른을 공경하고 급우들을 배려하는 바른 인성으로, ",
+              "평소 남을 돕는 일에 솔선수범하는 훌륭한 인성을 갖추어, ",
+            ],
+            교우관계_소통: [
+              "특유의 친화력과 소통 능력을 발휘하여 학급 내 긍정적인 분위기를 주도하며, ",
+              "동료들의 의견을 경청하고 존중하는 성숙한 태도로 원만한 교우관계를 형성하며, ",
+              "갈등 상황에서도 이성적으로 의견을 조율하는 소통 역량을 발휘하여, ",
+            ],
+            규칙_성실: [
+              "매사 책임감이 강하고 학교 규칙을 자발적으로 준수하는 성실함이 돋보이며, ",
+              "주어진 일과를 묵묵히 수행해 내는 근면 성실한 태도를 바탕으로, ",
+              "학생의 본분을 다하며 타의 귀감이 되는 모범적인 생활 태도로, ",
+            ],
+            리더십_주도성: [
+              "공동체를 위해 먼저 나서서 봉사하는 솔선수범의 리더십을 발휘하며, ",
+              "학급의 대소사에서 책임감 있게 동료들을 이끄는 통솔력이 돋보이며, ",
+              "자신의 역할을 넘어 조직의 화합을 이끄는 부드러운 카리스마를 바탕으로, ",
+            ],
+            학업_발전: [
+              "학업에 대한 뚜렷한 목표 의식과 자기주도적 학습 태도를 통해, ",
+              "자신의 부족한 점을 인지하고 꾸준히 개선해 나가는 학업적 성장이 돋보이며, ",
+              "앎에 대한 지적 호기심을 바탕으로 성실하게 탐구하는 자세를 보이며, ",
+            ],
+            GROWTH_DEFENSE: [
+              "초기에는 다소 어려움을 겪기도 하였으나 지속적인 긍정적 성찰을 통해 ",
+              "때로는 시행착오가 있었으나 이를 성장의 발판으로 삼아 ",
+              "초반에는 다소 아쉬운 점이 있었으나 교사의 조언을 적극 수용하여 ",
+              "학교생활 중 마주한 한계를 회피하지 않고 정면으로 극복하고자 ",
+            ],
+            일반_연결: [
+              "이와 함께 평소 학교생활 전반에서 ",
+              "또한 교사의 지속적인 관찰 결과 ",
+              "더불어 매사 긍정적이고 능동적인 태도로 ",
+            ],
+          };
+        }
+
+        elevate(text) {
+          let result = text;
+          for (const cat in this.ELEVATION_DICT) {
+            this.ELEVATION_DICT[cat].forEach((rule) => {
+              let replacement = Array.isArray(rule.replace)
+                ? rule.replace[0]
+                : rule.replace;
+              result = result.replace(rule.pattern, replacement + " ");
+            });
+          }
+          return result.replace(/\s{2,}/g, " ").trim();
+        }
+
+        detectIntent(text) {
+          let maxHits = 0;
+          let bestIntent = "일반_연결";
+
+          for (const intent in this.INTENT_KEYWORDS) {
+            let hits = 0;
+            this.INTENT_KEYWORDS[intent].forEach((keyword) => {
+              if (text.includes(keyword)) hits++;
+            });
+            if (hits > maxHits) {
+              maxHits = hits;
+              bestIntent = intent;
+            }
+          }
+          return bestIntent;
+        }
+
+        getBridge(intent, isComprehensive) {
+          if (isComprehensive) return "종합적으로 볼 때, ";
+          const bridges =
+            this.SMART_BRIDGES[intent] || this.SMART_BRIDGES["일반_연결"];
+          return bridges[Math.floor(Math.random() * bridges.length)];
+        }
+
+        process(teacherText, isComprehensive = false) {
+          if (!teacherText || teacherText.trim() === "")
+            return { bridge: "", text: "" };
+
+          let elevated = this.elevate(teacherText);
+          let intent = this.detectIntent(teacherText);
+          let bridge = this.getBridge(intent, isComprehensive);
+
+          let isNegationDetected = false;
+          for (let pattern of this.NEGATION_DEFENSE_PATTERNS) {
+            if (pattern.test(teacherText)) {
+              isNegationDetected = true;
+              break;
+            }
+          }
+
+          if (isNegationDetected) {
+            const defenseBridges = this.SMART_BRIDGES["GROWTH_DEFENSE"];
+            let defBridge =
+              defenseBridges[Math.floor(Math.random() * defenseBridges.length)];
+            bridge = isComprehensive
+              ? "종합적으로 볼 때, " + defBridge
+              : defBridge;
+          }
+
+          // Smart Formatter
+          let cleanContent = elevated.trim().replace(/\.+$/, "");
+          let isSentence = /(다|함|음|고|며|어|아|지)$/.test(cleanContent);
+          if (!isSentence) {
+            elevated = elevated + " 등 모범적인 면모를 보이며,";
+          }
+
+          return { bridge: bridge, text: elevated };
+        }
+      }
+
       const grammarEngine = new GrammarEngine();
+      const bridgeEngine = new HeuristicBridgeEngine();
+
       const currentStudent = "이현태";
       const cats = [
         "성격",
@@ -1111,7 +1441,7 @@
       ];
       const levels = ["매우우수", "우수", "보통", "노력"];
 
-      /* --- [V10.5 마스터 키워드 DB - 리얼리티 극복/성장 서사 전면 개편] --- */
+      /* --- [마스터 키워드 DB] --- */
       const KEYWORD_DB = {
         성격: [
           {
@@ -1233,7 +1563,7 @@
                 "탁월한 리더십으로 친구들의 의견을 조율하고 학급을 올바른 방향으로 이끄는 포용력을 갖춤.",
               우수: "친구들을 잘 통솔하며 모둠 활동에서 리더 역할을 훌륭히 수행함.",
               보통: "필요시 친구들을 이끄는 책임감 있는 모습을 보임.",
-              노력: "단체 활동 시 자신의 의견만을 내세우는 경향이 있었으나, 갈등 해결 과정을 통해 타인의 의견을 수용하고 부드럽게 의견을 조율하는 리더십을 배워가고 있음.",
+              노력: "단체 활동 시 자신의 의견만을 내세우는 경향이 있었으나, 갈등 해결 과정을 통해 타인의 의견을 수용하고 부드럽게 의견 조율을 이끄는 리더십을 배워가고 있음.",
             },
           },
           {
@@ -1951,12 +2281,12 @@
             });
         }
         if (data.comprehensive)
-          summary += `\n[종합 의견]\n${data.comprehensive}\n`;
+          summary += `\n[학기말 종합 의견]\n${data.comprehensive}\n`;
         document.getElementById("rawDataDisplay").value =
           summary || "선택된 데이터가 없습니다.";
       }
 
-      /* --- [V10.5 핵심] 완벽한 톤앤매너 서사 래핑(Wrapping) 및 성장 브릿지 엔진 --- */
+      /* --- [핵심] 완벽한 톤앤매너 서사 래핑(Wrapping) 및 종합의견 브릿지 결합 --- */
       function assembleContextVersions(targets, comprehensive) {
         targets.sort((a, b) => new Date(a.date) - new Date(b.date));
 
@@ -2001,7 +2331,6 @@
             if (catFreq[cat] > 0) hasData = true;
           }
 
-          // 톤별 도입/결론 자동 삽입
           if (tone === "A") {
             catOrder = ["교우관계", "성격/생활", "학업/진로", "기타"];
             if (hasData)
@@ -2028,7 +2357,6 @@
               let para = "";
               if (tone === "A" || tone === "B") {
                 para += paras.length > 0 ? "또한, " : "";
-                // [V10.5] 노력 텍스트가 이미 완성된 극복 서사를 담고 있으므로 자연스럽게 나열
                 if (sArr.length > 0 && eArr.length > 0) {
                   para += sArr.join(" ") + " 나아가 " + eArr.join(" ");
                 } else {
@@ -2046,15 +2374,19 @@
           let resultText = "";
 
           if (tone === "C") {
-            resultText =
-              bodyText +
-              (bodyText && comprehensive ? " " : "") +
-              (comprehensive ? comprehensive : "");
+            resultText = bodyText + (bodyText && comprehensive ? " " : "");
+            if (comprehensive) {
+              let processedComp = bridgeEngine.process(comprehensive, true); // true for comprehensive
+              resultText += processedComp.bridge + processedComp.text;
+            }
           } else {
             resultText = intro + bodyText;
             if (comprehensive) {
+              let processedComp = bridgeEngine.process(comprehensive, true);
               resultText +=
-                (bodyText ? " 종합적으로 볼 때, " : "") + comprehensive;
+                (bodyText ? " " : "") +
+                processedComp.bridge +
+                processedComp.text;
             } else if (outro) {
               resultText += (bodyText ? " " : "") + outro;
             }
@@ -2130,7 +2462,7 @@
         showToast("자소서형 다중 톤앤매너 행특 초안이 생성되었습니다.");
       }
 
-      /* --- [V10.5 중복 방어막 및 UI 통합 전송 기능] --- */
+      /* --- [중복 방어막 및 수동 텍스트 브릿지 연동 전송 기능] --- */
       function moveToFinal() {
         const draftText = document.getElementById("tempDraft").value;
         const preview = document.getElementById("finalPreview");
@@ -2160,14 +2492,31 @@
         let currentSentences = getSentences(draftText);
         let manualCount = 0;
         let teacherSentences = [];
+        let pureAiSentences = [];
+
         currentSentences.forEach((cs) => {
           if (cs && !aiSentences.includes(cs)) {
             manualCount++;
             teacherSentences.push(cs);
+          } else if (cs) {
+            pureAiSentences.push(cs);
           }
         });
 
-        let correctedText = grammarEngine.convert(draftText);
+        let finalDraftToAppend = "";
+        let bridgeTeacherText = "";
+
+        if (manualCount > 0) {
+          let rawTeacherText = teacherSentences.join(" ");
+          let processed = bridgeEngine.process(rawTeacherText, false);
+          bridgeTeacherText = processed.bridge + processed.text;
+          finalDraftToAppend =
+            pureAiSentences.join(" ") + " " + bridgeTeacherText;
+        } else {
+          finalDraftToAppend = draftText;
+        }
+
+        let correctedText = grammarEngine.convert(finalDraftToAppend);
         let b = 0;
         let testText = preview.innerText + " " + correctedText;
         for (let i = 0; i < testText.length; i++)
@@ -2193,7 +2542,7 @@
           freq: tempContext.freq,
           comp: tempContext.comp,
           aiGeneratedText: tempContext.aiGeneratedText,
-          teacherText: teacherSentences.join(" "),
+          teacherText: bridgeTeacherText || teacherSentences.join(" "),
           len: correctedText.length,
           status: "active",
           needsUpgrade: false,
@@ -2364,7 +2713,6 @@
         showToast("이전 상태로 완벽하게 복구되었습니다.");
       }
 
-      /* --- [V10.5] 안전 압축(Safe Trim) - 평가어 보호 --- */
       function safeCompress(text) {
         let c = text;
         c = c.replace(/종합적으로 볼 때, /g, "");
@@ -2373,7 +2721,7 @@
         return c;
       }
 
-      /* --- [V10.5 핵심] 시계열 재배열 및 수동 텍스트 100% 보존 융합 엔진 --- */
+      /* --- [핵심] 통합 다듬기 및 브릿지 엔진 적용 --- */
       function checkAndUpgradeIntegrity() {
         let activeItems = finalHistoryStack.filter(
           (i) => i.status !== "deleted"
@@ -2410,11 +2758,17 @@
           if (s && !knownSentences.includes(s)) newPreviewSentences.push(s);
         });
 
+        // 1. 기존에 저장된 teacherText(이미 브릿지 처리됨)
         let allTeacherTexts = activeItems
           .map((i) => i.teacherText)
           .filter((t) => t);
-        if (newPreviewSentences.length > 0)
-          allTeacherTexts.push(newPreviewSentences.join(" "));
+
+        // 2. 우측에서 방금 새로 타이핑된 문장에 브릿지 엔진 가동
+        if (newPreviewSentences.length > 0) {
+          let rawNewTeacherText = newPreviewSentences.join(" ");
+          let processed = bridgeEngine.process(rawNewTeacherText, false);
+          allTeacherTexts.push(processed.bridge + processed.text);
+        }
         let finalTeacherText = allTeacherTexts.join(" ");
 
         let allActiveLogIds = [];
@@ -2431,6 +2785,7 @@
         if (allTargets.length === 0 && !compToUse) return;
 
         let dominantTone = activeItems[0].tone || "A";
+        // assembleContextVersions 내부에서 compToUse(학기말종합의견)에 대한 브릿지 처리가 포함됨
         let reassembled = assembleContextVersions(allTargets, compToUse);
         let newAiText = reassembled.versions[dominantTone];
 
