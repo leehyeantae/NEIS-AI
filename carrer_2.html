@@ -481,7 +481,7 @@
     </div>
 
     <div id="toast">알림</div>
-    <div class="topbar">진로활동 관리 시스템</div>
+    <div class="topbar">진로활동 관리</div>
 
     <div class="container">
       <section class="left">
@@ -996,7 +996,6 @@
         return b;
       }
 
-      /* --- 한글 조사(받침) 자동 판별기 --- */
       function attachJosa(word, josa) {
         if (!word) return "";
         const lastChar = word.charCodeAt(word.length - 1);
@@ -1021,7 +1020,9 @@
         }
       }
 
-      /* --- 자연어 맞춤법/종결어미 변환 엔진 --- */
+      /* =========================================================================
+         [Grammar Engine] - 기존 맞춤법/종결어미 변환 로직
+         ========================================================================= */
       class GrammarEngine {
         constructor() {
           this.irregularDict = {
@@ -1255,7 +1256,781 @@
         }
       }
 
+      /* =========================================================================
+         [Bridge Engine] - 교사 수동 작성 문맥 인식 및 스마트 융합 엔진 (Master NLP 탑재본)
+         ========================================================================= */
+      class HeuristicBridgeEngine {
+        constructor() {
+          // 1. [Phase 1] Master Elevation Dictionary
+          this.ELEVATION_DICT = {
+            COGNITIVE: [
+              {
+                pattern: /(알아|찾아|살펴)(보고|보며|보았고|봤으며|봄)/g,
+                replace: [
+                  "주도적으로 탐색하며",
+                  "관련 문헌을 심층 고찰하며",
+                  "다각도로 조사하여",
+                ],
+              },
+              {
+                pattern: /(생각|고민)(하고|하며|해보고|해봄)/g,
+                replace: [
+                  "깊이 있게 사고하며",
+                  "논리적으로 추론하여",
+                  "비판적으로 통찰하며",
+                ],
+              },
+              {
+                pattern: /(이해|파악)(하고|하며|함)/g,
+                replace: [
+                  "완벽히 체화하여",
+                  "개념을 내면화하여",
+                  "핵심 원리를 숙지하여",
+                ],
+              },
+              {
+                pattern: /(깨닫고|느끼고|느끼며|알게되고)/g,
+                replace: [
+                  "유의미한 통찰을 얻었으며",
+                  "학문적 깨달음을 바탕으로",
+                  "새로운 시각을 정립하며",
+                ],
+              },
+              {
+                pattern: /(질문|질의)(하고|하며|함)/g,
+                replace: [
+                  "날카로운 의문을 제기하며",
+                  "지적 호기심을 발휘하여",
+                  "심층적인 질의를 통해",
+                ],
+              },
+              {
+                pattern: /(나누고|분류|구분)(하고|하며)/g,
+                replace: [
+                  "체계적으로 범주화하여",
+                  "기준에 따라 세분화하며",
+                  "유형별로 분석하여",
+                ],
+              },
+              {
+                pattern: /(비교)(하고|하며|해보고)/g,
+                replace: [
+                  "공통점과 차이점을 대조 분석하여",
+                  "특징을 객관적으로 비교 고찰하며",
+                ],
+              },
+              {
+                pattern: /(배우고|익히고|공부하고)/g,
+                replace: [
+                  "새로운 지식을 습득하고",
+                  "학습 내용을 체화하여",
+                  "이론적 토대를 다지고",
+                ],
+              },
+              {
+                pattern: /(풀고|풀어내고|해결하고)/g,
+                replace: [
+                  "논리적으로 도출하고",
+                  "문제의 본질을 타개하며",
+                  "합리적인 결론을 전개하고",
+                ],
+              },
+            ],
+            PRACTICAL: [
+              {
+                pattern: /(만들고|만들어|제작)(보고|보며|함|하며)/g,
+                replace: [
+                  "창의적으로 고안하여",
+                  "실제 결과물로 산출하며",
+                  "구조를 설계 및 구현하여",
+                ],
+              },
+              {
+                pattern: /(쓰고|적고|기록)(하고|하며|함)/g,
+                replace: [
+                  "논리정연하게 서술하고",
+                  "체계적으로 기록하여",
+                  "분석 보고서를 작성하며",
+                ],
+              },
+              {
+                pattern: /(고치고|바꾸고|수정)(하고|하며)/g,
+                replace: [
+                  "오류를 수정 보완하여",
+                  "기존의 방식을 개선하며",
+                  "시스템을 최적화하고",
+                ],
+              },
+              {
+                pattern: /(해보고|시도)(하고|하며)/g,
+                replace: [
+                  "적극적으로 실천에 옮기며",
+                  "배운 내용을 실제 상황에 적용하여",
+                  "다양한 접근을 시도하며",
+                ],
+              },
+              {
+                pattern: /(보여주고|나타내고|증명)(하며|함)/g,
+                replace: [
+                  "뛰어난 역량을 발현하며",
+                  "자신의 가치를 입증하고",
+                  "가시적인 성과로 도출하며",
+                ],
+              },
+              {
+                pattern: /(쓰고|사용|이용)(하고|하며)/g,
+                replace: [
+                  "도구를 적절히 활용하여",
+                  "기술을 효과적으로 차용하며",
+                  "주어진 자원을 융합하여",
+                ],
+              },
+            ],
+            COLLABORATION: [
+              {
+                pattern: /(말하고|이야기|발표)(하고|하며)/g,
+                replace: [
+                  "자신의 의견을 논리적으로 피력하고",
+                  "설득력 있게 개진하며",
+                  "대중 앞에서 명확히 전달하고",
+                ],
+              },
+              {
+                pattern: /(듣고|들어주고)/g,
+                replace: [
+                  "타인의 의견을 경청하며",
+                  "열린 자세로 수용하고",
+                  "깊이 있게 공감하며",
+                ],
+              },
+              {
+                pattern: /(도와주고|돕고|도우며)/g,
+                replace: [
+                  "동료의 학습을 지원하고",
+                  "이타심을 발휘하여 조력하며",
+                  "팀원들을 헌신적으로 보조하고",
+                ],
+              },
+              {
+                pattern: /(같이|함께|다같이) (하고|하며)/g,
+                replace: [
+                  "동료들과 긴밀히 연대하여",
+                  "긍정적인 시너지를 발휘하며 협업하고",
+                  "공동의 목표를 위해 협동하며",
+                ],
+              },
+              {
+                pattern: /(친하게|사이좋게|싸우지 않고) (지내고|지내며)/g,
+                replace: [
+                  "원만한 라포(Rapport)를 형성하며",
+                  "갈등 없이 안정적인 유대 관계를 맺고",
+                ],
+              },
+              {
+                pattern: /(나누고|빌려주고|양보)(하고|하며)/g,
+                replace: [
+                  "자신의 자원을 기꺼이 공유하고",
+                  "타인을 배려하는 성숙함을 보이며",
+                  "공동체를 위해 헌신하고",
+                ],
+              },
+              {
+                pattern: /(칭찬|응원|격려)(하고|하며)/g,
+                replace: [
+                  "동료들의 사기를 북돋고",
+                  "긍정적인 피드백으로 지지하며",
+                  "따뜻한 격려를 아끼지 않고",
+                ],
+              },
+            ],
+            LEADERSHIP: [
+              {
+                pattern: /(이끌고|지휘)(하고|하며)/g,
+                replace: [
+                  "조직을 탁월하게 통솔하며",
+                  "부드러운 카리스마로 리더십을 발휘하고",
+                  "학급을 올바른 방향으로 견인하며",
+                ],
+              },
+              {
+                pattern: /(맡아서|담당)(하고|하며)/g,
+                replace: [
+                  "주도적으로 역할을 전담하여",
+                  "막중한 임무를 책임감 있게 수행하며",
+                  "프로젝트의 중추적인 역할을 맡아",
+                ],
+              },
+              {
+                pattern: /(나서서|먼저|앞장서서) (하고|하며)/g,
+                replace: [
+                  "누구보다 먼저 솔선수범하여",
+                  "궂은일도 자발적으로 자원하며",
+                  "타의 모범이 되어 행동하고",
+                ],
+              },
+              {
+                pattern: /(싸움을|갈등을) (말리고|풀고|해결)(하고|하며)/g,
+                replace: [
+                  "이견을 합리적으로 조율하며",
+                  "객관적인 태도로 갈등을 중재하고",
+                ],
+              },
+              {
+                pattern: /(새롭게|다르게|색다르게) (접근|생각|시도)/g,
+                replace: [
+                  "기존의 틀을 깨는 독창적인 시각으로",
+                  "창의적인 발상을 통해",
+                  "유연한 사고방식을 바탕으로",
+                ],
+              },
+            ],
+            ADVERB: [
+              {
+                pattern: /(스스로|혼자서)/g,
+                replace: [
+                  "자기주도적으로",
+                  "자발적으로",
+                  "뛰어난 독립성을 바탕으로",
+                ],
+              },
+              {
+                pattern: /(열심히|최선을 다해|열정적으로)/g,
+                replace: [
+                  "매사 성실하게",
+                  "남다른 열의를 다해",
+                  "적극적인 자세로 몰입하여",
+                ],
+              },
+              {
+                pattern: /(계속|꾸준히|쉬지않고)/g,
+                replace: [
+                  "지속적으로",
+                  "초지일관된 태도로",
+                  "포기하지 않는 집념으로",
+                ],
+              },
+              {
+                pattern: /(꼼꼼히|자세히|틀리지 않게)/g,
+                replace: [
+                  "면밀하고 체계적으로",
+                  "높은 분석력을 바탕으로",
+                  "세밀하고 치밀하게",
+                ],
+              },
+              {
+                pattern: /(많이|깊게|깊이)/g,
+                replace: [
+                  "다방면으로 폭넓게",
+                  "심도 있고 입체적으로",
+                  "다각적인 시각으로",
+                ],
+              },
+              {
+                pattern: /(잘|완벽하게|훌륭하게)/g,
+                replace: [
+                  "탁월하게",
+                  "성공적으로",
+                  "흠잡을 데 없는 완성도로",
+                  "우수하게",
+                ],
+              },
+              {
+                pattern: /(빠르게|빨리)/g,
+                replace: [
+                  "신속하고 정확하게",
+                  "뛰어난 적응력으로",
+                  "효율적으로",
+                ],
+              },
+            ],
+            CAREER: [
+              {
+                pattern: /(관심이 많고|관심을 가지고)/g,
+                replace: [
+                  "뛰어난 지적 호기심을 발휘하여",
+                  "전공 분야에 대한 남다른 흥미를 보이며",
+                  "깊은 관심을 바탕으로",
+                ],
+              },
+              {
+                pattern: /(좋아하고|즐기고|즐기며)/g,
+                replace: [
+                  "자신의 적성에 부합하여 열정을 보이며",
+                  "학습 그 자체를 즐기는 태도로",
+                ],
+              },
+              {
+                pattern: /(꿈꾸며|희망하며|목표로)/g,
+                replace: [
+                  "자신의 진로 비전을 확고히 다지며",
+                  "미래 목표 의식을 뚜렷하게 설정하고",
+                ],
+              },
+            ],
+          };
+
+          // 2. [Phase 2] Master Intent & Negation Dictionary
+          this.INTENT_KEYWORDS = {
+            자기주도_탐구: [
+              "스스로",
+              "혼자서",
+              "찾아",
+              "탐구",
+              "공부",
+              "분석",
+              "독서",
+              "도서",
+              "책",
+              "문헌",
+              "질문",
+              "궁금",
+              "호기심",
+              "심화",
+              "논문",
+              "기사",
+              "인터넷",
+              "연구",
+              "실험",
+              "증명",
+              "원리",
+              "개념",
+              "이해",
+              "복습",
+              "예습",
+              "학습",
+              "플래너",
+              "오답",
+              "노트",
+              "필기",
+              "정리",
+              "요약",
+              "학구열",
+              "주도적",
+              "자발적",
+              "독립적",
+              "관찰",
+              "추론",
+              "가설",
+              "검증",
+              "배경지식",
+              "원인",
+              "결과",
+              "상관관계",
+              "논리",
+              "집요함",
+              "학습태도",
+              "수업",
+              "경청",
+              "집중",
+              "몰입",
+              "끈기",
+              "과제",
+              "수행평가",
+              "자료",
+              "수집",
+              "비교",
+              "대조",
+              "특징",
+              "규칙성",
+              "패턴",
+            ],
+            전공_적합성: [
+              "관심",
+              "진로",
+              "꿈",
+              "희망",
+              "직업",
+              "분야",
+              "대학",
+              "학과",
+              "전공",
+              "개발",
+              "프로그램",
+              "소프트웨어",
+              "코딩",
+              "의학",
+              "보건",
+              "간호",
+              "과학",
+              "물리",
+              "화학",
+              "생명",
+              "지구과학",
+              "교육",
+              "사회",
+              "역사",
+              "철학",
+              "예술",
+              "미술",
+              "음악",
+              "체육",
+              "스포츠",
+              "미래",
+              "적성",
+              "흥미",
+              "목표",
+              "비전",
+              "로드맵",
+              "계획",
+              "특강",
+              "강연",
+              "멘토링",
+              "캠프",
+              "체험",
+              "동아리",
+              "세미나",
+              "전문가",
+              "진학",
+              "포트폴리오",
+              "진로상담",
+              "적성검사",
+              "직업관",
+              "가치관",
+              "동향",
+              "트렌드",
+              "이슈",
+              "뉴스",
+              "역량",
+              "소양",
+              "자질",
+              "준비도",
+              "실무",
+              "직무",
+            ],
+            리더십_책임감: [
+              "이끌",
+              "도맡아",
+              "솔선수범",
+              "조장",
+              "반장",
+              "부장",
+              "앞장서서",
+              "책임",
+              "희생",
+              "마무리",
+              "정리",
+              "총괄",
+              "기획",
+              "진행",
+              "리더",
+              "회장",
+              "부반장",
+              "기장",
+              "팀장",
+              "사회자",
+              "통솔",
+              "지휘",
+              "헌신",
+              "주도",
+              "모범",
+              "규칙",
+              "준수",
+              "임무",
+              "역할",
+              "완수",
+              "추진력",
+              "결단력",
+              "관리",
+              "감독",
+              "조직",
+              "운영",
+              "분배",
+              "배분",
+              "일정",
+              "조율",
+              "회의",
+              "의견수렴",
+              "카리스마",
+              "포용력",
+              "대표",
+              "안내",
+              "지도",
+              "인솔",
+              "통제",
+              "표본",
+              "신뢰",
+              "당번",
+              "청소",
+              "환경",
+              "미화",
+              "캠페인",
+              "홍보",
+              "독려",
+            ],
+            협업_소통: [
+              "도와",
+              "친구",
+              "함께",
+              "같이",
+              "배려",
+              "양보",
+              "갈등",
+              "조율",
+              "중재",
+              "경청",
+              "의견",
+              "모둠",
+              "조별",
+              "팀워크",
+              "공동체",
+              "협업",
+              "협력",
+              "소통",
+              "대화",
+              "공감",
+              "나눔",
+              "지원",
+              "조력",
+              "타협",
+              "화해",
+              "이타심",
+              "존중",
+              "수용",
+              "동료",
+              "급우",
+              "멘토",
+              "멘티",
+              "튜터",
+              "튜티",
+              "연대",
+              "친화력",
+              "라포",
+              "유대감",
+              "화합",
+              "친절",
+              "따뜻",
+              "위로",
+              "격려",
+              "응원",
+              "칭찬",
+              "피드백",
+              "토론",
+              "토의",
+              "설득",
+              "가교",
+              "분위기",
+              "메이커",
+              "활력",
+              "웃음",
+              "긍정",
+              "명랑",
+              "원만",
+              "대인관계",
+              "사교적",
+            ],
+            창의_문제해결: [
+              "새로운",
+              "아이디어",
+              "해결",
+              "제시",
+              "고안",
+              "방법",
+              "오류",
+              "문제점",
+              "개선",
+              "수정",
+              "극복",
+              "다르게",
+              "시각",
+              "창의성",
+              "창의력",
+              "대안",
+              "발명",
+              "발상",
+              "혁신",
+              "다각적",
+              "융합",
+              "복합",
+              "접근",
+              "타개",
+              "보완",
+              "최적화",
+              "효율",
+              "알고리즘",
+              "트러블슈팅",
+              "통찰력",
+              "논리적",
+              "유연한",
+              "사고",
+              "관점",
+              "전환",
+              "역발상",
+              "창안",
+              "기획력",
+              "디버깅",
+              "시뮬레이션",
+              "프로토타입",
+              "모형",
+              "제작",
+              "디자인씽킹",
+              "브레인스토밍",
+              "구조화",
+              "시각화",
+              "도식화",
+              "수식",
+              "증명",
+              "반례",
+            ],
+          };
+
+          this.NEGATION_DEFENSE_PATTERNS = [
+            /(부족|미흡|아쉽|못하|않|없|어렵|힘들|포기|좌절|실패|실수|오류|한계|단점|결점|문제|서툴|서투르)/g,
+            /(소극|조용|말이 없|내성|낯가림|위축|긴장|불안|주저|회피|숨|자신감 없|수동적|의존적|끌려다니|소심)/g,
+            /(산만|떠들|장난|시끄럽|집중 못|주의력|딴짓|불참|지각|결석|태만|게으름|미루|불성실|귀찮|나태)/g,
+            /(충돌|다툼|갈등|싸움|이기적|고집|독단|폐쇄적|배려 없|공감 못|어울리지 못|혼자서만|마찰|불화)/g,
+            /(~하지만|~했으나|~임에도 불구하고|가끔|때로는|종종|간혹|아직은|초기에는|처음에는|~편이나)/g,
+          ];
+
+          // 3. [Phase 3] Master Smart Bridge Dictionary
+          this.SMART_BRIDGES = {
+            자기주도_탐구: [
+              "수업 내용에 머무르지 않고 지적 호기심을 능동적으로 확장하여, ",
+              "특히 스스로 배움을 확장해 나가는 탁월한 자기주도성이 돋보이며, ",
+              "주목할 만한 점은, 평소 끈기 있는 탐구 자세를 바탕으로 ",
+              "정규 교육과정의 범위를 넘어 학구적인 열의를 발휘하여, ",
+              "주어진 과제에 만족하지 않고 깊이 있는 학습을 주도하며, ",
+              "나아가 배운 지식을 단편적으로 암기하는 데 그치지 않고, ",
+              "이와 더불어 지적 성장에 대한 남다른 갈증을 바탕으로, ",
+              "학습의 본질을 꿰뚫고자 하는 진정성 있는 몰입을 보여주며, ",
+              "단순한 결과 도출을 넘어 그 이면의 원리를 파악하고자, ",
+              "지식을 구조화하고 내면화하려는 학구적인 열의를 보이며, ",
+              "매사 탐구하는 자세를 생활화하여 지식의 외연을 넓히고자, ",
+              "지속적인 자기 점검을 통해 학습의 완성도를 높이는 한편, ",
+            ],
+            전공_적합성: [
+              "특히, 자신의 진로 분야에 대한 남다른 열정을 바탕으로, ",
+              "나아가, 전공 분야에 대한 깊은 학구적 호기심을 발휘하여, ",
+              "무엇보다도 자신의 미래 비전과 현재의 학습을 유기적으로 연계하여, ",
+              "이와 함께 확고한 진로 목표 의식을 길잡이 삼아, ",
+              "평소 희망 전공 분야에 대한 뚜렷한 목표 의식을 바탕으로, ",
+              "자신의 진로를 구체화하기 위해 능동적으로 탐색하는 과정을 통해, ",
+              "해당 전공 분야의 동향에 기민하게 반응하며 소양을 쌓고자, ",
+              "미래 인재로서 갖추어야 할 전문 지식에 대한 높은 흥미를 보이며, ",
+              "단순한 관심을 넘어 이를 실천적 학업 역량으로 승화시키고자, ",
+              "자신의 적성을 객관적으로 분석하고 이에 맞는 활동을 기획하여, ",
+              "진로와 직업에 대한 성숙한 가치관을 바탕으로 꾸준히 노력하며, ",
+              "관심 분야에 대한 깊이 있는 통찰력을 기르기 위해 자발적으로, ",
+            ],
+            리더십_책임감: [
+              "학업뿐만 아니라 공동체를 이끄는 훌륭한 책임감을 발휘하여, ",
+              "특히, 조직의 목표 달성을 위해 솔선수범하는 리더십이 돋보이며, ",
+              "어려운 상황에서도 묵묵히 궂은일을 도맡아 하는 희생정신을 바탕으로, ",
+              "나아가 타인을 강압적으로 통솔하기보다 스스로 모범을 보이며, ",
+              "주어진 임무를 끝까지 완수해 내는 강한 추진력을 바탕으로, ",
+              "학급의 대소사에서 중추적인 역할을 훌륭히 소화해 내며, ",
+              "조직의 화합을 이끄는 부드러운 카리스마와 통솔력을 발휘하여, ",
+              "동료들의 장점을 이끌어내는 서번트 리더십(Servant Leadership)을 발휘하여, ",
+              "스스로 계획하고 주도적으로 실행에 옮기는 탁월한 기획력을 바탕으로, ",
+              "갈등 상황에서도 흔들리지 않는 결단력과 책임감을 통해, ",
+            ],
+            협업_소통: [
+              "타인을 배려하고 존중하는 성숙한 인성을 바탕으로, ",
+              "특히 동료들과의 협업 과정에서 뛰어난 소통 능력을 발휘하여, ",
+              "자신의 이익보다 공동체의 화합을 먼저 생각하는 이타심을 발휘하여, ",
+              "열린 마음으로 타인의 의견을 수용하고 존중하는 태도를 바탕으로, ",
+              "공동체의 목표 달성을 위해 원활한 대인관계 역량을 발휘하여, ",
+              "나아가 이견이 발생했을 때 합리적으로 조율하는 유연함을 보이며, ",
+              "평소 긍정적이고 명랑한 에너지로 학급에 활력을 불어넣으며, ",
+              "동료의 어려움을 지나치지 않고 기꺼이 조력하는 따뜻한 성품으로, ",
+              "팀워크의 중요성을 깊이 인지하고 헌신적으로 협력하는 태도로, ",
+              "원활한 의사소통 능력을 바탕으로 팀 내 갈등의 중재자 역할을 하며, ",
+            ],
+            창의_문제해결: [
+              "틀에 얽매이지 않는 유연하고 창의적인 사고방식을 바탕으로, ",
+              "특히 문제 상황에 직면했을 때 다각적이고 입체적인 시각으로 접근하여, ",
+              "기존의 방식을 비판적으로 수용하고 획기적으로 개선하려는 노력으로, ",
+              "나아가 직관적인 발상과 치밀한 논리력을 융합하여, ",
+              "주어진 제약을 핑계 삼지 않고 새로운 대안을 적극적으로 모색하여, ",
+              "고정관념에서 벗어나 융합적인 시각으로 현상을 분석하며, ",
+              "복잡한 문제를 단순화하고 핵심을 짚어내는 탁월한 분석력을 바탕으로, ",
+              "예상치 못한 오류 앞에서도 당황하지 않고 원인을 논리적으로 규명하여, ",
+              "다양한 지식을 연결하여 독창적인 결과물을 산출해 내는 역량을 발휘하여, ",
+            ],
+            GROWTH_DEFENSE: [
+              "초기에는 낯선 과제와 환경에 다소 어려움을 겪기도 하였으나, 이를 극복하고자 ",
+              "처음에는 자신감이 다소 부족한 모습을 보였으나, 지속적인 노력과 성찰을 통해 ",
+              "때로는 시행착오를 겪으며 한계에 부딪히기도 하였으나, 포기하지 않고 ",
+              "학습 과정에서 뜻대로 되지 않아 좌절하기도 하였으나, 특유의 회복탄력성을 발휘하여 ",
+              "과거의 아쉬웠던 점을 스스로 객관적으로 인지하고, 이를 긍정적인 방향으로 개선하고자 ",
+              "초반에는 다소 소극적인 태도를 보였으나 점차 주변의 조언을 수용하며 ",
+              "때로는 의사소통이나 협업 과정에서 마찰이 있기도 하였으나, 이를 성장의 계기로 삼아 ",
+              "자신의 부족한 점을 회피하지 않고 정면으로 마주하며 꾸준히 노력한 결과, ",
+            ],
+            일반_연결: [
+              "이와 함께, 평소 학교생활 전반에서 ",
+              "또한, 교사의 지속적인 관찰 결과 ",
+              "더불어, 매사 긍정적이고 능동적인 태도로 ",
+              "이 외에도 다양한 교육 활동에 성실히 참여하며 ",
+              "일상적인 학교생활 속에서도 성실함을 잃지 않고, ",
+              "뿐만 아니라, 자신에게 주어진 역할에 최선을 다하며, ",
+            ],
+          };
+        }
+
+        elevate(text) {
+          let result = text;
+          for (const cat in this.ELEVATION_DICT) {
+            this.ELEVATION_DICT[cat].forEach((rule) => {
+              let replacement = Array.isArray(rule.replace)
+                ? rule.replace[0]
+                : rule.replace;
+              result = result.replace(rule.pattern, replacement + " ");
+            });
+          }
+          return result.replace(/\s{2,}/g, " ").trim();
+        }
+
+        detectIntent(text) {
+          let maxHits = 0;
+          let bestIntent = "일반_연결";
+
+          for (const intent in this.INTENT_KEYWORDS) {
+            let hits = 0;
+            this.INTENT_KEYWORDS[intent].forEach((keyword) => {
+              if (text.includes(keyword)) hits++;
+            });
+            if (hits > maxHits) {
+              maxHits = hits;
+              bestIntent = intent;
+            }
+          }
+          return bestIntent;
+        }
+
+        getBridge(intent) {
+          const bridges =
+            this.SMART_BRIDGES[intent] || this.SMART_BRIDGES["일반_연결"];
+          return bridges[Math.floor(Math.random() * bridges.length)];
+        }
+
+        process(teacherText) {
+          if (!teacherText || teacherText.trim() === "")
+            return { bridge: "", text: "" };
+
+          let elevated = this.elevate(teacherText);
+          let intent = this.detectIntent(teacherText);
+          let bridge = this.getBridge(intent);
+
+          let isNegationDetected = false;
+          for (let pattern of this.NEGATION_DEFENSE_PATTERNS) {
+            if (pattern.test(teacherText)) {
+              isNegationDetected = true;
+              break;
+            }
+          }
+
+          if (isNegationDetected) {
+            const defenseBridges = this.SMART_BRIDGES["GROWTH_DEFENSE"];
+            bridge =
+              defenseBridges[Math.floor(Math.random() * defenseBridges.length)];
+          }
+
+          return { bridge: bridge, text: elevated };
+        }
+      }
+
       const grammarEngine = new GrammarEngine();
+      const bridgeEngine = new HeuristicBridgeEngine();
 
       /* --- [State & Initialization] --- */
       let studentHistory = [];
@@ -1329,7 +2104,6 @@
           tabId,
           checked: true,
         };
-
         data.date = document.getElementById(tabId + "Date").value;
         let jobCode = document.getElementById(tabId + "Career").value;
         let customJob = document
@@ -1348,11 +2122,10 @@
           let optText = document.querySelector(
             `#${tabId}Career option[value="${jobCode}"]`
           ).text;
-          if (optText.includes("(")) {
+          if (optText.includes("("))
             data.jobLabel = optText.split("(")[1].replace(")", "").trim();
-          } else {
+          else
             data.jobLabel = optText.substring(optText.indexOf(" ") + 1).trim();
-          }
         }
 
         if (tabId === "basic") {
@@ -1372,7 +2145,6 @@
               data.r2 === data.r3
             )
               return alert("순위 결과는 중복될 수 없습니다.");
-
             data.hashKey = `TEST|${data.date}|${data.topic}|${data.jobCode}|${data.r1}|${data.r2}|${data.r3}`;
           } else {
             data.content = document
@@ -1396,7 +2168,6 @@
             .trim();
           if (!data.topic || !data.content)
             return alert("주제와 내용을 모두 입력하세요.");
-
           data.hashKey = `EXPLORE|${data.subType}|${data.date}|${data.jobCode}|${data.topic}`;
         }
 
@@ -1424,7 +2195,6 @@
           document.getElementById("exploreTopic").value = "";
           document.getElementById("exploreContent").value = "";
         }
-
         renderHistory();
         showToast("목록에 저장되었습니다.");
       }
@@ -1570,6 +2340,8 @@
       }
 
       /* --- 파트 분리형 다중 버전 및 직업 브릿지 생성 --- */
+      /* --- 파트 분리형 다중 버전 및 직업 브릿지 생성 --- */
+      /* --- 파트 분리형 다중 버전 및 직업 브릿지 생성 --- */
       function assembleCareerVersions(targets) {
         targets.sort((a, b) => new Date(a.date) - new Date(b.date));
 
@@ -1582,7 +2354,6 @@
         let isUndecided = ["미정", "탐색 중"].includes(lastJob);
 
         let actsMap = [];
-
         let introA = "",
           introB = "",
           introC = "";
@@ -1615,7 +2386,6 @@
             date: item.date,
             jobLabel: item.jobLabel,
           });
-
           let topicEul = attachJosa(item.topic, "을/를");
 
           if (
@@ -1630,22 +2400,73 @@
           }
           currentJob = item.jobLabel;
 
+          let cleanContent = item.content
+            ? item.content.trim().replace(/\.+$/, "")
+            : "";
+          let isSentence = /(다|함|음|고|며|어|아|지)$/.test(cleanContent); // 문장 종결 어미 감지
+
           if (item.subType === "test") {
             bodyA += `${item.topic} 결과 ${item.r1}, ${item.r2}, ${item.r3} 성향이 두드러짐을 확인하고 자신의 강점을 객관적으로 분석함. `;
             bodyB += `${item.topic}에 적극적으로 참여하여 ${item.r1}, ${item.r2}, ${item.r3} 성향을 확인하고 자아 탐색의 밑거름으로 삼음. `;
             bodyC += `${item.topic}에서 ${item.r1}, ${item.r2}, ${item.r3} 성향을 확인함. `;
           } else if (item.subType === "counsel") {
-            bodyA += `진로 상담을 통해 ${item.content}에 대해 심도 있게 분석하고 체계적인 진로 로드맵을 설계함. `;
-            bodyB += `진로 상담에 적극적으로 임하며 ${item.content}에 대한 조언을 수용하고 긍정적인 태도로 진로를 개척함. `;
-            bodyC += `진로 상담을 통해 ${item.content}에 대해 논의함. `;
+            if (isSentence) {
+              let converted = "";
+              // [수정된 부분] 3가지 케이스로 정밀하게 나누어 처리
+              if (cleanContent.endsWith("다")) {
+                converted = cleanContent.slice(0, -1) + "다는 점을 확인하고,";
+              } else if (/(함|음)$/.test(cleanContent)) {
+                converted = cleanContent + " 등 진로에 대한 깊은 고민을 나누며";
+              } else {
+                converted =
+                  cleanContent +
+                  ", 이를 바탕으로 진로에 대한 깊은 고민을 나누며";
+              }
+
+              bodyA += `진로 상담 과정에서 ${converted} 체계적인 진로 로드맵을 설계함. `;
+              bodyB += `진로 상담에 적극적으로 임하여 ${converted} 긍정적인 태도로 진로를 개척함. `;
+              bodyC += `진로 상담을 통해 ${
+                cleanContent.endsWith("다")
+                  ? cleanContent.slice(0, -1) + "다는 점을"
+                  : cleanContent
+              } 논의함. `;
+            } else {
+              bodyA += `진로 상담을 통해 ${cleanContent}에 대해 심도 있게 분석하고 체계적인 진로 로드맵을 설계함. `;
+              bodyB += `진로 상담에 적극적으로 임하며 ${cleanContent}에 대한 조언을 수용하고 긍정적인 태도로 진로를 개척함. `;
+              bodyC += `진로 상담을 통해 ${cleanContent}에 대해 논의함. `;
+            }
           } else if (item.subType === "lecture") {
-            bodyA += `${topicEul} 주제로 한 특강에서 ${item.content}를 비판적으로 수용하며 전공 분야의 지식 기반을 탄탄히 다짐. `;
-            bodyB += `${topicEul} 주제로 한 특강을 경청하고 ${item.content}를 학습하며 전공에 대한 확고한 의지와 열의를 보임. `;
-            bodyC += `${topicEul} 주제로 한 특강을 듣고 ${item.content}를 학습함. `;
+            if (isSentence) {
+              let converted = cleanContent.endsWith("다")
+                ? cleanContent.slice(0, -1) + "다는 점을"
+                : cleanContent + " 등 다양한 사실을";
+              bodyA += `${topicEul} 주제로 한 특강에서 ${converted} 깨닫고 비판적으로 수용하며 전공 분야의 지식 기반을 탄탄히 다짐. `;
+              bodyB += `${topicEul} 주제로 한 특강을 경청하고 ${converted} 깊이 이해하며 전공에 대한 확고한 의지와 열의를 보임. `;
+              bodyC += `${topicEul} 주제로 한 특강을 듣고 ${converted} 학습함. `;
+            } else {
+              let contentEul = attachJosa(cleanContent, "을/를");
+              bodyA += `${topicEul} 주제로 한 특강에서 ${contentEul} 비판적으로 수용하며 전공 분야의 지식 기반을 탄탄히 다짐. `;
+              bodyB += `${topicEul} 주제로 한 특강을 경청하고 ${contentEul} 학습하며 전공에 대한 확고한 의지와 열의를 보임. `;
+              bodyC += `${topicEul} 주제로 한 특강을 듣고 ${contentEul} 학습함. `;
+            }
           } else {
-            bodyA += `${topicEul} 중심으로 탐구 활동을 수행하며 ${item.content} 등 전공과 관련된 심층적인 분석력과 논리력을 증명함. `;
-            bodyB += `${topicEul} 중심으로 자기주도적 탐구를 수행하여 ${item.content} 등 앎의 지평을 넓히는 뛰어난 실천력을 보임. `;
-            bodyC += `${topicEul} 탐구하며 ${item.content} 등 전공 적합성을 보임. `;
+            // 전공 심화 탐구(activity)
+            if (isSentence) {
+              let converted = cleanContent.endsWith("다")
+                ? cleanContent.slice(0, -1) + "다는 결론을 도출하는 등"
+                : cleanContent + " 등";
+              bodyA += `${topicEul} 중심으로 탐구 활동을 수행하여 ${converted} 전공과 관련된 심층적인 분석력을 증명함. `;
+              bodyB += `${topicEul} 중심으로 자기주도적 탐구를 수행하여 ${converted} 앎의 지평을 넓히는 실천력을 보임. `;
+              bodyC += `${topicEul} 탐구하며 ${
+                cleanContent.endsWith("다")
+                  ? cleanContent.slice(0, -1) + "다는"
+                  : cleanContent
+              } 점을 확인함. `;
+            } else {
+              bodyA += `${topicEul} 중심으로 탐구 활동을 수행하며 ${cleanContent} 등 전공과 관련된 심층적인 분석력과 논리력을 증명함. `;
+              bodyB += `${topicEul} 중심으로 자기주도적 탐구를 수행하여 ${cleanContent} 등 앎의 지평을 넓히는 뛰어난 실천력을 보임. `;
+              bodyC += `${topicEul} 탐구하며 ${cleanContent} 등 전공 적합성을 보임. `;
+            }
           }
         });
 
@@ -1709,7 +2530,6 @@
           parts: null,
           aiGeneratedText: "",
         };
-
         document.querySelectorAll(".draft-tab")[0].click();
         showToast(
           "시간 순서와 직업 변경 서사가 적용된 다중 버전 초안이 생성되었습니다."
@@ -1739,6 +2559,7 @@
         });
       }
 
+      /* --- [핵심] Bridge Engine이 연동된 전송 함수 --- */
       function moveToFinal() {
         const draftText = document.getElementById("tempDraft").value;
         const preview = document.getElementById("finalPreview");
@@ -1766,16 +2587,35 @@
 
         let aiSentences = getSentences(tempContext.aiGeneratedText);
         let currentSentences = getSentences(draftText);
+
         let manualCount = 0;
         let teacherSentences = [];
+        let pureAiSentences = [];
+
         currentSentences.forEach((cs) => {
           if (cs && !aiSentences.includes(cs)) {
             manualCount++;
             teacherSentences.push(cs);
+          } else if (cs) {
+            pureAiSentences.push(cs);
           }
         });
 
-        let correctedText = grammarEngine.convert(draftText);
+        let finalDraftToAppend = "";
+        let bridgeTeacherText = "";
+
+        if (manualCount > 0) {
+          let rawTeacherText = teacherSentences.join(" ");
+          let processed = bridgeEngine.process(rawTeacherText);
+
+          bridgeTeacherText = processed.bridge + processed.text;
+          finalDraftToAppend =
+            pureAiSentences.join(" ") + " " + bridgeTeacherText;
+        } else {
+          finalDraftToAppend = draftText;
+        }
+
+        let correctedText = grammarEngine.convert(finalDraftToAppend);
         let currentText = preview.innerText;
         let b = getByteCount(currentText + " " + correctedText);
 
@@ -1800,7 +2640,7 @@
           actsMap: tempContext.actsMap,
           parts: tempContext.parts,
           originalAiText: tempContext.aiGeneratedText,
-          teacherText: teacherSentences.join(" "),
+          teacherText: bridgeTeacherText || teacherSentences.join(" "),
           len: correctedText.length,
           status: "active",
           manualCount: manualCount,
@@ -1809,10 +2649,11 @@
         document.getElementById("tempDraft").value = "";
         renderInfoLayer();
         updateByte();
-        showToast("우측 최종 기재란으로 전송되었습니다.");
+        showToast(
+          "브릿지 엔진 처리 완료. 우측 최종 기재란으로 전송되었습니다."
+        );
       }
 
-      /* --- [V8.4 픽스] 클릭 시 highlightSentence 발동 정상화 --- */
       function renderInfoLayer() {
         const con = document.getElementById("infoContentContainer");
         con.innerHTML = "";
@@ -1824,15 +2665,13 @@
         finalHistoryStack.forEach((item) => {
           const div = document.createElement("div");
           div.className = `info-card`;
-
-          // ★ 여기서 클릭 이벤트를 연결합니다!
           div.onclick = () => highlightSentence(item.id);
 
           let tagsHtml = item.actsMap
             .map((a) => `<span class="tag">${a.name}</span>`)
             .join("");
           if (item.manualCount > 0) {
-            tagsHtml += `<span class="tag" style="background:#fef08a; border-color:#fde047; color:#854d0e;">✏️ 직접 작성 ${item.manualCount}건</span>`;
+            tagsHtml += `<span class="tag" style="background:#fef08a; border-color:#fde047; color:#854d0e;">✏️ 교사 평가 ${item.manualCount}건 결합됨</span>`;
           }
 
           let delBtn = `<button class="delete-sentence-btn" onclick="deleteFinalSentence(event, '${item.id}')">🗑️ 일괄 삭제</button>`;
