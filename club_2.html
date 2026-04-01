@@ -922,30 +922,48 @@
       }
 
       /* --- [V9.3 에러방지] 무결점 조사 부착 엔진 --- */
+      /* --- [마스터 버전] 무결점 조사 자동 결합 엔진 --- */
       function attachJosa(word, josaType) {
         if (!word) return "";
-        const lastChar = word.charCodeAt(word.length - 1);
+        let cleanWord = word.trim();
+
+        // 괄호로 끝나는 경우 괄호 앞 단어 기준으로 판별
+        let testWord = cleanWord;
+        const bracketMatch = cleanWord.match(/(.+)\([^)]+\)$/);
+        if (bracketMatch) testWord = bracketMatch[1].trim();
+
+        const lastChar = testWord.charCodeAt(testWord.length - 1);
         if (lastChar < 0xac00 || lastChar > 0xd7a3) {
           return (
-            word + "(" + josaType.split("/")[0] + ")" + josaType.split("/")[1]
+            cleanWord +
+            "(" +
+            josaType.split("/")[0] +
+            ")" +
+            josaType.split("/")[1]
           );
         }
+
         const jongseong = (lastChar - 0xac00) % 28;
         const hasJongseong = jongseong > 0;
 
         switch (josaType) {
           case "을/를":
-            return word + (hasJongseong ? "을" : "를");
+            return cleanWord + (hasJongseong ? "을" : "를");
           case "이/가":
-            return word + (hasJongseong ? "이" : "가");
+            return cleanWord + (hasJongseong ? "이" : "가");
           case "은/는":
-            return word + (hasJongseong ? "은" : "는");
+            return cleanWord + (hasJongseong ? "은" : "는");
           case "과/와":
-            return word + (hasJongseong ? "과" : "와");
+            return cleanWord + (hasJongseong ? "과" : "와");
+          case "으로서/로서":
+            return cleanWord + (hasJongseong ? "으로서" : "로서");
           case "으로/로":
-            return word + (hasJongseong && jongseong !== 8 ? "으로" : "로");
+            // 'ㄹ' 받침(종성 인덱스 8)은 '로'를 사용
+            return (
+              cleanWord + (hasJongseong && jongseong !== 8 ? "으로" : "로")
+            );
           default:
-            return word + josaType;
+            return cleanWord + josaType;
         }
       }
 
@@ -1679,6 +1697,7 @@
       }
 
       /* --- [V9.3 에러방지] 다중 톤앤매너 서사 엔진 --- */
+      /* --- [V9.3 에러방지] 다중 톤앤매너 서사 엔진 (조사 및 문장판별 완벽 적용) --- */
       function assembleClubVersions(targets) {
         targets.sort((a, b) => new Date(a.date) - new Date(b.date));
 
@@ -1718,19 +1737,21 @@
             bIntroB = "",
             bIntroC = "";
 
+          // [완벽 통합 1: 역할 소개 부분의 조사(로서/으로서) 교정]
+          let roleWithJosa = attachJosa(
+            ROLE_NAMES[block.roleKey] || block.customName,
+            "으로서/로서"
+          );
+
           if (index === 0) {
             if (block.roleKey === "custom") {
-              bIntroA = `${block.customName}로서 ${CLUB_NAME} 활동에 탐구심을 가지고 참여하며, `;
-              bIntroB = `${block.customName}로서 ${CLUB_NAME} 활동에 열정적으로 임하며, `;
-              bIntroC = `${block.customName}로서 활동하며, `;
+              bIntroA = `${roleWithJosa} ${CLUB_NAME} 활동에 탐구심을 가지고 참여하며, `;
+              bIntroB = `${roleWithJosa} ${CLUB_NAME} 활동에 열정적으로 임하며, `;
+              bIntroC = `${roleWithJosa} 활동하며, `;
             } else {
-              bIntroA = `${CLUB_NAME} ${
-                ROLE_NAMES[block.roleKey]
-              }로서 깊은 학구적 호기심을 바탕으로 활동을 주도함. `;
-              bIntroB = `${CLUB_NAME} ${
-                ROLE_NAMES[block.roleKey]
-              }로서 탁월한 책임감을 발휘하여 부원들을 이끎. `;
-              bIntroC = `${CLUB_NAME} ${ROLE_NAMES[block.roleKey]}로 활동함. `;
+              bIntroA = `${CLUB_NAME} ${roleWithJosa} 깊은 학구적 호기심을 바탕으로 활동을 주도함. `;
+              bIntroB = `${CLUB_NAME} ${roleWithJosa} 탁월한 책임감을 발휘하여 부원들을 이끎. `;
+              bIntroC = `${CLUB_NAME} ${roleWithJosa} 활동함. `;
             }
           } else {
             if (block.roleKey === "custom") {
@@ -1777,6 +1798,7 @@
             bBodyC = "";
           let blockSummary = [];
 
+          // [완벽 통합 2: 활동 내용이 단어인지 문장인지 스마트 감별]
           for (let [cKey, cItems] of contentMap) {
             const count = cItems.length;
             const first = cItems[0];
@@ -1789,11 +1811,25 @@
 
             if (first.type === "normal") {
               let actName = first.content.trim() || `${first.cat} 관련 활동`;
-              let actNameEul = attachJosa(actName, "을/를");
 
-              bBodyA += `${actNameEul} ${freqAdverb}심도 있게 탐구함. `;
-              bBodyB += `${actNameEul} ${freqAdverb}열정적으로 수행함. `;
-              bBodyC += `${actNameEul} ${freqAdverb}수행함. `;
+              // [핵심] 이미 문장으로 끝나는 경우(함, 다, 음, 기 등) 감지
+              let isFullSentence =
+                /[.!?]$/.test(actName) ||
+                /(함|음|다|임|됨|줌|기)$/.test(actName);
+
+              if (isFullSentence) {
+                // 이미 문장이면 템플릿('~를 심도있게 탐구함')을 붙이지 않고 문법 엔진만 통과시킴
+                let convertedSentence = grammarEngine.convert(actName);
+                bBodyA += `${convertedSentence} `;
+                bBodyB += `${convertedSentence} `;
+                bBodyC += `${convertedSentence} `;
+              } else {
+                // 단순 명사/단어인 경우에만 조사를 붙이고 템플릿과 결합
+                let actNameEul = attachJosa(actName, "을/를");
+                bBodyA += `${actNameEul} ${freqAdverb}심도 있게 탐구함. `;
+                bBodyB += `${actNameEul} ${freqAdverb}열정적으로 수행함. `;
+                bBodyC += `${actNameEul} ${freqAdverb}수행함. `;
+              }
               blockSummary.push(`${actName}(${count})`);
             } else {
               const topicEul = attachJosa(first.topic, "을/를");
