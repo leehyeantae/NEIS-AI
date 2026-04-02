@@ -946,7 +946,15 @@
                   style="padding-top: 5px; padding-bottom: 5px"
                 >
                   <div class="form-label"></div>
-                  <div class="form-input-group">
+                  <div
+                    class="form-input-group"
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 10px;
+                      flex-wrap: wrap;
+                    "
+                  >
                     <label
                       style="
                         cursor: pointer;
@@ -966,9 +974,17 @@
                         type="checkbox"
                         id="eventIsLeader"
                         style="transform: scale(1.2)"
+                        onchange="document.getElementById('eventRoleName').style.display = this.checked ? 'block' : 'none';"
                       />
-                      👑 임원/리더로서 행사 주도 (기획/통솔)
+                      👑 임원/리더로서 행사 주도
                     </label>
+                    <input
+                      type="text"
+                      id="eventRoleName"
+                      class="input"
+                      style="display: none; width: 160px; padding: 8px"
+                      placeholder="역할명 (예: 기획단장)"
+                    />
                   </div>
                 </div>
                 <div class="form-row" id="area-event" style="display: none">
@@ -1943,6 +1959,13 @@
             eName = document.getElementById("customEventName").value.trim();
           data.date = document.getElementById("eventDate").value;
           data.isLeader = document.getElementById("eventIsLeader").checked;
+
+          // [추가] 이벤트 역할명 저장
+          data.eventRoleName = data.isLeader
+            ? document.getElementById("eventRoleName").value.trim()
+            : "";
+          if (data.isLeader && !data.eventRoleName) data.eventRoleName = "임원";
+
           if (!eName || !data.date || data.keywords.length === 0)
             return alert("항목을 모두 기입하세요.");
           data.title = eName;
@@ -1976,6 +1999,9 @@
           document.getElementById("eventDate").value = "";
           document.getElementById("customEventName").style.display = "none";
           document.getElementById("eventIsLeader").checked = false;
+          // [추가] 폼 초기화
+          document.getElementById("eventRoleName").value = "";
+          document.getElementById("eventRoleName").style.display = "none";
         }
 
         evalConflicts();
@@ -2150,6 +2176,12 @@
           document.getElementById("eventDate").value = item.date;
           document.getElementById("eventIsLeader").checked =
             item.isLeader || false;
+
+          // [추가] 이벤트 역할명 로드
+          const roleInput = document.getElementById("eventRoleName");
+          roleInput.value = item.eventRoleName || "";
+          roleInput.style.display = item.isLeader ? "block" : "none";
+
           let opts = Array.from(
             document.getElementById("eventName").options
           ).map((o) => o.value);
@@ -2445,9 +2477,12 @@
             bodyC += `${prefixC}${dTitleE} 참여해 ${kwText}. `;
           } else if (h.type === "event") {
             if (h.isLeader) {
-              bodyA += `${prefixA}${dTitle}에서 임원으로서 주도적으로 행사를 기획하고 통솔하며 ${kwText}. 탁월한 리더십을 증명함. `;
-              bodyB += `${prefixB}${dTitle}에서 리더의 역할을 맡아 솔선수범하여 급우들을 이끌고 ${kwText}. 뛰어난 역량을 보여줌. `;
-              bodyC += `${prefixC}${dTitle}에서 임원으로서 ${kwText}. `;
+              let eRoleA = attachJosa(h.eventRoleName || "임원", "으로서/로서");
+              let eRoleB = attachJosa(h.eventRoleName || "임원", "으로/로");
+
+              bodyA += `${prefixA}${dTitle}에서 ${eRoleA} 주도적으로 행사를 기획하고 통솔하며 ${kwText}. 탁월한 리더십을 증명함. `;
+              bodyB += `${prefixB}${dTitle}에서 ${eRoleB} 솔선수범하여 급우들을 이끌고 ${kwText}. 뛰어난 역량을 보여줌. `;
+              bodyC += `${prefixC}${dTitle}에서 ${eRoleA} ${kwText}. `;
             } else {
               bodyA += `${prefixA}${dTitleE} 적극적으로 참여하여 ${kwText}. 학급 단합에 기여함. `;
               bodyB += `${prefixB}${dTitleE} 주도적으로 임하여 ${kwText}. 긍정적 에너지를 발휘함. `;
@@ -2580,15 +2615,16 @@
         let bridgeTeacherText = "";
 
         if (manualCount > 0) {
-          let rawTeacherText = teacherSentences.join(" ");
-          let processed = bridgeEngine.process(rawTeacherText, false);
-          bridgeTeacherText = processed.bridge + processed.text;
+          // [치명적 오류 해결] 존재하지 않는 bridgeEngine 호출을 제거하고,
+          // 선생님이 입력한 텍스트를 그대로 보존하여 뒤에 안전하게 이어 붙입니다.
+          bridgeTeacherText = teacherSentences.join(" ");
           finalDraftToAppend =
             pureAiSentences.join(" ") + " " + bridgeTeacherText;
         } else {
           finalDraftToAppend = draftText;
         }
 
+        // 전체 문장 맞춤법/종결어미 1차 정제
         let correctedText = grammarEngine.convert(finalDraftToAppend);
         let currentText = preview.innerText;
         let b = getByteCount(currentText + " " + correctedText);
@@ -2610,11 +2646,11 @@
         finalHistoryStack.push({
           id: uniqueId,
           hashKey: tempContext.hashKey,
-          summary: tempContext.summary, // 키워드 스택 저장
+          summary: tempContext.summary, // 키워드 스택 저장 (태그 UI용)
           logIds: tempContext.logIds,
           freq: tempContext.freq,
           aiGeneratedText: tempContext.aiGeneratedText,
-          teacherText: bridgeTeacherText || teacherSentences.join(" "),
+          teacherText: bridgeTeacherText,
           len: correctedText.length,
           status: "active",
           needsUpgrade: false,
@@ -2623,6 +2659,7 @@
           tone: selectedDraftType,
         });
 
+        // 시간순(dateKey)으로 스택 정렬 및 프리뷰 재배치
         finalHistoryStack.sort((a, b) => a.dateKey - b.dateKey);
         finalHistoryStack.forEach((item) => {
           const node = document.getElementById(item.id);
@@ -2707,23 +2744,56 @@
         showToast("기록이 삭제되었습니다.");
       }
 
+      /* --- [V10.4 마스터] 초강력 팩트 중심 압축 엔진 --- */
       function safeCompress(text) {
         if (!text) return "";
         let c = text;
-        c = c.replace(/이러한 과정을 통해 /g, "");
-        c = c.replace(/더불어 /g, "");
-        c = c.replace(/또한 /g, "");
-        c = c.replace(/나아가 /g, "");
-        // 압축 시, 반복되는 서술어 템플릿 제거
-        c = c.replace(/ 이를 통해 공동체를 위한 책임감을 보여줌\./g, "");
-        c = c.replace(/ 이 과정에서 뛰어난 리더십을 증명함\./g, "");
-        c = c.replace(/ 이로써 타인을 배려하는 성숙한 태도를 함양함\./g, "");
-        c = c.replace(/ 나아가 공동체 시민으로서의 소양을 다짐\./g, "");
-        c = c.replace(/ 탁월한 리더십을 증명함\./g, "");
-        c = c.replace(/ 뛰어난 역량을 보여줌\./g, "");
-        c = c.replace(/ 학급 단합에 기여함\./g, "");
-        c = c.replace(/ 긍정적 에너지를 발휘함\./g, "");
-        return c;
+        const removals = [
+          /이러한 과정을 통해 /g,
+          /더불어 /g,
+          /또한 /g,
+          /나아가 /g,
+          /이와 함께 /g,
+          /특히 /g,
+          /그리고 /g,
+          /이어 /g,
+          /이에 /g,
+          /이를 바탕으로 /g,
+          /이러한 성실한 태도와 헌신을 바탕으로 /g,
+          /이전의 리더십 경험을 토대로 /g,
+          /임원으로서 헌신했던 앞선 경험을 바탕으로, /g,
+          /앞선 활동에서 보여준 역량을 인정받아 /g,
+          / 이를 통해 공동체를 위한 책임감을 보여줌\./g,
+          / 이 과정에서 뛰어난 리더십을 증명함\./g,
+          / 한층 발전된 책임감을 발휘함\./g,
+          / 탁월한 리더십으로 도약함\./g,
+          / 리더를 돕는 성숙한 팔로워십\(Followership\)을 보여줌\./g,
+          / 모범적인 협조적 태도를 증명함\./g,
+          / 이 과정에서 변함없는 헌신을 발휘함\./g,
+          / 학급을 이끄는 리더십을 증명함\./g,
+          / 발전된 책임감을 발휘함\./g,
+          / 탁월한 리더십을 증명함\./g,
+          / 이로써 타인을 배려하는 성숙한 태도를 함양함\./g,
+          / 나아가 공동체 시민으로서의 소양을 다짐\./g,
+          / 뛰어난 역량을 보여줌\./g,
+          / 학급 단합에 기여함\./g,
+          / 긍정적 에너지를 발휘함\./g,
+          /이러한 주도적 태도는 교내 활동에서도 빛을 발하여, /g,
+          /학급을 이끄는 한편, /g,
+        ];
+
+        removals.forEach((r) => (c = c.replace(r, "")));
+
+        c = c.replace(/ 적극 참여하여 /g, " 참여해 ");
+        c = c.replace(/ 적극적으로 참여하여 /g, " 참여해 ");
+        c = c.replace(
+          / 주도적으로 행사를 기획하고 통솔하며 /g,
+          " 행사를 주도하며 "
+        );
+        c = c.replace(/ 솔선수범하여 급우들을 이끌고 /g, " 급우들을 이끌며 ");
+        c = c.replace(/ 주도적으로 임하여 /g, " 참여해 ");
+
+        return c.trim();
       }
 
       function saveUndoState() {
@@ -2751,6 +2821,7 @@
         showToast("이전 상태로 복구되었습니다.");
       }
 
+      /* --- [V10.4 마스터] 전역 통합 다듬기 (압축률 극대화) --- */
       function checkIntegrity() {
         let activeItems = finalHistoryStack.filter(
           (i) => i.status !== "deleted"
@@ -2759,7 +2830,7 @@
 
         if (
           !confirm(
-            "⚠️ [주의]\n다듬기 실행 시 선생님이 직접 쓰신 문장은 100% 보존되며, 전체 데이터가 완벽한 하나의 자소서형 서사로 재조립됩니다.\n진행하시겠습니까?"
+            "⚠️ [주의]\n다듬기 실행 시 선생님이 직접 쓰신 문장은 100% 보존되며, 전체 데이터가 완벽한 하나의 자소서형 서사로 재조립 및 압축됩니다.\n진행하시겠습니까?"
           )
         )
           return;
@@ -2803,19 +2874,20 @@
         allLogIds = [...new Set(allLogIds)];
 
         let allTargets = studentHistory.filter((h) => allLogIds.includes(h.id));
-        if (allTargets.length === 0) {
-          alert("조립할 수 있는 기초 데이터가 없습니다.");
-          return;
-        }
+        if (allTargets.length === 0)
+          return alert("조립할 수 있는 기초 데이터가 없습니다.");
 
         let reassembled = assembleAutonomyVersions(allTargets);
         let dominantTone = activeItems[0].tone || "A";
         let newParts = reassembled.versions[dominantTone];
 
+        // [핵심] Intro와 Body를 모두 압축 엔진에 통과시키고 Outro(단순 꼬리말)는 과감히 삭제!
+        let mergedIntro = safeCompress(newParts.intro);
         let mergedBody = safeCompress(newParts.body);
+        let mergedOutro = "";
 
         let compressedAiText = grammarEngine.convert(
-          [newParts.intro, mergedBody, newParts.outro].join(" ")
+          [mergedIntro, mergedBody, mergedOutro].join(" ")
         );
         let testText = grammarEngine.convert(
           (compressedAiText + " " + finalTeacherText).replace(/\s{2,}/g, " ")
@@ -2829,127 +2901,7 @@
             "⚠️ 압축을 진행했음에도 용량이 1500 Byte를 초과합니다.\n우측 상단의 [↩️ 되돌리기] 버튼을 눌러 원상 복구한 뒤, 덜 중요한 활동을 삭제하시는 것을 권장합니다."
           );
         } else {
-          showToast("시간 정렬 및 자소서형 압축이 성공적으로 완료되었습니다!");
-        }
-
-        const preview = document.getElementById("finalPreview");
-        preview.innerHTML = "";
-        const uniqueId = "opt_" + Date.now();
-        const span = document.createElement("span");
-        span.className = "sentence-block";
-        span.id = uniqueId;
-        span.innerText = finalText;
-        preview.appendChild(span);
-
-        finalHistoryStack = [
-          {
-            id: uniqueId,
-            acts: reassembled.acts,
-            summary: reassembled.summary, // 압축 후에도 키워드 보존!
-            logIds: allLogIds,
-            parts: newParts,
-            aiGeneratedText: compressedAiText,
-            optimizedAiText: compressedAiText,
-            teacherText: finalTeacherText,
-            len: finalText.length,
-            status: "optimized",
-            manualCount: getSentences(finalTeacherText).length,
-            dateKey: reassembled.dateKey,
-            tone: dominantTone,
-          },
-        ];
-
-        renderInfoLayer();
-        updateByte();
-      }
-
-      /* --- [V10.1 궁극 마스터] 전역 메타데이터 기반 통합 다듬기 (데이터 보존) --- */
-      function checkIntegrity() {
-        let activeItems = finalHistoryStack.filter(
-          (i) => i.status !== "deleted"
-        );
-        if (activeItems.length === 0) return alert("다듬을 내용이 없습니다.");
-
-        if (
-          !confirm(
-            "⚠️ [주의]\n다듬기 실행 시 선생님이 직접 쓰신 문장은 100% 보존되며, 전체 데이터가 완벽한 하나의 자소서형 서사로 재조립됩니다.\n진행하시겠습니까?"
-          )
-        )
-          return;
-
-        saveUndoState();
-
-        let displayedSentences = getSentences(
-          document.getElementById("finalPreview").innerText
-        );
-        let knownSentences = [];
-        activeItems.forEach((i) => {
-          let baseText = i.optimizedAiText
-            ? i.optimizedAiText
-            : i.aiGeneratedText;
-          if (baseText)
-            knownSentences.push(
-              ...getSentences(grammarEngine.convert(baseText))
-            );
-          if (i.teacherText)
-            knownSentences.push(
-              ...getSentences(grammarEngine.convert(i.teacherText))
-            );
-        });
-
-        let newPreviewSentences = [];
-        displayedSentences.forEach((s) => {
-          if (s && !knownSentences.includes(s)) newPreviewSentences.push(s);
-        });
-
-        let allTeacherTexts = activeItems
-          .map((i) => i.teacherText)
-          .filter((t) => t);
-        if (newPreviewSentences.length > 0)
-          allTeacherTexts.push(newPreviewSentences.join(" "));
-        let finalTeacherText = allTeacherTexts.join(" ");
-
-        // [핵심 해결] 모든 로그 ID를 모아서 원본 데이터에서 완벽히 재조립
-        let allLogIds = [];
-        activeItems.forEach((i) => {
-          if (i.logIds) allLogIds.push(...i.logIds);
-        });
-        allLogIds = [...new Set(allLogIds)];
-
-        let allTargets = studentHistory.filter((h) => allLogIds.includes(h.id));
-
-        if (allTargets.length === 0) {
-          alert("조립할 수 있는 기초 데이터가 없습니다.");
-          return;
-        }
-
-        // 전체 데이터를 묶어서 한 번에 서사 생성 (연임/승급 브릿지 완벽 복구)
-        let reassembled = assembleAutonomyVersions(allTargets);
-
-        // 사용자가 선택했던 Tone 유지 (기본값 A)
-        let dominantTone = activeItems[0].tone || "A";
-        let newParts = reassembled.versions[dominantTone];
-
-        let mergedBody = safeCompress(newParts.body);
-
-        let compressedAiText = grammarEngine.convert(
-          [newParts.intro, mergedBody, newParts.outro].join(" ")
-        );
-        let testText = grammarEngine.convert(
-          (compressedAiText + " " + finalTeacherText).replace(/\s{2,}/g, " ")
-        );
-
-        let finalText = testText;
-        let finalByte = getByteCount(testText);
-
-        if (finalByte > 1500) {
-          alert(
-            "⚠️ 압축을 진행했음에도 용량이 1500 Byte를 초과합니다.\n우측 상단의 [↩️ 되돌리기] 버튼을 눌러 원상 복구한 뒤, 덜 중요한 활동을 삭제하시는 것을 권장합니다."
-          );
-        } else {
-          showToast(
-            "완벽한 시간 정렬 및 자소서형 압축이 성공적으로 완료되었습니다!"
-          );
+          showToast("초고밀도 자소서형 압축이 성공적으로 완료되었습니다!");
         }
 
         const preview = document.getElementById("finalPreview");
@@ -3000,9 +2952,11 @@
         document.getElementById("byteCount").style.color =
           getByteCount(text) > 1500 ? "red" : "#1f4ddc";
       }
+
       function finalApply() {
         alert("NEIS 입력 완료");
       }
+
       function showToast(m) {
         const t = document.getElementById("toast");
         t.textContent = m;
