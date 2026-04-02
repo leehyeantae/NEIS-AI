@@ -2523,9 +2523,11 @@
           aiGeneratedText: "",
         };
 
-        document.querySelectorAll(".draft-tab").forEach((t) => {
-          if (t.innerText.includes(selectedDraftType)) t.click();
-        });
+        // [오류 해결] 탭의 텍스트가 아닌, 선택된 타입(A, B, C)의 인덱스를 찾아 강제 클릭하도록 수정
+        let tabIndex =
+          selectedDraftType === "A" ? 0 : selectedDraftType === "B" ? 1 : 2;
+        document.querySelectorAll(".draft-tab")[tabIndex].click();
+
         showToast("자소서형 공동체 서사가 생성되었습니다.");
       }
 
