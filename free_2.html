@@ -2385,13 +2385,15 @@
             introB = `${c1.date} ${r1Role} ${kw1Text}. ${c2.date}에도 연임하여 ${kw2Text}. 학급을 이끄는 리더십을 증명함. `;
             introC = `${c1.date} ${r1Role} ${kw1Text}. ${c2.date} 연임하여 ${kw2Text}. `;
           } else if (score1 < score2) {
-            introA = `${c1.date} ${r1Role} ${kw1Text}. 성실함을 인정받아 ${c2.date} ${r2Ro} 선출되어 ${kw2Text}. 발전된 책임감을 발휘함. `;
-            introB = `${c1.date} ${r1Role} ${kw1Text}. 헌신을 바탕으로 ${c2.date} ${r2Ro} 선출되어 ${kw2Text}. 탁월한 리더십을 증명함. `;
-            introC = `${c1.date} ${r1Role} ${kw1Text}. ${c2.date} ${r2Ro} 선출되어 ${kw2Text}. `;
+            // [승급] 더 높은 직책으로 올라갈 때 (예: 학급 구성원 -> 반장)
+            introA = `${c1.date} ${r1Role} ${kw1Text}. 이러한 성실한 태도와 헌신을 바탕으로 ${c2.date}에는 ${r2Ro} 선출되어 ${kw2Text}. 한층 발전된 책임감을 발휘함. `;
+            introB = `${c1.date} ${r1Role} ${kw1Text}. 앞선 활동에서 보여준 역량을 인정받아 ${c2.date} ${r2Ro} 선출되어 ${kw2Text}. 탁월한 리더십으로 도약함. `;
+            introC = `${c1.date} ${r1Role} ${kw1Text}. 이를 바탕으로 ${c2.date} ${r2Ro} 선출되어 ${kw2Text}. `;
           } else {
-            introA = `${c1.date} ${r1Role} ${kw1Text}. ${c2.date}에는 ${r2Role} ${kw2Text}. 리더를 돕는 성숙한 팔로워십을 보여줌. `;
-            introB = `${c1.date} ${r1Role} ${kw1Text}. ${c2.date}에는 ${r2Role} ${kw2Text}. 든든하게 뒷받침함. `;
-            introC = `${c1.date} ${r1Role} ${kw1Text}. ${c2.date} ${r2Role} ${kw2Text}. `;
+            // [강등/팔로워십] 일반 직책으로 내려올 때 (예: 반장 -> 학급 구성원)
+            introA = `${c1.date} ${r1Role} ${kw1Text}. 임원으로서 헌신했던 앞선 경험을 바탕으로, ${c2.date}에는 ${r2Role} 급우들과 적극적으로 협력하며 ${kw2Text}. 리더를 돕는 성숙한 조력자 역할을 함. `;
+            introB = `${c1.date} ${r1Role} ${kw1Text}. 이전의 리더십 경험을 토대로 ${c2.date}에는 ${r2Role} 팀원으로서 든든하게 뒷받침하며 ${kw2Text}. 모범적인 협조적 태도를 증명함. `;
+            introC = `${c1.date} ${r1Role} ${kw1Text}. 이어 ${c2.date} ${r2Role} ${kw2Text}. `;
           }
           summaryData[`${c1.date} ${r1}`] = c1.keywords;
           summaryData[`${c2.date} ${r2}`] = c2.keywords;
