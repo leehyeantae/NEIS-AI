@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>동아리활동 관리 시스템</title>
+    <title>동아리활동 관리 시스템 (V9.3.1 Master)</title>
     <style>
       /* --- [스크롤 및 레이아웃 최적화] --- */
       * {
@@ -493,7 +493,7 @@
     </div>
 
     <div id="toast">알림</div>
-    <div class="topbar">동아리활동 관리 시스템</div>
+    <div class="topbar">동아리활동 관리 시스템 (V9.3.1 Master)</div>
 
     <div class="container">
       <section class="left">
@@ -1833,11 +1833,32 @@
               blockSummary.push(`${actName}(${count})`);
             } else {
               const topicEul = attachJosa(first.topic, "을/를");
-              let pContent = first.content.trim() || "유의미한 결과물";
+              let pContent = first.content.trim();
 
-              bBodyA += `${topicEul} 주제로 심화 프로젝트를 ${freqAdverb}진행하여 ${pContent}를 논리적으로 도출함. `;
-              bBodyB += `${topicEul} 주제로 미디어 프로젝트를 주도하여 ${pContent}를 성공적으로 완성함. `;
-              bBodyC += `${topicEul} 프로젝트를 통해 ${pContent}를 도출함. `;
+              if (!pContent) {
+                bBodyA += `${topicEul} 주제로 심화 프로젝트를 ${freqAdverb}진행하여 유의미한 결과물을 논리적으로 도출함. `;
+                bBodyB += `${topicEul} 주제로 미디어 프로젝트를 주도하여 유의미한 결과물을 성공적으로 완성함. `;
+                bBodyC += `${topicEul} 프로젝트를 통해 유의미한 결과물을 도출함. `;
+              } else {
+                // [스마트 문장 감별] 단어인지, 완성된 문장인지 파악
+                let isFullSentence =
+                  /[.!?]$/.test(pContent) ||
+                  /(함|음|다|임|됨|줌|기)$/.test(pContent);
+
+                if (isFullSentence) {
+                  // 문장형: 템플릿을 강제로 붙이지 않고 독립된 문장으로 자연스럽게 이어줌
+                  let convertedContent = grammarEngine.convert(pContent);
+                  bBodyA += `${topicEul} 주제로 심화 프로젝트를 ${freqAdverb}진행함. ${convertedContent} `;
+                  bBodyB += `${topicEul} 주제로 미디어 프로젝트를 주도함. ${convertedContent} `;
+                  bBodyC += `${topicEul} 프로젝트를 진행함. ${convertedContent} `;
+                } else {
+                  // 단어형: 자연스럽게 조사를 붙여 템플릿에 결합
+                  let pContentEul = attachJosa(pContent, "을/를");
+                  bBodyA += `${topicEul} 주제로 심화 프로젝트를 ${freqAdverb}진행하여 ${pContentEul} 논리적으로 도출함. `;
+                  bBodyB += `${topicEul} 주제로 미디어 프로젝트를 주도하여 ${pContentEul} 성공적으로 완성함. `;
+                  bBodyC += `${topicEul} 프로젝트를 통해 ${pContentEul} 도출함. `;
+                }
+              }
               blockSummary.push(`[P]${first.topic}(${count})`);
             }
           }
