@@ -631,7 +631,7 @@
               <span id="byteCount" style="color: #1f4ddc; font-weight: 700"
                 >0</span
               >
-              / 1500 Byte
+              / 2100 Byte
             </div>
           </div>
 
@@ -2643,9 +2643,9 @@
         let currentText = preview.innerText;
         let b = getByteCount(currentText + " " + correctedText);
 
-        if (b > 1500) {
+        if (b > 2100) {
           alert(
-            "⚠️ 추가 후 총 용량이 1500 Byte를 초과합니다.\n우측의 [AI 안전 다듬기] 버튼을 눌러 내용을 최적화해 주세요."
+            "⚠️ 추가 후 총 용량이 2100 Byte를 초과합니다.\n우측의 [AI 안전 다듬기] 버튼을 눌러 내용을 최적화해 주세요."
           );
         }
 
@@ -2865,9 +2865,9 @@
         let finalText = testText;
         let finalByte = getByteCount(testText);
 
-        if (finalByte > 1500) {
+        if (finalByte > 2100) {
           alert(
-            "⚠️ 압축을 진행했음에도 용량이 1500 Byte를 초과합니다.\n우측 상단의 [↩️ 되돌리기] 버튼을 눌러 원상 복구한 뒤, 덜 중요한 활동 1~2개를 과감히 삭제하시는 것을 권장합니다."
+            "⚠️ 압축을 진행했음에도 용량이 2100 Byte를 초과합니다.\n우측 상단의 [↩️ 되돌리기] 버튼을 눌러 원상 복구한 뒤, 덜 중요한 활동 1~2개를 과감히 삭제하시는 것을 권장합니다."
           );
         } else {
           showToast(
@@ -2923,7 +2923,7 @@
         document.getElementById("charNum").innerText = text.length;
         document.getElementById("byteCount").innerText = getByteCount(text);
         document.getElementById("byteCount").style.color =
-          getByteCount(text) > 1500 ? "red" : "#1f4ddc";
+          getByteCount(text) > 2100 ? "red" : "#1f4ddc";
       }
       function finalApply() {
         alert("NEIS 입력 완료");
