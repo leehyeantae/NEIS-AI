@@ -2403,7 +2403,51 @@
           let cleanContent = item.content
             ? item.content.trim().replace(/\.+$/, "")
             : "";
-          let isSentence = /(다|함|음|고|며|어|아|지)$/.test(cleanContent); // 문장 종결 어미 감지
+
+          // 🌟 [V10.6 완벽 방어막] 수기 입력(활동 사례) 스마트 감별
+          let isSentence = false;
+          let words = cleanContent.split(/\s+/);
+          let lastWord = words[words.length - 1] || "";
+
+          const nounExceptions = [
+            "게임",
+            "책임",
+            "모임",
+            "계산기",
+            "프로그램",
+            "어플리케이션",
+            "앱",
+            "웹",
+            "시스템",
+            "데이터",
+            "코드",
+            "결과물",
+            "기획안",
+            "보고서",
+            "프로젝트",
+            "플랫폼",
+            "서비스",
+            "솔루션",
+          ];
+          let isExceptionNoun = nounExceptions.some((n) =>
+            lastWord.endsWith(n)
+          );
+
+          if (!isExceptionNoun && lastWord) {
+            if (
+              /(다|요|함|음|됨|줌|냄|봄|짐|끎|듦|씀|킴|낌|김|임)$/.test(
+                lastWord
+              )
+            ) {
+              isSentence = true;
+            } else if (
+              /(하|되|시키|만들|보|주|가|오|쓰|읽|듣|얻|찾|느끼|배우|이끌)기$/.test(
+                lastWord
+              )
+            ) {
+              isSentence = true;
+            }
+          }
 
           if (item.subType === "test") {
             bodyA += `${item.topic} 결과 ${item.r1}, ${item.r2}, ${item.r3} 성향이 두드러짐을 확인하고 자신의 강점을 객관적으로 분석함. `;
@@ -2411,61 +2455,41 @@
             bodyC += `${item.topic}에서 ${item.r1}, ${item.r2}, ${item.r3} 성향을 확인함. `;
           } else if (item.subType === "counsel") {
             if (isSentence) {
-              let converted = "";
-              // [수정된 부분] 3가지 케이스로 정밀하게 나누어 처리
-              if (cleanContent.endsWith("다")) {
-                converted = cleanContent.slice(0, -1) + "다는 점을 확인하고,";
-              } else if (/(함|음)$/.test(cleanContent)) {
-                converted = cleanContent + " 등 진로에 대한 깊은 고민을 나누며";
-              } else {
-                converted =
-                  cleanContent +
-                  ", 이를 바탕으로 진로에 대한 깊은 고민을 나누며";
-              }
-
-              bodyA += `진로 상담 과정에서 ${converted} 체계적인 진로 로드맵을 설계함. `;
-              bodyB += `진로 상담에 적극적으로 임하여 ${converted} 긍정적인 태도로 진로를 개척함. `;
-              bodyC += `진로 상담을 통해 ${
-                cleanContent.endsWith("다")
-                  ? cleanContent.slice(0, -1) + "다는 점을"
-                  : cleanContent
-              } 논의함. `;
+              // 문장형: 억지 연결을 끊고 독립 문장으로 브릿지
+              let converted = grammarEngine.convert(cleanContent + ".");
+              bodyA += `진로 상담 과정에서 자신의 진로에 대해 심층적으로 논의함. ${converted} 이를 바탕으로 체계적인 진로 로드맵을 설계함. `;
+              bodyB += `진로 상담에 적극적으로 임함. ${converted} 조언을 수용하고 긍정적인 태도로 진로를 개척함. `;
+              bodyC += `진로 상담을 진행함. ${converted} `;
             } else {
+              // 단어형: 자연스럽게 조사 '에'를 붙임
               bodyA += `진로 상담을 통해 ${cleanContent}에 대해 심도 있게 분석하고 체계적인 진로 로드맵을 설계함. `;
-              bodyB += `진로 상담에 적극적으로 임하며 ${cleanContent}에 대한 조언을 수용하고 긍정적인 태도로 진로를 개척함. `;
-              bodyC += `진로 상담을 통해 ${cleanContent}에 대해 논의함. `;
+              bodyB += `진로 상담에 적극적으로 임하며 ${cleanContent}에 관한 조언을 수용하고 진로를 개척함. `;
+              bodyC += `진로 상담을 통해 ${cleanContent} 관련 논의함. `;
             }
           } else if (item.subType === "lecture") {
             if (isSentence) {
-              let converted = cleanContent.endsWith("다")
-                ? cleanContent.slice(0, -1) + "다는 점을"
-                : cleanContent + " 등 다양한 사실을";
-              bodyA += `${topicEul} 주제로 한 특강에서 ${converted} 깨닫고 비판적으로 수용하며 전공 분야의 지식 기반을 탄탄히 다짐. `;
-              bodyB += `${topicEul} 주제로 한 특강을 경청하고 ${converted} 깊이 이해하며 전공에 대한 확고한 의지와 열의를 보임. `;
-              bodyC += `${topicEul} 주제로 한 특강을 듣고 ${converted} 학습함. `;
+              let converted = grammarEngine.convert(cleanContent + ".");
+              bodyA += `${topicEul} 주제로 한 특강을 경청함. ${converted} 배운 내용을 비판적으로 수용하며 전공 분야의 지식 기반을 탄탄히 다짐. `;
+              bodyB += `${topicEul} 주제로 한 특강에 참여함. ${converted} 이를 깊이 이해하며 전공에 대한 확고한 의지를 보임. `;
+              bodyC += `${topicEul} 특강을 수강함. ${converted} `;
             } else {
               let contentEul = attachJosa(cleanContent, "을/를");
-              bodyA += `${topicEul} 주제로 한 특강에서 ${contentEul} 비판적으로 수용하며 전공 분야의 지식 기반을 탄탄히 다짐. `;
-              bodyB += `${topicEul} 주제로 한 특강을 경청하고 ${contentEul} 학습하며 전공에 대한 확고한 의지와 열의를 보임. `;
-              bodyC += `${topicEul} 주제로 한 특강을 듣고 ${contentEul} 학습함. `;
+              bodyA += `${topicEul} 주제로 한 특강에서 ${contentEul} 학습하고 비판적으로 수용하며 전공 분야의 지식 기반을 탄탄히 다짐. `;
+              bodyB += `${topicEul} 주제로 한 특강을 경청하며 ${contentEul} 깊이 이해하고 전공에 대한 확고한 의지를 보임. `;
+              bodyC += `${topicEul} 특강에서 ${contentEul} 학습함. `;
             }
           } else {
             // 전공 심화 탐구(activity)
             if (isSentence) {
-              let converted = cleanContent.endsWith("다")
-                ? cleanContent.slice(0, -1) + "다는 결론을 도출하는 등"
-                : cleanContent + " 등";
-              bodyA += `${topicEul} 중심으로 탐구 활동을 수행하여 ${converted} 전공과 관련된 심층적인 분석력을 증명함. `;
-              bodyB += `${topicEul} 중심으로 자기주도적 탐구를 수행하여 ${converted} 앎의 지평을 넓히는 실천력을 보임. `;
-              bodyC += `${topicEul} 탐구하며 ${
-                cleanContent.endsWith("다")
-                  ? cleanContent.slice(0, -1) + "다는"
-                  : cleanContent
-              } 점을 확인함. `;
+              let converted = grammarEngine.convert(cleanContent + ".");
+              bodyA += `${topicEul} 중심으로 심화 탐구 활동을 수행함. ${converted} 이 과정을 통해 전공과 관련된 심층적인 분석력을 증명함. `;
+              bodyB += `${topicEul} 중심으로 자기주도적 탐구를 수행함. ${converted} 앎의 지평을 넓히는 뛰어난 실천력을 보임. `;
+              bodyC += `${topicEul} 탐구를 수행함. ${converted} `;
             } else {
-              bodyA += `${topicEul} 중심으로 탐구 활동을 수행하며 ${cleanContent} 등 전공과 관련된 심층적인 분석력과 논리력을 증명함. `;
-              bodyB += `${topicEul} 중심으로 자기주도적 탐구를 수행하여 ${cleanContent} 등 앎의 지평을 넓히는 뛰어난 실천력을 보임. `;
-              bodyC += `${topicEul} 탐구하며 ${cleanContent} 등 전공 적합성을 보임. `;
+              let contentEul = attachJosa(cleanContent, "을/를");
+              bodyA += `${topicEul} 중심으로 심화 탐구 활동을 수행하여 ${contentEul} 도출하는 등 전공과 관련된 심층적인 분석력을 증명함. `;
+              bodyB += `${topicEul} 중심으로 자기주도적 탐구를 진행하여 ${contentEul} 성공적으로 탐색하는 실천력을 보임. `;
+              bodyC += `${topicEul} 탐구를 통해 ${contentEul} 확인함. `;
             }
           }
         });
